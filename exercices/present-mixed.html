@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Present Simple ou Present Continuous ? </h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+  { fr: "Je mange des pâtes là.", en: "I'm eating pasta right now." },
+  { fr: "Je mange des pâtes tous les dimanches.", en: "I eat pasta every Sunday." },
+  { fr: "Elle boit un café maintenant.", en: "She's drinking a coffee now." },
+  { fr: "Elle boit toujours du café le matin.", en: "She always drinks coffee in the morning." },
+  { fr: "On regarde un film en ce moment.", en: "We're watching a movie at the moment." },
+  { fr: "On regarde souvent des films.", en: "We often watch films." },
+  { fr: "Il parle au téléphone là.", en: "He's talking on the phone right now." },
+  { fr: "Il parle souvent avec ses amis.", en: "He often talks with his friends." },
+  { fr: "Ils mangent dehors en ce moment.", en: "They're eating outside at the moment." },
+  { fr: "Ils mangent dehors tous les vendredis.", en: "They eat outside every Friday." },
+
+  { fr: "Je travaille là.", en: "I'm working right now." },
+  { fr: "Je travaille tous les jours.", en: "I work every day." },
+  { fr: "Elle lit un livre maintenant.", en: "She's reading a book now." },
+  { fr: "Elle lit souvent le soir.", en: "She often reads in the evening." },
+  { fr: "On écoute de la musique là.", en: "We're listening to music right now." },
+  { fr: "On écoute souvent de la musique.", en: "We often listen to music." },
+  { fr: "Il écrit un message maintenant.", en: "He's writing a message now." },
+  { fr: "Il écrit rarement.", en: "He rarely writes." },
+  { fr: "Ils regardent la télé là.", en: "They're watching TV right now." },
+  { fr: "Ils regardent toujours la télé le soir.", en: "They always watch TV in the evening." },
+
+  { fr: "Je marche dans la rue là.", en: "I'm walking in the street right now." },
+  { fr: "Je marche souvent après le travail.", en: "I often walk after work." },
+  { fr: "Elle travaille sur son projet en ce moment.", en: "She's working on her project at the moment." },
+  { fr: "Elle travaille dans une banque.", en: "She works in a bank." },
+  { fr: "On attend.", en: "We're waiting." },
+  { fr: "On attend toujours longtemps ici.", en: "We always wait a long time here." },
+  { fr: "Il mange là.", en: "He's eating right now." },
+  { fr: "Il mange toujours à midi.", en: "He always eats at noon." },
+  { fr: "Ils parlent ensemble en ce moment.", en: "They're talking together at the moment." },
+  { fr: "Ils parlent souvent ensemble.", en: "They often talk together." },
+
+  { fr: "Je ne travaille pas aujourd'hui.", en: "I'm not working today." },
+  { fr: "Je ne travaille jamais le dimanche.", en: "I never work on Sundays." },
+  { fr: "Elle n'est pas en train de parler.", en: "She's not talking." },
+  { fr: "Elle ne parle jamais en classe.", en: "She never speaks in class." },
+  { fr: "On ne regarde pas ça maintenant.", en: "We're not watching that now." },
+  { fr: "On ne regarde jamais ça.", en: "We never watch that." },
+  { fr: "Il ne mange pas là.", en: "He's not eating." },
+  { fr: "Il ne mange jamais ça.", en: "He never eats that." },
+  { fr: "Ils ne jouent pas là.", en: "They're not playing." },
+  { fr: "Ils ne jouent jamais ensemble.", en: "They never play together." },
+
+  { fr: "Qu'est-ce que tu fais là ?", en: "What are you doing?" },
+  { fr: "Qu'est-ce que tu fais tous les jours ?", en: "What do you do every day?" },
+  { fr: "Pourquoi est-ce qu'elle pleure maintenant ?", en: "Why is she crying now?" },
+  { fr: "Pourquoi est-ce qu'elle pleure souvent ?", en: "Why does she often cry?" },
+  { fr: "Où est-ce qu'ils vont là ?", en: "Where are they going?" },
+  { fr: "Où est-ce qu'ils vont tous les week-ends ?", en: "Where do they go every weekend?" },
+  { fr: "Tu travailles là ?", en: "Are you working?" },
+  { fr: "Tu travailles souvent ?", en: "Do you often work?" },
+  { fr: "Il parle là ?", en: "Is he talking?" },
+  { fr: "Il parle souvent ?", en: "Does he often talk?" },
+
+  // ---- un peu plus avancé ----
+
+  { fr: "Je suis en train de manger des spaghettis.", en: "I'm eating spaghetti." },
+  { fr: "Je mange souvent des spaghettis.", en: "I often eat spaghetti." },
+  { fr: "Elle est en train de chercher ses clés.", en: "She's looking for her keys." },
+  { fr: "Elle cherche toujours ses clés.", en: "She always looks for her keys." },
+  { fr: "On est en train de préparer le dîner.", en: "We're preparing dinner." },
+  { fr: "On prépare toujours le dîner ensemble.", en: "We always prepare dinner together." },
+  { fr: "Il est en train de regarder ce que tu fais.", en: "He's watching what you're doing." },
+  { fr: "Il regarde souvent ce que tu fais.", en: "He often watches what you do." },
+  { fr: "Ils sont en train de travailler sur quelque chose.", en: "They're working on something." },
+  { fr: "Ils travaillent souvent ensemble.", en: "They often work together." },
+
+  { fr: "Je ne suis pas en train d'écouter.", en: "I'm not listening." },
+  { fr: "Je n'écoute jamais ça.", en: "I never listen to that." },
+  { fr: "Elle n'est pas en train de venir.", en: "She's not coming." },
+  { fr: "Elle ne vient jamais ici.", en: "She never comes here." },
+  { fr: "On n'est pas en train de parler.", en: "We're not talking." },
+  { fr: "On ne parle jamais de ça.", en: "We never talk about that." },
+  { fr: "Il n'est pas en train de répondre.", en: "He's not answering." },
+  { fr: "Il ne répond jamais.", en: "He never answers." },
+  { fr: "Ils ne sont pas en train de regarder.", en: "They're not watching." },
+  { fr: "Ils ne regardent jamais ça.", en: "They never watch that." },
+
+  { fr: "Qu'est-ce que tu es en train de manger ?", en: "What are you eating?" },
+  { fr: "Qu'est-ce que tu manges souvent ?", en: "What do you often eat?" },
+  { fr: "Pourquoi est-ce que tu attends là ?", en: "Why are you waiting?" },
+  { fr: "Pourquoi est-ce que tu attends toujours ?", en: "Why do you always wait?" },
+  { fr: "Où est-ce qu'elle est en train d'aller ?", en: "Where is she going?" },
+  { fr: "Où est-ce qu'elle va d'habitude ?", en: "Where does she usually go?" },
+  { fr: "Est-ce qu'ils sont en train de travailler ?", en: "Are they working?" },
+  { fr: "Est-ce qu'ils travaillent souvent ?", en: "Do they often work?" },
+  { fr: "Est-ce que tu es en train d'écouter ?", en: "Are you listening?" },
+  { fr: "Est-ce que tu écoutes souvent ?", en: "Do you often listen?" },
+  { fr: "Je mange une pomme maintenant.", en: "I'm eating an apple now." },
+  { fr: "Je mange une pomme tous les matins.", en: "I eat an apple every morning." },
+  { fr: "Elle écrit un message là.", en: "She's writing a message right now." },
+  { fr: "Elle écrit souvent à ses amis.", en: "She often writes to her friends." },
+  { fr: "On parle ensemble en ce moment.", en: "We're talking together at the moment." },
+  { fr: "On parle souvent ensemble.", en: "We often talk together." },
+  { fr: "Il écoute de la musique maintenant.", en: "He's listening to music now." },
+  { fr: "Il écoute toujours de la musique en travaillant.", en: "He always listens to music while working." },
+  { fr: "Ils regardent une vidéo là.", en: "They're watching a video right now." },
+  { fr: "Ils regardent souvent des vidéos.", en: "They often watch videos." },
+
+  { fr: "Je ne lis pas là.", en: "I'm not reading right now." },
+  { fr: "Je ne lis jamais ce genre de livre.", en: "I never read that kind of book." },
+  { fr: "Elle ne travaille pas maintenant.", en: "She's not working now." },
+  { fr: "Elle ne travaille jamais le week-end.", en: "She never works on weekends." },
+  { fr: "On ne mange pas là.", en: "We're not eating right now." },
+  { fr: "On ne mange jamais ici.", en: "We never eat here." },
+  { fr: "Il ne parle pas maintenant.", en: "He's not talking now." },
+  { fr: "Il ne parle jamais en réunion.", en: "He never speaks in meetings." },
+  { fr: "Ils ne jouent pas là.", en: "They're not playing right now." },
+  { fr: "Ils ne jouent jamais dehors.", en: "They never play outside." },
+
+  { fr: "Est-ce que tu manges là ?", en: "Are you eating?" },
+  { fr: "Est-ce que tu manges souvent ici ?", en: "Do you often eat here?" },
+  { fr: "Est-ce qu'elle travaille maintenant ?", en: "Is she working now?" },
+  { fr: "Est-ce qu'elle travaille souvent ?", en: "Does she often work?" },
+  { fr: "Est-ce qu'on regarde ça maintenant ?", en: "Are we watching that now?" },
+  { fr: "Est-ce qu'on regarde souvent ça ?", en: "Do we often watch that?" },
+  { fr: "Est-ce qu'il écoute là ?", en: "Is he listening?" },
+  { fr: "Est-ce qu'il écoute souvent ?", en: "Does he often listen?" },
+  { fr: "Est-ce qu'ils jouent là ?", en: "Are they playing?" },
+  { fr: "Est-ce qu'ils jouent souvent ?", en: "Do they often play?" },
+
+  { fr: "Qu'est-ce que tu regardes là ?", en: "What are you watching?" },
+  { fr: "Qu'est-ce que tu regardes souvent ?", en: "What do you often watch?" },
+  { fr: "Pourquoi est-ce qu'elle parle là ?", en: "Why is she talking?" },
+  { fr: "Pourquoi est-ce qu'elle parle toujours ?", en: "Why does she always talk?" },
+  { fr: "Où est-ce qu'ils vont là ?", en: "Where are they going?" },
+  { fr: "Où est-ce qu'ils vont d'habitude ?", en: "Where do they usually go?" },
+  { fr: "Avec qui est-ce que tu parles là ?", en: "Who are you talking to?" },
+  { fr: "Avec qui est-ce que tu parles souvent ?", en: "Who do you often talk to?" },
+  { fr: "Comment est-ce qu'il fait ça là ?", en: "How is he doing that?" },
+  { fr: "Comment est-ce qu'il fait ça d'habitude ?", en: "How does he usually do that?" },
+
+  { fr: "Je suis en train de cuisiner.", en: "I'm cooking." },
+  { fr: "Je cuisine souvent le soir.", en: "I often cook in the evening." },
+  { fr: "Elle est en train de nettoyer.", en: "She's cleaning." },
+  { fr: "Elle nettoie toujours après manger.", en: "She always cleans after eating." },
+  { fr: "On est en train de travailler ensemble.", en: "We're working together." },
+  { fr: "On travaille souvent ensemble.", en: "We often work together." },
+  { fr: "Il est en train de réparer la voiture.", en: "He's fixing the car." },
+  { fr: "Il répare souvent des voitures.", en: "He often fixes cars." },
+  { fr: "Ils sont en train de préparer le dîner.", en: "They're preparing dinner." },
+  { fr: "Ils préparent toujours le dîner.", en: "They always prepare dinner." },
+
+  { fr: "Je ne suis pas en train de cuisiner.", en: "I'm not cooking." },
+  { fr: "Je ne cuisine jamais.", en: "I never cook." },
+  { fr: "Elle n'est pas en train de nettoyer.", en: "She's not cleaning." },
+  { fr: "Elle ne nettoie jamais.", en: "She never cleans." },
+  { fr: "On n'est pas en train de travailler.", en: "We're not working." },
+  { fr: "On ne travaille jamais ici.", en: "We never work here." },
+  { fr: "Il n'est pas en train de réparer.", en: "He's not fixing." },
+  { fr: "Il ne répare jamais ça.", en: "He never fixes that." },
+  { fr: "Ils ne sont pas en train de préparer.", en: "They're not preparing." },
+  { fr: "Ils ne préparent jamais ça.", en: "They never prepare that." },
+
+  { fr: "Qu'est-ce que tu es en train de cuisiner ?", en: "What are you cooking?" },
+  { fr: "Qu'est-ce que tu cuisines souvent ?", en: "What do you often cook?" },
+  { fr: "Pourquoi est-ce qu'elle nettoie là ?", en: "Why is she cleaning?" },
+  { fr: "Pourquoi est-ce qu'elle nettoie toujours ?", en: "Why does she always clean?" },
+  { fr: "Où est-ce qu'on travaille là ?", en: "Where are we working?" },
+  { fr: "Où est-ce qu'on travaille d'habitude ?", en: "Where do we usually work?" },
+  { fr: "Est-ce qu'il est en train de réparer ?", en: "Is he fixing it?" },
+  { fr: "Est-ce qu'il répare souvent ça ?", en: "Does he often fix that?" },
+  { fr: "Est-ce qu'ils sont en train de préparer ?", en: "Are they preparing?" },
+  { fr: "Est-ce qu'ils préparent souvent ça ?", en: "Do they often prepare that?" }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>

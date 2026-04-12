@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>English Grammar Lab</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  //last
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="#about">À propos</a>
+        <a href="#categories">Exercices</a>
+        <a href="#levels">Niveaux</a>
+        <a href="#contact">Contact</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-content">
+        <div class="hero-text">
+          <p class="eyebrow">Faire de l'anglais un réflexe</p>
+          <h1>Des exercices de grammaire clairs et progressifs</h1>
+          <p class="hero-description">
+            Entraîne-toi sur les temps, les articles, les prépositions,
+            les questions, les négations et bien plus encore, avec des
+            exercices pour progresser étape par étape.
+          </p>
+
+          <div class="hero-buttons">
+            <a href="#categories" class="btn btn-primary">Commencer</a>
+            <a href="#about" class="btn btn-secondary">Découvrir le site</a>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <h2>Exercices populaires</h2>
+          <ul>
+            <li>Present Simple vs Present Continuous</li>
+            <li>Articles : a / an / the / Ø</li>
+            <li>Prépositions : in / on / at</li>
+            <li>Questions et formes négatives</li>
+            <li>Adjectifs, adverbes et ordre des mots</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="section-label">À propos</p>
+          <h2>Un site conçu pour pratiquer, pas seulement lire des règles</h2>
+          <p>
+            L’objectif est simple : rendre la grammaire anglaise réflexive
+            grâce à des exercices basé sur la répétition.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <h3>Progressif</h3>
+            <p>
+              Des notions de base jusqu’aux points plus subtils, avec une vraie
+              montée en difficulté.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <h3>Pratique</h3>
+            <p>
+              Chaque partie du site est orientée vers l’entraînement concret :
+              quiz, phrases à compléter, corrections.
+            </p>
+          </article>
+
+          <article class="feature-card">
+            <h3>Motivant</h3>
+            <p>
+              Une interface simple et agréable pour donner envie de revenir
+              travailler régulièrement.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="categories" class="section section-alt">
+      <div class="container">
+        <div class="section-heading">
+          <p class="section-label">Exercices</p>
+          <h2>Choisis une catégorie</h2>
+        </div>
+
+        <div class="cards-grid">
+          <a href="categories/tenses.html" class="exercise-card">
+            <h3>Les temps</h3>
+            <p>Present simple, present continuous, past simple, present perfect...</p>
+          </a>
+
+          <a href="exercices/articles.html" class="exercise-card">
+            <h3>Les articles</h3>
+            <p>Maîtriser a, an, the et le zéro article.</p>
+          </a>
+
+          <a href="categories/prepositions.html" class="exercise-card">
+            <h3>Les prépositions</h3>
+            <p>in, on, at, under, above, between, during...</p>
+          </a>
+          
+          <!-- <a href="#" class="exercise-card">
+            <h3>Questions & négations</h3>
+            <p>Former correctement les phrases affirmatives, négatives et interrogatives.</p>
+          </a>
+          
+          <a href="#" class="exercise-card">
+            <h3>Pronoms & déterminants</h3>
+            <p>Subject pronouns, possessives, demonstratives, quantifiers...</p>
+          </a>
+          
+          <a href="#" class="exercise-card">
+            <h3>Structures avancées</h3>
+            <p>Comparatifs, modaux, conditionnels, voix passive et plus.</p>
+          </a> -->
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container cta-box">
+        <div>
+          <p class="section-label">Prêt à commencer ?</p>
+          <h2>Choisis un thème et lance ton premier exercice</h2>
+        </div>
+        <a href="#categories" class="btn btn-primary">Voir les exercices</a>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact" class="site-footer">
+    <div class="container footer-content">
+      <p>© 2026 English Grammar Lab</p>
+      <p>Site d’exercices d’anglais et de grammaire</p>
+      <p>INAHO Selim</p>
+    </div>
+  </footer>
+
+  <script src="theme.js"></script>
+</body>
+</html>

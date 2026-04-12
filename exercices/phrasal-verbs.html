@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au Verbes à particules</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+      // TAKE OFF
+
+      // remove clothes
+      { fr: "Il enlève sa veste.", en: "He takes off his jacket." },
+      { fr: "Elle enlève ses chaussures.", en: "She takes off her shoes." },
+
+      // plane
+      { fr: "L'avion décolle.", en: "The plane takes off." },
+      { fr: "L'avion décolle à 6h.", en: "The plane takes off at 6." },
+
+      // success
+      { fr: "Son business marche.", en: "His business takes off." },
+      { fr: "Le projet décolle vite.", en: "The project takes off quickly." },
+
+      // GET UP
+      { fr: "Je me lève tôt.", en: "I get up early." },
+      { fr: "Il se lève à 8h.", en: "He gets up at 8." },
+
+      // WAKE UP
+      { fr: "Je me réveille.", en: "I wake up." },
+      { fr: "Elle se réveille tard.", en: "She wakes up late." },
+
+      // SIT DOWN
+      { fr: "Assieds-toi.", en: "Sit down." },
+      { fr: "Il s'assoit.", en: "He sits down." },
+
+      // STAND UP
+      { fr: "Lève-toi.", en: "Stand up." },
+      { fr: "Elle se lève.", en: "She stands up." },
+
+      // TURN ON
+      { fr: "J'allume la lumière.", en: "I turn on the light." },
+      { fr: "Il allume la télé.", en: "He turns on the TV." },
+
+      // TURN OFF
+      { fr: "J'éteins la lumière.", en: "I turn off the light." },
+      { fr: "Elle éteint la télé.", en: "She turns off the TV." },
+
+      // LOOK AT
+      { fr: "Je regarde ça.", en: "I look at that." },
+      { fr: "Il regarde le tableau.", en: "He looks at the board." },
+
+      // LOOK FOR
+      { fr: "Je cherche mes clés.", en: "I look for my keys." },
+      { fr: "Elle cherche son téléphone.", en: "She looks for her phone." },
+
+      // LOOK AFTER
+      { fr: "Je m'occupe de lui.", en: "I look after him." },
+      { fr: "Elle s'occupe des enfants.", en: "She looks after the kids." },
+
+      // LOOK UP (search)
+      { fr: "Je cherche un mot.", en: "I look up a word." },
+      { fr: "Il cherche une info.", en: "He looks up information." },
+
+      // LOOK UP (improve)
+      { fr: "Les choses s'améliorent.", en: "Things are looking up." },
+      { fr: "La situation s'améliore.", en: "The situation is looking up." },
+
+      // GIVE UP
+      { fr: "J'abandonne.", en: "I give up." },
+      { fr: "Elle abandonne vite.", en: "She gives up quickly." },
+
+      // GIVE BACK
+      { fr: "Je rends le livre.", en: "I give back the book." },
+      { fr: "Il rend l'argent.", en: "He gives back the money." },
+
+      // GIVE IN
+      { fr: "Je cède.", en: "I give in." },
+      { fr: "Il cède à la pression.", en: "He gives in to pressure." },
+
+      // GO ON (continue)
+      { fr: "Continue.", en: "Go on." },
+      { fr: "Il continue de parler.", en: "He goes on talking." },
+
+      // GO ON (happen)
+      { fr: "Que se passe-t-il ?", en: "What is going on?" },
+      { fr: "Il se passe quelque chose.", en: "Something is going on." },
+
+      // GO BACK
+      { fr: "Je retourne chez moi.", en: "I go back home." },
+      { fr: "Elle retourne au travail.", en: "She goes back to work." },
+
+      // GO OUT (social)
+      { fr: "Je sors ce soir.", en: "I go out tonight." },
+      { fr: "Ils sortent ensemble.", en: "They go out together." },
+
+      // GO OUT (light)
+      { fr: "La lumière s'éteint.", en: "The light goes out." },
+      { fr: "Le feu s'éteint.", en: "The fire goes out." },
+
+      // COME BACK
+      { fr: "Je reviens.", en: "I come back." },
+      { fr: "Il revient tard.", en: "He comes back late." },
+
+      // COME IN
+      { fr: "Entre.", en: "Come in." },
+      { fr: "Il entre.", en: "He comes in." },
+
+      // COME OUT
+      { fr: "Le film sort.", en: "The movie comes out." },
+      { fr: "Le livre sort demain.", en: "The book comes out tomorrow." },
+
+      // TAKE BACK
+      { fr: "Je reprends ce que j'ai dit.", en: "I take back what I said." },
+      { fr: "Il reprend ses mots.", en: "He takes back his words." },
+
+      // TAKE AWAY (remove)
+      { fr: "J'enlève les assiettes de la table.", en: "I take away the plates from the table." },
+      { fr: "Ils enlèvent les chaises après la réunion.", en: "They take away the chairs after the meeting." },
+
+      // TAKE OVER
+      { fr: "Il prend le contrôle.", en: "He takes over." },
+      { fr: "La société prend le contrôle.", en: "The company takes over." },
+
+      // PUT ON
+      { fr: "Je mets ma veste.", en: "I put on my jacket." },
+      { fr: "Elle met ses chaussures.", en: "She puts on her shoes." },
+
+      // PUT OFF (postpone)
+      { fr: "Je reporte le rendez-vous à demain.", en: "I put off the meeting until tomorrow." },
+      { fr: "Ils reportent le projet à la semaine prochaine.", en: "They put off the project until next week." },
+
+      // PUT OUT
+      { fr: "J'éteins le feu.", en: "I put out the fire." },
+      { fr: "Il éteint la cigarette.", en: "He puts out the cigarette." },
+
+      // PICK UP
+
+      // pick up (object)
+      { fr: "Je ramasse mon téléphone par terre.", en: "I pick up my phone from the floor." },
+      { fr: "Elle ramasse son sac après le cours.", en: "She picks up her bag after class." },
+
+      // pick up (learn)
+      { fr: "J'apprends l'anglais en regardant des séries.", en: "I pick up English by watching shows." },
+      { fr: "Il apprend vite de nouvelles choses.", en: "He picks up new things quickly." },
+
+      // pick up (someone)
+      { fr: "Je récupère mon frère à la gare.", en: "I pick up my brother at the station." },
+      { fr: "Elle récupère son amie après le travail.", en: "She picks up her friend after work." },
+
+      // DROP OFF
+      { fr: "Je dépose mon ami devant chez lui.", en: "I drop off my friend in front of his house." },
+      { fr: "Il dépose sa sœur à l'école.", en: "He drops off his sister at school." },
+
+      // RUN OUT OF
+      { fr: "Je n'ai plus de lait.", en: "I run out of milk." },
+      { fr: "Ils n'ont plus d'argent à la fin du mois.", en: "They run out of money at the end of the month." },
+
+      // RUN INTO
+      { fr: "Je croise un ami au supermarché.", en: "I run into a friend at the supermarket." },
+      { fr: "Elle croise son prof en ville.", en: "She runs into her teacher in town." },
+
+      // RUN AWAY
+      { fr: "Le chien s'enfuit du jardin.", en: "The dog runs away from the garden." },
+      { fr: "L'enfant s'enfuit de la maison.", en: "The child runs away from home." },
+
+      // BREAK DOWN (machine)
+      { fr: "La voiture tombe en panne sur l'autoroute.", en: "The car breaks down on the highway." },
+      { fr: "L'ordinateur tombe en panne pendant le travail.", en: "The computer breaks down during work." },
+
+      // BREAK DOWN (emotion)
+      { fr: "Elle s'effondre en pleurant.", en: "She breaks down in tears." },
+      { fr: "Il s'effondre après la nouvelle.", en: "He breaks down after the news." },
+
+      // BREAK UP
+      { fr: "Ils se séparent après deux ans.", en: "They break up after two years." },
+      { fr: "Le couple se sépare en été.", en: "The couple breaks up in summer." },
+
+      // BRING BACK
+      { fr: "Je ramène les livres à la bibliothèque.", en: "I bring back the books to the library." },
+      { fr: "Elle ramène des souvenirs de voyage.", en: "She brings back souvenirs from her trip." },
+
+      // BRING UP (topic)
+      { fr: "Il aborde le sujet pendant le dîner.", en: "He brings up the topic during dinner." },
+      { fr: "Elle aborde ce problème en réunion.", en: "She brings up the issue in the meeting." },
+
+      // CALL BACK
+      { fr: "Je rappelle mon ami plus tard.", en: "I call back my friend later." },
+      { fr: "Elle rappelle le client dans l'après-midi.", en: "She calls back the client in the afternoon." },
+
+      // CALL OFF
+      { fr: "Ils annulent la réunion à cause de la pluie.", en: "They call off the meeting because of the rain." },
+      { fr: "On annule le match à cause du vent.", en: "We call off the game because of the wind." },
+
+      // CHECK IN
+      { fr: "Je m'enregistre à l'hôtel.", en: "I check in at the hotel." },
+      { fr: "Ils s'enregistrent à l'aéroport.", en: "They check in at the airport." },
+
+      // CHECK OUT (leave)
+      { fr: "Je quitte l'hôtel à midi.", en: "I check out of the hotel at noon." },
+      { fr: "Elle quitte la chambre le matin.", en: "She checks out in the morning." },
+
+      // CHECK OUT (look at)
+      { fr: "Va voir ce restaurant, il est incroyable.", en: "Check out this restaurant, it's amazing." },
+      { fr: "Regarde ce site, tu vas aimer.", en: "Check out this website, you'll like it." },
+
+      // COME ACROSS
+      { fr: "Je trouve un vieux livre par hasard.", en: "I come across an old book." },
+      { fr: "Elle trouve une photo en fouillant.", en: "She comes across a photo while searching." },
+
+      // COME BACK TO
+      { fr: "Je reviens à cette idée plus tard.", en: "I come back to this idea later." },
+      { fr: "On revient à ce sujet demain.", en: "We come back to this topic tomorrow." },
+
+      // CUT OFF
+      { fr: "On coupe l'électricité dans la maison.", en: "We cut off the electricity in the house." },
+      { fr: "Il coupe l'eau pendant les travaux.", en: "He cuts off the water during the work." },
+
+      // DO OVER AGAIN
+      { fr: "Je recommence l'exercice.", en: "I do the exercise over again." },
+      { fr: "Elle recommence le test.", en: "She does the test over again." },
+
+      // FALL APART
+      { fr: "Le projet s'effondre rapidement.", en: "The project falls apart quickly." },
+      { fr: "Le plan s'effondre à la fin.", en: "The plan falls apart at the end." },
+
+      // FALL DOWN
+      { fr: "Il tombe dans la rue.", en: "He falls down in the street." },
+      { fr: "Elle tombe en courant.", en: "She falls down while running." },
+
+      // FIGURE OUT
+      { fr: "Je comprends le problème.", en: "I figure out the problem." },
+      { fr: "Elle trouve la solution rapidement.", en: "She figures out the solution quickly." },
+
+      // FILL IN
+      { fr: "Je remplis les informations manquantes.", en: "I fill in the missing information." },
+      { fr: "Il complète le formulaire en ligne.", en: "He fills in the form online." },
+
+      // FILL UP
+      { fr: "Je remplis le réservoir.", en: "I fill up the tank." },
+      { fr: "Elle remplit le verre d'eau.", en: "She fills up the glass." },
+
+      // CARRY ON
+      { fr: "Continue ton travail malgré le bruit.", en: "Carry on with your work despite the noise." },
+      { fr: "Il continue de parler sans s'arrêter.", en: "He carries on talking without stopping." },
+
+      // GO AHEAD
+      { fr: "Tu peux commencer sans moi.", en: "Go ahead without me." },
+      { fr: "Elle commence le projet immédiatement.", en: "She goes ahead with the project immediately." },
+
+      // HOLD BACK
+      { fr: "Il retient ses émotions devant les autres.", en: "He holds back his emotions in front of others." },
+      { fr: "Elle se retient de rire pendant la réunion.", en: "She holds back her laughter during the meeting." },
+
+      // LOOK LIKE
+      { fr: "Il ressemble à son père.", en: "He looks like his father." },
+      { fr: "Elle ressemble à sa sœur.", en: "She looks like her sister." },
+
+      // COME ALONG
+      { fr: "Viens avec nous au cinéma.", en: "Come along with us to the cinema." },
+      { fr: "Il vient avec ses amis à la soirée.", en: "He comes along with his friends to the party." },
+
+      // GET THROUGH (finish)
+      { fr: "Je finis tout le travail aujourd'hui.", en: "I get through all the work today." },
+      { fr: "Elle termine ses devoirs rapidement.", en: "She gets through her homework quickly." },
+
+      // GO THROUGH (experience)
+      { fr: "Je traverse une période difficile.", en: "I go through a difficult time." },
+      { fr: "Ils traversent cette crise ensemble.", en: "They go through this crisis together." },
+
+      // KEEP BACK
+      { fr: "Il garde une partie de l'argent pour lui.", en: "He keeps back some of the money." },
+      { fr: "Elle garde une information importante.", en: "She keeps back important information." },
+
+      // LET GO
+      { fr: "Il lâche la corde.", en: "He lets go of the rope." },
+      { fr: "Elle lâche sa main.", en: "She lets go of his hand." },
+
+      // PASS OUT
+      { fr: "Il s'évanouit après l'effort.", en: "He passes out after the effort." },
+      { fr: "Elle s'évanouit dans la rue.", en: "She passes out in the street." },
+
+      // PASS AWAY
+      { fr: "Son grand-père meurt paisiblement.", en: "His grandfather passes away peacefully." },
+      { fr: "Elle meurt à l'hôpital.", en: "She passes away in the hospital." },
+
+      // PICK OUT
+      { fr: "Je choisis une chemise dans le magasin.", en: "I pick out a shirt in the store." },
+      { fr: "Elle choisit une robe pour la soirée.", en: "She picks out a dress for the party." },
+
+      // POINT OUT (rappel)
+      { fr: "Il montre une erreur dans le texte.", en: "He points out a mistake in the text." },
+      { fr: "Elle souligne un détail important.", en: "She points out an important detail." },
+
+      // PUT THROUGH
+      { fr: "Je te mets en relation avec le service.", en: "I put you through to the service." },
+      { fr: "Elle te met en contact avec son manager.", en: "She puts you through to her manager." },
+
+      // RUN OVER
+      { fr: "Je revois rapidement le plan.", en: "I run over the plan quickly." },
+      { fr: "Elle revoit les détails avant la réunion.", en: "She runs over the details before the meeting." },
+
+      // SET OFF
+      { fr: "On part en voyage tôt le matin.", en: "We set off early in the morning." },
+      { fr: "Ils partent pour l'aéroport à 6h.", en: "They set off for the airport at 6." },
+
+      // TAKE IN
+      { fr: "Je comprends l'information lentement.", en: "I take in the information slowly." },
+      { fr: "Elle absorbe tout ce qu'elle lit.", en: "She takes in everything she reads." },
+
+      // TAKE OUT
+      { fr: "Je sors le chien ce soir.", en: "I take out the dog tonight." },
+      { fr: "Il sort les poubelles le matin.", en: "He takes out the trash in the morning." },
+
+      // THROW AWAY
+      { fr: "Je jette les papiers inutiles.", en: "I throw away the useless papers." },
+      { fr: "Elle jette la nourriture périmée.", en: "She throws away expired food." },
+
+      // TURN BACK
+      { fr: "Je fais demi-tour à cause de la pluie.", en: "I turn back because of the rain." },
+      { fr: "Ils font demi-tour sur la route.", en: "They turn back on the road." },
+
+      // USE UP
+      { fr: "Je finis toute l'eau.", en: "I use up all the water." },
+      { fr: "Elle utilise tout le papier.", en: "She uses up all the paper." },
+
+      // WATCH OUT
+      { fr: "Fais attention à la voiture.", en: "Watch out for the car." },
+      { fr: "Fais attention en traversant.", en: "Watch out when crossing." },
+
+      // WORK ON
+      { fr: "Je travaille sur un nouveau projet.", en: "I work on a new project." },
+      { fr: "Elle travaille sur ses compétences.", en: "She works on her skills." },
+
+      // WRITE DOWN
+      { fr: "Je note l'adresse sur le papier.", en: "I write down the address on paper." },
+      { fr: "Elle note les idées dans son carnet.", en: "She writes down the ideas in her notebook." },
+
+      // HAPPEN TO (by chance / accident)
+      { fr: "tu connais le nom de ce film par hasard?", en: "Do you happen to know the name of the movie?" },
+      { fr: "Elle tombe sur une erreur en relisant le document.", en: "She happens to find a mistake while rereading the document." },
+
+      // HAPPEN TO (something unexpected happens to someone)
+      { fr: "Qu'est-ce qui t'arrive ?", en: "What happens to you?" },
+      { fr: "Il lui arrive quelque chose d'étrange.", en: "Something strange happens to him." }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au Present Simple</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+      { fr: "On mange souvent ici.", en: "We often eat here." },
+      { fr: "Elle ne travaille pas le dimanche.", en: "She doesn't work on Sundays." },
+      { fr: "Est-ce que tu aimes le café ?", en: "Do you like coffee?" },
+      { fr: "On ne regarde pas la télé le soir.", en: "We don't watch TV in the evening." },
+      { fr: "Il joue au foot avec ses amis.", en: "He plays football with his friends." },
+      { fr: "Pourquoi est-ce qu'elle part tôt ?", en: "Why does she leave early?" },
+      { fr: "On ne prend pas le bus.", en: "We don't take the bus." },
+      { fr: "Est-ce qu'ils viennent avec nous ?", en: "Do they come with us?" },
+      { fr: "Elle travaille dans une banque.", en: "She works in a bank." },
+      { fr: "On ne comprend pas ce mot.", en: "We don't understand this word." },
+
+      { fr: "Qu'est-ce que tu fais ?", en: "What do you do?" },
+      { fr: "Il ne boit pas de café.", en: "He doesn't drink coffee." },
+      { fr: "On voit souvent ce film.", en: "We often see this movie." },
+      { fr: "Quand est-ce que tu arrives ?", en: "When do you arrive?" },
+      { fr: "Elle ne veut pas venir.", en: "She doesn't want to come." },
+      { fr: "On prend toujours le même train.", en: "We always take the same train." },
+      { fr: "Est-ce qu'il comprend ?", en: "Does he understand?" },
+      { fr: "On ne parle pas anglais ici.", en: "We don't speak English here." },
+      { fr: "Elle lit beaucoup le soir.", en: "She reads a lot in the evening." },
+      { fr: "Où est-ce que tu habites ?", en: "Where do you live?" },
+
+      { fr: "Nous ne savons pas.", en: "We don't know." },
+      { fr: "Il pense souvent à ça.", en: "He often thinks about that." },
+      { fr: "Il pense y souvent.", en: "He often thinks about it." },
+      { fr: "Est-ce que tu viens ce soir ?", en: "Do you come tonight?" },
+      { fr: "On ne trouve pas la réponse.", en: "We don't find the answer." },
+      { fr: "Elle donne toujours de bons conseils.", en: "She always gives good advice." },
+      { fr: "Comment est-ce que tu fais ça ?", en: "How do you do that?" },
+      { fr: "On met toujours ça ici.", en: "We always put that here." },
+      { fr: "Il ne dit rien.", en: "He doesn't say anything." },
+      { fr: "Est-ce qu'elle croit ça ?", en: "Does she believe that?" },
+      { fr: "On garde ça pour plus tard.", en: "We keep that for later." },
+
+      { fr: "On ne laisse pas ça ici.", en: "We don't leave that here." },
+      { fr: "Elle commence à 8h.", en: "She starts at 8." },
+      { fr: "À quelle heure est-ce que tu finis ?", en: "What time do you finish?" },
+      { fr: "On ne continue pas.", en: "We don't continue." },
+      { fr: "Il utilise souvent son téléphone.", en: "He often uses his phone." },
+      { fr: "Pourquoi est-ce que tu changes d'avis ?", en: "Why do you change your mind?" },
+      { fr: "On ne suit pas ce plan.", en: "We don't follow this plan." },
+      { fr: "Elle essaie encore.", en: "She tries again." },
+      { fr: "Est-ce que tu aides tes parents ?", en: "Do you help your parents?" },
+      { fr: "On ne pose pas de questions.", en: "We don't ask questions." },
+
+      { fr: "Il répond toujours rapidement.", en: "He always answers quickly." },
+      { fr: "Combien de temps est-ce que tu travailles ?", en: "How long do you work?" },
+      { fr: "On ne joue pas aujourd'hui.", en: "We don't play today." },
+      { fr: "Elle appelle tous les jours.", en: "She calls every day." },
+      { fr: "Est-ce qu'il écoute ?", en: "Does he listen?" },
+      { fr: "On ne regarde pas ça.", en: "We don't watch that." },
+      { fr: "Il arrive toujours en retard.", en: "He always arrives late." },
+      { fr: "Quand est-ce qu'on commence ?", en: "When do we start?" },
+      { fr: "On ne finit pas tard.", en: "We don't finish late." },
+      { fr: "Elle reste à la maison.", en: "She stays at home." },
+
+      { fr: "On mange tard le soir.", en: "We eat late in the evening." },
+      { fr: "Elle ne travaille pas ici.", en: "She doesn't work here." },
+      { fr: "Est-ce que tu aimes ce film ?", en: "Do you like this movie?" },
+      { fr: "On ne regarde jamais ça.", en: "We never watch that." },
+      { fr: "Il joue tous les week-ends.", en: "He plays every weekend." },
+      { fr: "Pourquoi est-ce qu'elle part maintenant ?", en: "Why does she leave now?" },
+      { fr: "On ne prend jamais ça.", en: "We never take that." },
+      { fr: "Est-ce qu'ils viennent demain ?", en: "Do they come tomorrow?" },
+      { fr: "Elle travaille beaucoup.", en: "She works a lot." },
+      { fr: "On ne comprend toujours pas.", en: "We still don't understand." },
+
+      { fr: "Qu'est-ce que tu fais le matin ?", en: "What do you do in the morning?" },
+      { fr: "Il ne boit jamais de soda.", en: "He never drinks soda." },
+      { fr: "On voit souvent nos amis.", en: "We often see our friends." },
+      { fr: "Quand est-ce que tu pars ?", en: "When do you leave?" },
+      { fr: "Elle ne veut pas rester.", en: "She doesn't want to stay." },
+      { fr: "On prend le métro.", en: "We take the subway." },
+      { fr: "Est-ce qu'il comprend bien ?", en: "Does he understand well?" },
+      { fr: "On ne parle pas beaucoup.", en: "We don't talk much." },
+      { fr: "Elle lit tous les jours.", en: "She reads every day." },
+      { fr: "Où est-ce que tu travailles ?", en: "Where do you work?" },
+
+      { fr: "On ne sait jamais.", en: "We never know." },
+      { fr: "Il pense à toi.", en: "He thinks about you." },
+      { fr: "Est-ce que tu viens souvent ?", en: "Do you often come?" },
+      { fr: "On ne trouve rien.", en: "We don't find anything." },
+      { fr: "Elle donne tout.", en: "She gives everything." },
+      { fr: "Comment est-ce que tu fais ça ?", en: "How do you do that?" },
+      { fr: "On met tout ici.", en: "We put everything here." },
+      { fr: "Il ne dit jamais ça.", en: "He never says that." },
+      { fr: "Est-ce qu'elle croit en toi ?", en: "Does she believe in you?" },
+      { fr: "On garde le silence.", en: "We keep quiet." },
+
+      { fr: "On ne laisse rien ici.", en: "We don't leave anything here." },
+      { fr: "Elle commence tôt.", en: "She starts early." },
+      { fr: "À quelle heure est-ce que tu arrives ?", en: "What time do you arrive?" },
+      { fr: "On ne continue jamais.", en: "We never continue." },
+      { fr: "Il utilise ça souvent.", en: "He often uses that." },
+      { fr: "Pourquoi est-ce que tu changes ?", en: "Why do you change?" },
+      { fr: "On ne suit personne.", en: "We don't follow anyone." },
+      { fr: "Elle essaie encore.", en: "She tries again." },
+      { fr: "Est-ce que tu aides ?", en: "Do you help?" },
+      { fr: "On ne demande jamais ça.", en: "We never ask that." },
+
+      { fr: "Il répond vite.", en: "He answers quickly." },
+      { fr: "Combien de temps est-ce que tu attends ?", en: "How long do you wait?" },
+      { fr: "On ne joue jamais.", en: "We never play." },
+      { fr: "Elle appelle encore.", en: "She calls again." },
+      { fr: "Est-ce qu'il écoute bien ?", en: "Does he listen well?" },
+      { fr: "On ne regarde rien.", en: "We don't watch anything." },
+      { fr: "Il arrive tôt.", en: "He arrives early." },
+      { fr: "Quand est-ce qu'on part ?", en: "When do we leave?" },
+      { fr: "On ne finit jamais.", en: "We never finish." },
+      { fr: "Elle reste ici.", en: "She stays here." },
+
+      { fr: "On ne comprend pas pourquoi il fait ça comme ça.", en: "We don't understand why he does it like that." },
+      { fr: "Est-ce que tu sais vraiment ce qu'elle veut dire ?", en: "Do you really know what she means?" },
+      { fr: "Il ne dit jamais ce qu'il pense vraiment.", en: "He never says what he really thinks." },
+      { fr: "On prend toujours le même chemin pour rentrer.", en: "We always take the same way to go home." },
+      { fr: "Pourquoi est-ce que tu changes toujours d'avis au dernier moment ?", en: "Why do you always change your mind at the last moment?" },
+      { fr: "Elle ne comprend pas ce que tu expliques.", en: "She doesn't understand what you explain." },
+      { fr: "Est-ce qu'ils savent où on va ?", en: "Do they know where we go?" },
+      { fr: "On ne trouve jamais ce qu'on cherche ici.", en: "We never find what we look for here." },
+      { fr: "Il pense qu'on a raison.", en: "He thinks we are right." },
+      { fr: "Comment est-ce que tu fais pour rester calme dans ces situations ?", en: "How do you stay calm in these situations?" },
+
+      { fr: "On ne veut pas perdre du temps avec ça.", en: "We don't want to waste time on that." },
+      { fr: "Elle dit toujours la même chose quand on en parle.", en: "She always says the same thing when we talk about it." },
+      { fr: "Est-ce que tu vois ce que je veux dire ?", en: "Do you see what I mean?" },
+      { fr: "Il ne prend jamais de décision rapidement.", en: "He never makes decisions quickly." },
+      { fr: "On suit ce plan même si ça ne marche pas parfaitement.", en: "We follow this plan even if it doesn't work perfectly." },
+      { fr: "Pourquoi est-ce qu'elle ne répond jamais aux messages ?", en: "Why does she never answer messages?" },
+      { fr: "On ne pense pas que ce soit une bonne idée.", en: "We don't think it's a good idea." },
+      { fr: "Est-ce que tu comprends comment ça fonctionne ?", en: "Do you understand how it works?" },
+      { fr: "Il essaie toujours de faire mieux.", en: "He always tries to do better." },
+      { fr: "On ne sait jamais comment ça finit.", en: "We never know how it ends." },
+
+      { fr: "Elle ne veut jamais changer ses habitudes.", en: "She never wants to change her habits." },
+      { fr: "Est-ce que tu trouves ça normal ?", en: "Do you find that normal?" },
+      { fr: "On garde toujours une solution de secours.", en: "We always keep a backup solution." },
+      { fr: "Il ne parle jamais de sa vie personnelle.", en: "He never talks about his personal life." },
+      { fr: "Pourquoi est-ce que tu fais toujours ça ?", en: "Why do you always do that?" },
+      { fr: "On ne voit pas vraiment la différence.", en: "We don't really see the difference." },
+      { fr: "Elle utilise souvent cet exemple pour expliquer.", en: "She often uses this example to explain." },
+      { fr: "Est-ce qu'ils comprennent ce qu'on attend d'eux ?", en: "Do they understand what we expect from them?" },
+      { fr: "On ne veut pas répéter la même erreur.", en: "We don't want to repeat the same mistake." },
+      { fr: "Il change souvent de stratégie.", en: "He often changes his strategy." },
+
+      { fr: "On ne sait pas exactement ce qu'il fait.", en: "We don't know exactly what he does." },
+      { fr: "Est-ce que tu penses que ça vaut le coup ?", en: "Do you think it's worth it?" },
+      { fr: "Elle ne suit jamais les règles à la lettre.", en: "She never follows the rules exactly." },
+      { fr: "On trouve toujours une solution à la fin.", en: "We always find a solution in the end." },
+      { fr: "Pourquoi est-ce qu'il refuse toujours ?", en: "Why does he always refuse?" },
+      { fr: "On ne comprend pas ce qu'il veut.", en: "We don't understand what he wants." },
+      { fr: "Elle essaie de comprendre tout le monde.", en: "She tries to understand everyone." },
+      { fr: "Est-ce que tu sais comment on fait ça ?", en: "Do you know how we do that?" },
+      { fr: "On ne prend jamais ce genre de risque.", en: "We never take that kind of risk." },
+      { fr: "Il garde toujours son calme.", en: "He always keeps his calm." },
+
+      { fr: "On ne dit rien mais on comprend tout.", en: "We don't say anything but we understand everything." },
+      { fr: "Est-ce que tu vois où est le problème ?", en: "Do you see where the problem is?" },
+      { fr: "Elle ne fait jamais attention aux détails.", en: "She never pays attention to details." },
+      { fr: "On fait toujours attention à ce genre de chose.", en: "We always pay attention to that kind of thing." },
+      { fr: "Pourquoi est-ce qu'il agit comme ça ?", en: "Why does he act like that?" },
+      { fr: "On ne croit pas vraiment à cette histoire.", en: "We don't really believe that story." },
+      { fr: "Elle prend toujours le temps de réfléchir.", en: "She always takes time to think." },
+      { fr: "Est-ce qu'ils savent ce qu'ils font ?", en: "Do they know what they are doing?" },
+      { fr: "On ne veut pas faire les choses à moitié.", en: "We don't want to do things halfway." },
+      { fr: "Il comprend vite ce qu'on attend de lui.", en: "He quickly understands what we expect from him." },
+
+      { fr: "On ne regarde pas seulement le résultat.", en: "We don't only look at the result." },
+      { fr: "Est-ce que tu sais pourquoi il réagit comme ça ?", en: "Do you know why he reacts like that?" },
+      { fr: "Elle ne parle jamais sans réfléchir.", en: "She never speaks without thinking." },
+      { fr: "On suit souvent notre instinct.", en: "We often follow our instinct." },
+      { fr: "Pourquoi est-ce que tu refuses d'écouter ?", en: "Why do you refuse to listen?" },
+      { fr: "On ne comprend pas toujours ses réactions.", en: "We don't always understand his reactions." },
+      { fr: "Elle trouve toujours les bons mots.", en: "She always finds the right words." },
+      { fr: "Est-ce qu'ils prennent ça au sérieux ?", en: "Do they take that seriously?" },
+      { fr: "On ne change pas d'avis facilement.", en: "We don't change our mind easily." },
+      { fr: "Il utilise toujours le même exemple.", en: "He always uses the same example." },
+
+      { fr: "On ne pense pas comme eux.", en: "We don't think like them." },
+      { fr: "Est-ce que tu comprends ce que je ressens ?", en: "Do you understand what I feel?" },
+      { fr: "Elle ne veut jamais admettre ses erreurs.", en: "She never wants to admit her mistakes." },
+      { fr: "On trouve ça intéressant malgré tout.", en: "We find that interesting anyway." },
+      { fr: "Pourquoi est-ce qu'il ignore tout ça ?", en: "Why does he ignore all that?" },
+      { fr: "On ne voit pas ça comme un problème.", en: "We don't see that as a problem." },
+      { fr: "Elle essaie de faire de son mieux.", en: "She tries to do her best." },
+      { fr: "Est-ce qu'ils comprennent vraiment la situation ?", en: "Do they really understand the situation?" },
+      { fr: "On ne veut pas compliquer les choses.", en: "We don't want to make things complicated." },
+      { fr: "Il garde toujours ses distances.", en: "He always keeps his distance." }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>

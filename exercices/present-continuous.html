@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au Present Continuous</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+      { fr: "Je mange.", en: "I'm eating." },
+      { fr: "On regarde un film.", en: "We're watching a movie." },
+      { fr: "Elle travaille aujourd'hui.", en: "She's working today." },
+      { fr: "Il parle au téléphone.", en: "He's talking on the phone." },
+      { fr: "Ils jouent dehors.", en: "They're playing outside." },
+      { fr: "Je marche dans la rue.", en: "I'm walking in the street." },
+      { fr: "On discute ensemble.", en: "We're talking together." },
+      { fr: "Elle lit.", en: "She's reading." },
+      { fr: "Il écrit un message.", en: "He's writing a message." },
+      { fr: "Ils courent.", en: "They're running." },
+
+      { fr: "Je ne travaille pas aujourd'hui.", en: "I'm not working today." },
+      { fr: "On ne regarde pas ça.", en: "We're not watching that." },
+      { fr: "Elle ne mange pas.", en: "She's not eating." },
+      { fr: "Il ne parle pas.", en: "He's not talking." },
+      { fr: "Ils ne jouent pas.", en: "They're not playing." },
+      { fr: "Je ne marche pas.", en: "I'm not walking." },
+      { fr: "On ne discute pas.", en: "We're not talking." },
+      { fr: "Elle ne lit pas.", en: "She's not reading." },
+      { fr: "Il n'écrit pas.", en: "He's not writing." },
+      { fr: "Ils ne courent pas.", en: "They're not running." },
+
+      { fr: "Est-ce que tu travailles ?", en: "Are you working?" },
+      { fr: "Est-ce qu'on regarde ça ?", en: "Are we watching that?" },
+      { fr: "Est-ce qu'elle mange ?", en: "Is she eating?" },
+      { fr: "Est-ce qu'il parle ?", en: "Is he talking?" },
+      { fr: "Est-ce qu'ils jouent ?", en: "Are they playing?" },
+      { fr: "Est-ce que tu marches ?", en: "Are you walking?" },
+      { fr: "Est-ce qu'on discute ?", en: "Are we talking?" },
+      { fr: "Est-ce qu'elle lit ?", en: "Is she reading?" },
+      { fr: "Est-ce qu'il écrit ?", en: "Is he writing?" },
+      { fr: "Est-ce qu'ils courent ?", en: "Are they running?" },
+
+      { fr: "Qu'est-ce que tu fais ?", en: "What are you doing?" },
+      { fr: "Pourquoi est-ce qu'elle pleure ?", en: "Why is she crying?" },
+      { fr: "Où est-ce qu'ils vont ?", en: "Where are they going?" },
+      { fr: "Avec qui est-ce que tu parles ?", en: "Who are you talking to?" },
+      { fr: "Comment est-ce qu'il fait ça ?", en: "How is he doing that?" },
+      { fr: "Qu'est-ce que vous regardez ?", en: "What are you watching?" },
+      { fr: "Pourquoi est-ce qu'on attend ?", en: "Why are we waiting?" },
+      { fr: "Où est-ce qu'elle va ?", en: "Where is she going?" },
+      { fr: "Avec qui est-ce qu'il parle ?", en: "Who is he talking to?" },
+      { fr: "Comment est-ce qu'ils font ça ?", en: "How are they doing that?" },
+
+      { fr: "Je mange avec eux.", en: "I'm eating with them." },
+      { fr: "On travaille ensemble.", en: "We're working together." },
+      { fr: "Elle apprend.", en: "She's learning." },
+      { fr: "Il court.", en: "He's running." },
+      { fr: "Ils discutent.", en: "They're talking." },
+      { fr: "Je regarde par la fenêtre.", en: "I'm looking out the window." },
+      { fr: "On pense à une solution.", en: "We're thinking about a solution." },
+      { fr: "Elle cherche quelque chose.", en: "She's looking for something." },
+      { fr: "Il répare son téléphone.", en: "He's fixing his phone." },
+      { fr: "Ils écoutent de la musique.", en: "They're listening to music." },
+
+      { fr: "Je commence à comprendre.", en: "I'm starting to understand." },
+      { fr: "On n'écoute pas.", en: "We're not listening." },
+      { fr: "Elle ne vient pas.", en: "She's not coming." },
+      { fr: "Il ne répond pas.", en: "He's not answering." },
+      { fr: "Ils ne travaillent pas.", en: "They're not working." },
+      { fr: "Je ne regarde pas.", en: "I'm not looking." },
+      { fr: "On ne parle pas.", en: "We're not talking." },
+      { fr: "Elle ne rit pas.", en: "She's not laughing." },
+      { fr: "Il ne conduit pas.", en: "He's not driving." },
+      { fr: "Ils ne lisent pas.", en: "They're not reading." },
+
+      { fr: "Est-ce que tu étudies ?", en: "Are you studying?" },
+      { fr: "Est-ce qu'on part ?", en: "Are we leaving?" },
+      { fr: "Est-ce qu'elle lit ?", en: "Is she reading?" },
+      { fr: "Est-ce qu'il attend ?", en: "Is he waiting?" },
+      { fr: "Est-ce qu'ils viennent ?", en: "Are they coming?" },
+      { fr: "Est-ce que tu conduis ?", en: "Are you driving?" },
+      { fr: "Est-ce qu'on mange ?", en: "Are we eating?" },
+      { fr: "Est-ce qu'elle écrit ?", en: "Is she writing?" },
+      { fr: "Est-ce qu'il regarde ?", en: "Is he watching?" },
+      { fr: "Est-ce qu'ils écoutent ?", en: "Are they listening?" },
+
+      // ---- intermédiaire ----
+
+      { fr: "Je suis en train de réfléchir.", en: "I'm thinking." },
+      { fr: "On est en train d'attendre.", en: "We're waiting." },
+      { fr: "Elle est en train de préparer le dîner.", en: "She's preparing dinner." },
+      { fr: "Il est en train de conduire vers la maison.", en: "He's driving home." },
+      { fr: "Ils sont en train de travailler sur le projet.", en: "They're working on the project." },
+      { fr: "Je regarde ce que tu fais.", en: "I'm watching what you're doing." },
+      { fr: "On essaie de comprendre.", en: "We're trying to understand." },
+      { fr: "Elle est en train d'expliquer.", en: "She's explaining." },
+      { fr: "Il apprend vite.", en: "He's learning fast." },
+      { fr: "Ils sont en train de changer.", en: "They're changing." },
+
+      { fr: "Je ne suis pas en train de réfléchir.", en: "I'm not thinking." },
+      { fr: "On n'est pas en train d'attendre.", en: "We're not waiting." },
+      { fr: "Elle ne prépare pas le dîner.", en: "She's not preparing dinner." },
+      { fr: "Il ne conduit pas.", en: "He's not driving." },
+      { fr: "Ils ne travaillent pas dessus.", en: "They're not working on it." },
+      { fr: "Je ne regarde pas.", en: "I'm not watching." },
+      { fr: "On n'essaie pas.", en: "We're not trying." },
+      { fr: "Elle n'explique pas.", en: "She's not explaining." },
+      { fr: "Il n'apprend pas.", en: "He's not learning." },
+      { fr: "Ils ne changent pas.", en: "They're not changing." },
+
+      // ---- avancé (~30 phrases) ----
+
+      { fr: "On est en train d'essayer de trouver une solution.", en: "We're trying to find a solution." },
+      { fr: "Je suis en train de réfléchir à ce que tu dis.", en: "I'm thinking about what you're saying." },
+      { fr: "Elle commence à comprendre petit à petit.", en: "She's slowly starting to understand." },
+      { fr: "Il est en train d'apprendre à faire ça.", en: "He's learning to do that." },
+      { fr: "Ils sont en train de discuter du problème.", en: "They're discussing the problem." },
+
+      { fr: "On n'est pas en train de faire les choses correctement.", en: "We're not doing things properly." },
+      { fr: "Je ne suis pas en train de dire ça sérieusement.", en: "I'm not saying that seriously." },
+      { fr: "Elle n'est pas en train d'écouter ce que tu dis.", en: "She's not listening to what you're saying." },
+      { fr: "Il commence à comprendre.", en: "He's starting to understand." },
+      { fr: "Ils ne sont pas en train de suivre.", en: "They're not following." },
+
+      { fr: "Qu'est-ce que t'essayes de faire ?", en: "What are you trying to do?" },
+      { fr: "Pourquoi est-ce qu'on est en train de perdre du temps ?", en: "Why are we wasting time?" },
+      { fr: "Où est-ce qu'ils sont en train d'aller ?", en: "Where are they going?" },
+      { fr: "Avec qui est-ce que tu es en train de parler ?", en: "Who are you talking to?" },
+      { fr: "Comment est-ce qu'il est en train de faire ça ?", en: "How is he doing that?" },
+
+      { fr: "On est en train de changer notre façon de travailler.", en: "We're changing the way we work." },
+      { fr: "Je commence à comprendre pourquoi ça ne marche pas.", en: "I'm starting to understand why it's not working." },
+      { fr: "Elle est en train d'expliquer ce qu'on doit faire.", en: "She's explaining what we need to do." },
+      { fr: "Il est en train d'essayer de résoudre le problème.", en: "He's trying to solve the problem." },
+      { fr: "Ils sont en train de construire quelque chose.", en: "They're building something." },
+
+      { fr: "On n'est pas en train de faire ça pour rien.", en: "We're not doing that for nothing." },
+      { fr: "Je ne suis pas en train de mentir.", en: "I'm not lying." },
+      { fr: "Elle n'est pas en train de dire la vérité.", en: "She's not telling the truth." },
+      { fr: "Il n'est pas en train de faire attention.", en: "He's not paying attention." },
+      { fr: "Ils ne sont pas en train de réfléchir.", en: "They're not thinking." },
+
+      { fr: "Est-ce que tu es en train d'enregistrer ce que je dis ?", en: "Are you recording what I'm saying?" },
+      { fr: "Est-ce qu'on est en train de faire une erreur ?", en: "Are we making a mistake?" },
+      { fr: "Est-ce qu'elle est en train de mentir ?", en: "Is she lying?" },
+      { fr: "Est-ce qu'il est en train de perdre du temps ?", en: "Is he wasting time?" },
+      { fr: "Est-ce qu'ils sont en train de changer ?", en: "Are they changing?" }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>

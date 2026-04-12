@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi avec les prépositions</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+      // ---- TEMPS ----
+      { fr: "Je travaille le matin.", en: "I work in the morning." },
+      { fr: "Je travaille le lundi.", en: "I work on Monday." },
+      { fr: "Je travaille à 8h.", en: "I work at 8." },
+      { fr: "Elle part en juillet.", en: "She leaves in July." },
+      { fr: "On part le vendredi.", en: "We leave on Friday." },
+      { fr: "Il arrive à midi.", en: "He arrives at noon." },
+      { fr: "Ils voyagent en été.", en: "They travel in summer." },
+      { fr: "Je me repose le week-end.", en: "I rest on the weekend." },
+      { fr: "Elle travaille la nuit.", en: "She works at night." },
+      { fr: "On mange le soir.", en: "We eat in the evening." },
+
+      { fr: "Je travaille en hiver.", en: "I work in winter." },
+      { fr: "Elle part le mardi.", en: "She leaves on Tuesday." },
+      { fr: "On commence à 9h.", en: "We start at 9." },
+      { fr: "Il arrive le soir.", en: "He arrives in the evening." },
+      { fr: "Ils travaillent en juin.", en: "They work in June." },
+      { fr: "Je pars le week-end.", en: "I leave on the weekend." },
+      { fr: "Elle se réveille à 7h.", en: "She wakes up at 7." },
+      { fr: "On voyage en automne.", en: "We travel in fall." },
+      { fr: "Il dort la nuit.", en: "He sleeps at night." },
+      { fr: "Ils mangent le matin.", en: "They eat in the morning." },
+
+      // ---- LIEU ----
+      { fr: "Je suis dans la pièce.", en: "I am in the room." },
+      { fr: "Le livre est sur la table.", en: "The book is on the table." },
+      { fr: "Je suis à la porte.", en: "I am at the door." },
+      { fr: "Elle est dans la voiture.", en: "She is in the car." },
+      { fr: "Ils sont sur le mur.", en: "They are on the wall." },
+      { fr: "On est à la station.", en: "We are at the station." },
+      { fr: "Il est dans la maison.", en: "He is in the house." },
+      { fr: "Le chat est sur le lit.", en: "The cat is on the bed." },
+      { fr: "Je suis à la fenêtre.", en: "I am at the window." },
+      { fr: "Elle est dans le bureau.", en: "She is in the office." },
+
+      { fr: "Je suis dans le parc.", en: "I am in the park." },
+      { fr: "Le téléphone est sur la table.", en: "The phone is on the table." },
+      { fr: "On est à l'entrée.", en: "We are at the entrance." },
+      { fr: "Il est dans la cuisine.", en: "He is in the kitchen." },
+      { fr: "Le chat est sur la chaise.", en: "The cat is on the chair." },
+      { fr: "Elle est à la maison.", en: "She is at home." },
+      { fr: "Ils sont dans le jardin.", en: "They are in the garden." },
+      { fr: "Le sac est sur le canapé.", en: "The bag is on the sofa." },
+      { fr: "Je suis à la gare.", en: "I am at the station." },
+      { fr: "Elle est dans la salle.", en: "She is in the room." },
+
+      // ---- TO / FROM ----
+      { fr: "Je vais à Paris.", en: "I go to Paris." },
+      { fr: "Elle va à l'école.", en: "She goes to school." },
+      { fr: "On vient de France.", en: "We come from France." },
+      { fr: "Il part de la maison.", en: "He leaves from the house." },
+      { fr: "Ils vont au travail.", en: "They go to work." },
+      { fr: "Je viens de la ville.", en: "I come from the city." },
+      { fr: "Elle retourne à la maison.", en: "She goes back to the house." },
+      { fr: "On part du bureau.", en: "We leave from the office." },
+      { fr: "Il va au magasin.", en: "He goes to the store." },
+      { fr: "Ils viennent du parc.", en: "They come from the park." },
+
+      { fr: "Je vais à la gare.", en: "I go to the station." },
+      { fr: "Elle part de l'école.", en: "She leaves from the school." },
+      { fr: "On vient de chez lui.", en: "We come from his place." },
+      { fr: "Il va au restaurant.", en: "He goes to the restaurant." },
+      { fr: "Ils viennent de la maison.", en: "They come from the house." },
+      { fr: "Je retourne au bureau.", en: "I return to the office." },
+      { fr: "Elle va au parc.", en: "She goes to the park." },
+      { fr: "On vient de la gare.", en: "We come from the station." },
+      { fr: "Il part du travail.", en: "He leaves from work." },
+      { fr: "Ils vont à la plage.", en: "They go to the beach." },
+
+      // ---- WITH / BY ----
+      { fr: "Je parle avec lui.", en: "I speak with him." },
+      { fr: "Elle écrit avec un stylo.", en: "She writes with a pen." },
+      { fr: "On voyage en train.", en: "We travel by train." },
+      { fr: "Il vient en voiture.", en: "He comes by car." },
+      { fr: "Ils travaillent avec moi.", en: "They work with me." },
+      { fr: "Je coupe avec un couteau.", en: "I cut with a knife." },
+      { fr: "Elle paie en carte.", en: "She pays by card." },
+      { fr: "On communique par email.", en: "We communicate by email." },
+      { fr: "Il parle avec ses amis.", en: "He talks with his friends." },
+      { fr: "Ils voyagent en avion.", en: "They travel by plane." },
+
+      { fr: "Je parle avec elle.", en: "I speak with her." },
+      { fr: "Elle écrit avec un crayon.", en: "She writes with a pencil." },
+      { fr: "On voyage en bus.", en: "We travel by bus." },
+      { fr: "Il vient en train.", en: "He comes by train." },
+      { fr: "Ils travaillent avec lui.", en: "They work with him." },
+      { fr: "Je dessine avec un stylo.", en: "I draw with a pen." },
+      { fr: "Elle paie en liquide.", en: "She pays by cash." },
+      { fr: "On parle par téléphone.", en: "We talk by phone." },
+      { fr: "Il travaille avec une équipe.", en: "He works with a team." },
+      { fr: "Ils voyagent en voiture.", en: "They travel by car." },
+
+      // ---- FOR / ABOUT ----
+      { fr: "Je fais ça pour toi.", en: "I do that for you." },
+      { fr: "Elle travaille pour une entreprise.", en: "She works for a company." },
+      { fr: "On parle de toi.", en: "We talk about you." },
+      { fr: "Il pense à ça.", en: "He thinks about that." },
+      { fr: "Ils se battent pour une cause.", en: "They fight for a cause." },
+      { fr: "Je lis un livre sur l'histoire.", en: "I read a book about history." },
+      { fr: "Elle parle de son travail.", en: "She talks about her job." },
+      { fr: "On fait ça pour le plaisir.", en: "We do that for fun." },
+      { fr: "Il écrit sur la musique.", en: "He writes about music." },
+      { fr: "Ils parlent de la situation.", en: "They talk about the situation." },
+
+      { fr: "Je travaille pour lui.", en: "I work for him." },
+      { fr: "Elle fait ça pour moi.", en: "She does that for me." },
+      { fr: "On parle du film.", en: "We talk about the movie." },
+      { fr: "Il pense à son avenir.", en: "He thinks about his future." },
+      { fr: "Ils écrivent sur ce sujet.", en: "They write about this topic." },
+      { fr: "Je lis sur la science.", en: "I read about science." },
+      { fr: "Elle parle de ses idées.", en: "She talks about her ideas." },
+      { fr: "On fait ça pour eux.", en: "We do that for them." },
+      { fr: "Il écrit sur l'histoire.", en: "He writes about history." },
+      { fr: "Ils parlent de la musique.", en: "They talk about music." },
+
+      // ---- OVER / UNDER ----
+      { fr: "Le chat est sous la table.", en: "The cat is under the table." },
+      { fr: "L'avion passe au-dessus de la ville.", en: "The plane flies over the city." },
+      { fr: "Le sac est sous la chaise.", en: "The bag is under the chair." },
+      { fr: "Le pont est au-dessus de la rivière.", en: "The bridge is over the river." },
+      { fr: "Il saute au-dessus du mur.", en: "He jumps over the wall." },
+      { fr: "Elle cache le livre sous le lit.", en: "She hides the book under the bed." },
+      { fr: "Le chien dort sous la table.", en: "The dog sleeps under the table." },
+      { fr: "Il regarde au-dessus de son épaule.", en: "He looks over his shoulder." },
+      { fr: "Elle se cache sous la couverture.", en: "She hides under the blanket." },
+      { fr: "Le chat marche au-dessus du toit.", en: "The cat walks over the roof." },
+
+      // ---- POSITION ----
+      { fr: "La voiture est derrière la maison.", en: "The car is behind the house." },
+      { fr: "Le chien est devant la porte.", en: "The dog is in front of the door." },
+      { fr: "Il se cache derrière moi.", en: "He hides behind me." },
+      { fr: "Elle est devant moi.", en: "She is in front of me." },
+      { fr: "On attend devant le bâtiment.", en: "We wait in front of the building." },
+      { fr: "Il est derrière la chaise.", en: "He is behind the chair." },
+      { fr: "Elle marche devant lui.", en: "She walks in front of him." },
+      { fr: "On se tient devant la porte.", en: "We stand in front of the door." },
+      { fr: "Il reste derrière moi.", en: "He stays behind me." },
+      { fr: "Elle est derrière la table.", en: "She is behind the table." },
+
+      // ---- IN / INTO ----
+      { fr: "Je suis dans la pièce.", en: "I am in the room." },
+      { fr: "Je vais dans la pièce.", en: "I go into the room." },
+      { fr: "Elle est dans la voiture.", en: "She is in the car." },
+      { fr: "Elle monte dans la voiture.", en: "She gets into the car." },
+      { fr: "Il est dans la maison.", en: "He is in the house." },
+      { fr: "Il entre dans la maison.", en: "He goes into the house." },
+      { fr: "On est dans le bureau.", en: "We are in the office." },
+      { fr: "On va dans le bureau.", en: "We go into the office." },
+      { fr: "Ils sont dans le parc.", en: "They are in the park." },
+      { fr: "Ils entrent dans le parc.", en: "They go into the park." },
+
+      // ---- ON / ONTO ----
+      { fr: "Le chat est sur la table.", en: "The cat is on the table." },
+      { fr: "Le chat saute sur la table.", en: "The cat jumps onto the table." },
+      { fr: "Le livre est sur la chaise.", en: "The book is on the chair." },
+      { fr: "Le livre tombe sur la chaise.", en: "The book falls onto the chair." },
+      { fr: "Le sac est sur le lit.", en: "The bag is on the bed." },
+      { fr: "Le sac tombe sur le lit.", en: "The bag falls onto the bed." },
+
+      // ---- FINAL (complétion) ----
+      { fr: "Je marche dans la rue.", en: "I walk in the street." },
+      { fr: "Elle court sur la route.", en: "She runs on the road." },
+      { fr: "On attend à la gare.", en: "We wait at the station." },
+      { fr: "Il travaille avec son ami.", en: "He works with his friend." },
+      { fr: "Ils voyagent en métro.", en: "They travel by subway." },
+      { fr: "Je parle de mon travail.", en: "I talk about my job." },
+      { fr: "Elle pense à ses études.", en: "She thinks about her studies." },
+      { fr: "On écrit avec un stylo.", en: "We write with a pen." },
+      { fr: "Il coupe avec un couteau.", en: "He cuts with a knife." },
+      { fr: "Ils communiquent par message.", en: "They communicate by message." }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>

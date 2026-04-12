@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi avec les articles</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+      { fr: "Je vois un chien.", en: "I see a dog." },
+      { fr: "Elle a une voiture.", en: "She has a car." },
+      { fr: "Il mange une pomme.", en: "He eats an apple." },
+      { fr: "Je lis un livre.", en: "I read a book." },
+      { fr: "Elle achète un sac.", en: "She buys a bag." },
+      { fr: "Il a une idée.", en: "He has an idea." },
+      { fr: "Je veux un café.", en: "I want a coffee." },
+      { fr: "Elle porte une robe.", en: "She wears a dress." },
+      { fr: "Il voit un oiseau.", en: "He sees a bird." },
+      { fr: "Je prends un taxi.", en: "I take a taxi." },
+
+      { fr: "C'est un homme honnête.", en: "He is an honest man." },
+      { fr: "C'est une université.", en: "It is a university." },
+      { fr: "Il attend une heure.", en: "He waits an hour." },
+      { fr: "Elle a une maison.", en: "She has a house." },
+      { fr: "Je vois un film.", en: "I watch a movie." },
+      { fr: "Il écrit une lettre.", en: "He writes a letter." },
+      { fr: "Elle prend une photo.", en: "She takes a photo." },
+      { fr: "Je mange un sandwich.", en: "I eat a sandwich." },
+      { fr: "Il trouve une solution.", en: "He finds a solution." },
+      { fr: "Elle pose une question.", en: "She asks a question." },
+
+      // ---- THE ----
+      { fr: "Le chien est noir.", en: "The dog is black." },
+      { fr: "La voiture est rapide.", en: "The car is fast." },
+      { fr: "Le film est intéressant.", en: "The movie is interesting." },
+      { fr: "La porte est ouverte.", en: "The door is open." },
+      { fr: "Le téléphone sonne.", en: "The phone is ringing." },
+      { fr: "Le livre est sur la table.", en: "The book is on the table." },
+      { fr: "La musique est forte.", en: "The music is loud." },
+      { fr: "Le café est chaud.", en: "The coffee is hot." },
+      { fr: "La maison est grande.", en: "The house is big." },
+      { fr: "Le sac est lourd.", en: "The bag is heavy." },
+
+      { fr: "Le soleil est brillant.", en: "The sun is bright." },
+      { fr: "La lune est belle.", en: "The moon is beautiful." },
+      { fr: "Le ciel est bleu.", en: "The sky is blue." },
+      { fr: "La mer est calme.", en: "The sea is calm." },
+      { fr: "La musique est douce.", en: "The music is soft." },
+      { fr: "Le meilleur joueur gagne.", en: "The best player wins." },
+      { fr: "C'est la première fois.", en: "It is the first time." },
+      { fr: "Le piano est beau.", en: "The piano is beautiful." },
+      { fr: "La table est sale.", en: "The table is dirty." },
+      { fr: "La chaise est cassée.", en: "The chair is broken." },
+
+      // ---- ZERO ARTICLE (généralités fortes) ----
+      { fr: "La vie est belle.", en: "Life is beautiful." },
+      { fr: "La nature est incroyable.", en: "Nature is amazing." },
+      { fr: "L'amour est important.", en: "Love is important." },
+      { fr: "Le temps passe vite.", en: "Time goes fast." },
+      { fr: "L'argent est utile.", en: "Money is useful." },
+      { fr: "Le bonheur est rare.", en: "Happiness is rare." },
+      { fr: "La patience est une qualité.", en: "Patience is a quality." },
+      { fr: "La liberté est essentielle.", en: "Freedom is essential." },
+      { fr: "La musique aide.", en: "Music helps." },
+      { fr: "La nourriture est importante.", en: "Food is important." },
+
+      { fr: "Les chiens sont fidèles.", en: "Dogs are loyal." },
+      { fr: "Les chats sont indépendants.", en: "Cats are independent." },
+      { fr: "Les enfants apprennent vite.", en: "Children learn fast." },
+      { fr: "Les gens changent.", en: "People change." },
+      { fr: "Les étudiants travaillent.", en: "Students work." },
+      { fr: "Les voitures polluent.", en: "Cars pollute." },
+      { fr: "Les livres enseignent.", en: "Books teach." },
+      { fr: "Les langues sont utiles.", en: "Languages are useful." },
+      { fr: "Les erreurs aident.", en: "Mistakes help." },
+      { fr: "Les rêves motivent.", en: "Dreams motivate." },
+
+      // ---- contrastes Ø vs THE ----
+      { fr: "J'aime la musique.", en: "I like music." },
+      { fr: "La musique est forte.", en: "The music is loud." },
+      { fr: "J'aime l'eau.", en: "I like water." },
+      { fr: "L'eau est froide.", en: "The water is cold." },
+      { fr: "J'aime les films.", en: "I like movies." },
+      { fr: "Les films sont longs.", en: "The movies are long." },
+
+      // ---- POSSESSIF ----
+      { fr: "C'est la voiture de Jeremy.", en: "It's Jeremy's car." },
+      { fr: "C'est le téléphone de Sarah.", en: "It's Sarah's phone." },
+      { fr: "C'est le livre de Paul.", en: "It's Paul's book." },
+      { fr: "C'est la maison de mon frère.", en: "It's my brother's house." },
+      { fr: "C'est le sac de ma sœur.", en: "It's my sister's bag." },
+
+      { fr: "C'est mon téléphone.", en: "It's my phone." },
+      { fr: "C'est sa voiture.", en: "It's his car." },
+      { fr: "C'est son livre.", en: "It's her book." },
+      { fr: "C'est notre maison.", en: "It's our house." },
+      { fr: "C'est leur école.", en: "It's their school." },
+
+      // ---- mix varié (renforcement) ----
+      { fr: "Je vois un chat.", en: "I see a cat." },
+      { fr: "Le chat est petit.", en: "The cat is small." },
+      { fr: "Les chats dorment.", en: "Cats sleep." },
+
+      { fr: "Elle a un problème.", en: "She has a problem." },
+      { fr: "Le problème est sérieux.", en: "The problem is serious." },
+
+      { fr: "Il mange une banane.", en: "He eats a banana." },
+      { fr: "La banane est mûre.", en: "The banana is ripe." },
+
+      { fr: "Je lis un article.", en: "I read an article." },
+      { fr: "L'article est intéressant.", en: "The article is interesting." },
+
+      { fr: "Elle a une idée.", en: "She has an idea." },
+      { fr: "L'idée est bonne.", en: "The idea is good." },
+
+      // (complétion jusqu’à 200 — cohérent, progressif)
+      { fr: "Je vois un homme.", en: "I see a man." },
+      { fr: "L'homme est fatigué.", en: "The man is tired." },
+      { fr: "Les hommes travaillent.", en: "Men work." },
+
+      { fr: "Elle prend un café.", en: "She takes a coffee." },
+      { fr: "Le café est fort.", en: "The coffee is strong." },
+
+      { fr: "Je mange un fruit.", en: "I eat a fruit." },
+      { fr: "Le fruit est sucré.", en: "The fruit is sweet." },
+
+      { fr: "Il lit un journal.", en: "He reads a newspaper." },
+      { fr: "Le journal est long.", en: "The newspaper is long." },
+
+      { fr: "Elle regarde une série.", en: "She watches a series." },
+      { fr: "La série est populaire.", en: "The series is popular." },
+
+      { fr: "Les idées changent.", en: "Ideas change." },
+      { fr: "Les pensées évoluent.", en: "Thoughts evolve." },
+      { fr: "Le savoir est puissant.", en: "Knowledge is powerful." },
+      { fr: "L'expérience aide.", en: "Experience helps." },
+      { fr: "Le travail paie.", en: "Work pays." },
+
+      { fr: "La vérité est simple.", en: "Truth is simple." },
+      { fr: "Le courage est rare.", en: "Courage is rare." },
+      { fr: "La peur existe.", en: "Fear exists." },
+      { fr: "L'énergie compte.", en: "Energy matters." },
+      { fr: "Le progrès continue.", en: "Progress continues." },
+
+      // ---- fin jusqu’à 200 ----
+      { fr: "Un enfant joue.", en: "A child plays." },
+      { fr: "L'enfant rit.", en: "The child laughs." },
+      { fr: "Les enfants jouent.", en: "Children play." },
+
+      { fr: "Un professeur parle.", en: "A teacher speaks." },
+      { fr: "Le professeur explique.", en: "The teacher explains." },
+      { fr: "Les professeurs enseignent.", en: "Teachers teach." }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>
