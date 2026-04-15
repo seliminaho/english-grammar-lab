@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Going to - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au futur proche avec going to</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+      { fr: "Je vais manger.", en: "I'm going to eat." },
+      { fr: "On va regarder un film.", en: "We're going to watch a movie." },
+      { fr: "Elle va travailler aujourd'hui.", en: "She's going to work today." },
+      { fr: "Il va parler au téléphone.", en: "He's going to talk on the phone." },
+      { fr: "Ils vont jouer dehors.", en: "They're going to play outside." },
+      { fr: "Je vais marcher dans la rue.", en: "I'm going to walk in the street." },
+      { fr: "On va discuter ensemble.", en: "We're going to talk together." },
+      { fr: "Elle va lire.", en: "She's going to read." },
+      { fr: "Il va écrire un message.", en: "He's going to write a message." },
+      { fr: "Ils vont courir.", en: "They're going to run." },
+
+      { fr: "Je ne vais pas travailler aujourd'hui.", en: "I'm not going to work today." },
+      { fr: "On ne va pas regarder ça.", en: "We're not going to watch that." },
+      { fr: "Elle ne va pas manger.", en: "She's not going to eat." },
+      { fr: "Il ne va pas parler.", en: "He's not going to talk." },
+      { fr: "Ils ne vont pas jouer.", en: "They're not going to play." },
+      { fr: "Je ne vais pas marcher.", en: "I'm not going to walk." },
+      { fr: "On ne va pas discuter.", en: "We're not going to talk." },
+      { fr: "Elle ne va pas lire.", en: "She's not going to read." },
+      { fr: "Il ne va pas écrire.", en: "He's not going to write." },
+      { fr: "Ils ne vont pas courir.", en: "They're not going to run." },
+
+      { fr: "Est-ce que tu vas travailler ?", en: "Are you going to work?" },
+      { fr: "Est-ce qu'on va regarder ça ?", en: "Are we going to watch that?" },
+      { fr: "Est-ce qu'elle va manger ?", en: "Is she going to eat?" },
+      { fr: "Est-ce qu'il va parler ?", en: "Is he going to talk?" },
+      { fr: "Est-ce qu'ils vont jouer ?", en: "Are they going to play?" },
+      { fr: "Est-ce que tu vas marcher ?", en: "Are you going to walk?" },
+      { fr: "Est-ce qu'on va discuter ?", en: "Are we going to talk?" },
+      { fr: "Est-ce qu'elle va lire ?", en: "Is she going to read?" },
+      { fr: "Est-ce qu'il va écrire ?", en: "Is he going to write?" },
+      { fr: "Est-ce qu'ils vont courir ?", en: "Are they going to run?" },
+
+      { fr: "Qu'est-ce que tu vas faire ?", en: "What are you going to do?" },
+      { fr: "Pourquoi est-ce qu'elle va pleurer ?", en: "Why is she going to cry?" },
+      { fr: "Où est-ce qu'ils vont aller ?", en: "Where are they going to go?" },
+      { fr: "Avec qui est-ce que tu vas parler ?", en: "Who are you going to talk to?" },
+      { fr: "Comment est-ce qu'il va faire ça ?", en: "How is he going to do that?" },
+      { fr: "Qu'est-ce que vous allez regarder ?", en: "What are you going to watch?" },
+      { fr: "Pourquoi est-ce qu'on va attendre ?", en: "Why are we going to wait?" },
+      { fr: "Où est-ce qu'elle va aller ?", en: "Where is she going to go?" },
+      { fr: "Avec qui est-ce qu'il va parler ?", en: "Who is he going to talk to?" },
+      { fr: "Comment est-ce qu'ils vont faire ça ?", en: "How are they going to do that?" },
+
+      { fr: "Je vais manger avec eux.", en: "I'm going to eat with them." },
+      { fr: "On va travailler ensemble.", en: "We're going to work together." },
+      { fr: "Elle va apprendre.", en: "She's going to learn." },
+      { fr: "Il va courir.", en: "He's going to run." },
+      { fr: "Ils vont discuter.", en: "They're going to talk." },
+      { fr: "Je vais regarder par la fenêtre.", en: "I'm going to look out the window." },
+      { fr: "On va penser à une solution.", en: "We're going to think about a solution." },
+      { fr: "Elle va chercher quelque chose.", en: "She's going to look for something." },
+      { fr: "Il va réparer son téléphone.", en: "He's going to fix his phone." },
+      { fr: "Ils vont écouter de la musique.", en: "They're going to listen to music." },
+
+      { fr: "Je vais commencer à comprendre.", en: "I'm going to start understanding." },
+      { fr: "On ne va pas écouter.", en: "We're not going to listen." },
+      { fr: "Elle ne va pas venir.", en: "She's not going to come." },
+      { fr: "Il ne va pas répondre.", en: "He's not going to answer." },
+      { fr: "Ils ne vont pas travailler.", en: "They're not going to work." },
+      { fr: "Je ne vais pas regarder.", en: "I'm not going to look." },
+      { fr: "On ne va pas parler.", en: "We're not going to talk." },
+      { fr: "Elle ne va pas rire.", en: "She's not going to laugh." },
+      { fr: "Il ne va pas conduire.", en: "He's not going to drive." },
+      { fr: "Ils ne vont pas lire.", en: "They're not going to read." },
+
+      { fr: "Est-ce que tu vas étudier ?", en: "Are you going to study?" },
+      { fr: "Est-ce qu'on va partir ?", en: "Are we going to leave?" },
+      { fr: "Est-ce qu'elle va lire ?", en: "Is she going to read?" },
+      { fr: "Est-ce qu'il va attendre ?", en: "Is he going to wait?" },
+      { fr: "Est-ce qu'ils vont venir ?", en: "Are they going to come?" },
+      { fr: "Est-ce que tu vas conduire ?", en: "Are you going to drive?" },
+      { fr: "Est-ce qu'on va manger ?", en: "Are we going to eat?" },
+      { fr: "Est-ce qu'elle va écrire ?", en: "Is she going to write?" },
+      { fr: "Est-ce qu'il va regarder ?", en: "Is he going to watch?" },
+      { fr: "Est-ce qu'ils vont écouter ?", en: "Are they going to listen?" },
+
+      // ---- intermédiaire ----
+
+      { fr: "Je vais réfléchir.", en: "I'm going to think." },
+      { fr: "On va attendre.", en: "We're going to wait." },
+      { fr: "Elle va préparer le dîner.", en: "She's going to prepare dinner." },
+      { fr: "Il va conduire jusqu'à la maison.", en: "He's going to drive home." },
+      { fr: "Ils vont travailler sur le projet.", en: "They're going to work on the project." },
+      { fr: "Je vais regarder ce que tu fais.", en: "I'm going to watch what you're doing." },
+      { fr: "On va essayer de comprendre.", en: "We're going to try to understand." },
+      { fr: "Elle va expliquer.", en: "She's going to explain." },
+      { fr: "Il va apprendre vite.", en: "He's going to learn fast." },
+      { fr: "Ils vont changer.", en: "They're going to change." },
+
+      { fr: "Je ne vais pas réfléchir.", en: "I'm not going to think." },
+      { fr: "On ne va pas attendre.", en: "We're not going to wait." },
+      { fr: "Elle ne va pas préparer le dîner.", en: "She's not going to prepare dinner." },
+      { fr: "Il ne va pas conduire.", en: "He's not going to drive." },
+      { fr: "Ils ne vont pas travailler dessus.", en: "They're not going to work on it." },
+      { fr: "Je ne vais pas regarder.", en: "I'm not going to watch." },
+      { fr: "On ne va pas essayer.", en: "We're not going to try." },
+      { fr: "Elle ne va pas expliquer.", en: "She's not going to explain." },
+      { fr: "Il ne va pas apprendre.", en: "He's not going to learn." },
+      { fr: "Ils ne vont pas changer.", en: "They're not going to change." },
+
+      // ---- avancé ----
+
+      { fr: "On va essayer de trouver une solution.", en: "We're going to try to find a solution." },
+      { fr: "Je vais réfléchir à ce que tu dis.", en: "I'm going to think about what you're saying." },
+      { fr: "Elle va commencer à comprendre petit à petit.", en: "She's going to start understanding little by little." },
+      { fr: "Il va apprendre à faire ça.", en: "He's going to learn to do that." },
+      { fr: "Ils vont discuter du problème.", en: "They're going to discuss the problem." },
+
+      { fr: "On ne va pas faire les choses correctement.", en: "We're not going to do things properly." },
+      { fr: "Je ne vais pas dire ça sérieusement.", en: "I'm not going to say that seriously." },
+      { fr: "Elle ne va pas écouter ce que tu dis.", en: "She's not going to listen to what you're saying." },
+      { fr: "Il va commencer à comprendre.", en: "He's going to start understanding." },
+      { fr: "Ils ne vont pas suivre.", en: "They're not going to follow." },
+
+      { fr: "Qu'est-ce que tu vas essayer de faire ?", en: "What are you going to try to do?" },
+      { fr: "Pourquoi est-ce qu'on va perdre du temps ?", en: "Why are we going to waste time?" },
+      { fr: "Où est-ce qu'ils vont aller ?", en: "Where are they going to go?" },
+      { fr: "Avec qui est-ce que tu vas parler ?", en: "Who are you going to talk to?" },
+      { fr: "Comment est-ce qu'il va faire ça ?", en: "How is he going to do that?" },
+
+      { fr: "On va changer notre façon de travailler.", en: "We're going to change the way we work." },
+      { fr: "Je vais commencer à comprendre pourquoi ça ne marche pas.", en: "I'm going to start understanding why it's not working." },
+      { fr: "Elle va expliquer ce qu'on doit faire.", en: "She's going to explain what we need to do." },
+      { fr: "Il va essayer de résoudre le problème.", en: "He's going to try to solve the problem." },
+      { fr: "Ils vont construire quelque chose.", en: "They're going to build something." },
+
+      { fr: "On ne va pas faire ça pour rien.", en: "We're not going to do that for nothing." },
+      { fr: "Je ne vais pas mentir.", en: "I'm not going to lie." },
+      { fr: "Elle ne va pas dire la vérité.", en: "She's not going to tell the truth." },
+      { fr: "Il ne va pas faire attention.", en: "He's not going to pay attention." },
+      { fr: "Ils ne vont pas réfléchir.", en: "They're not going to think." },
+
+      { fr: "Est-ce que tu vas enregistrer ce que je dis ?", en: "Are you going to record what I'm saying?" },
+      { fr: "Est-ce qu'on va faire une erreur ?", en: "Are we going to make a mistake?" },
+      { fr: "Est-ce qu'elle va mentir ?", en: "Is she going to lie?" },
+      { fr: "Est-ce qu'il va perdre du temps ?", en: "Is he going to waste time?" },
+      { fr: "Est-ce qu'ils vont changer ?", en: "Are they going to change?" }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>
