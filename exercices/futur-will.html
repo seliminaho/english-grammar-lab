@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Will et le futur - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au futur en will</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+      // ---- décisions spontanées ----
+      { fr: "D'accord, je t'aiderai.", en: "Okay, I'll help you." },
+      { fr: "Attends, je vais ouvrir la porte.", en: "Wait, I'll open the door." },
+      { fr: "Je vais répondre.", en: "I'll answer it." },
+      { fr: "Je vais vérifier.", en: "I'll check." },
+      { fr: "Je vais lui demander.", en: "I'll ask him." },
+      { fr: "Je vais prendre celui-ci.", en: "I'll take this one." },
+      { fr: "Je vais payer.", en: "I'll pay." },
+      { fr: "Je vais m'en occuper.", en: "I'll take care of it." },
+      { fr: "Je vais te montrer.", en: "I'll show you." },
+      { fr: "Je vais corriger ça.", en: "I'll fix that." },
+
+      // ---- promesses ----
+      { fr: "Je te rappellerai.", en: "I'll call you back." },
+      { fr: "Je ne dirai rien.", en: "I won't say anything." },
+      { fr: "Je serai là.", en: "I'll be there." },
+      { fr: "Je ne t'oublierai pas.", en: "I won't forget you." },
+      { fr: "Je ferai de mon mieux.", en: "I'll do my best." },
+      { fr: "Je garderai le secret.", en: "I'll keep the secret." },
+      { fr: "Je t'aiderai demain.", en: "I'll help you tomorrow." },
+      { fr: "Je ne recommencerai pas.", en: "I won't do it again." },
+      { fr: "Je te le rendrai.", en: "I'll give it back to you." },
+      { fr: "Je serai prudent.", en: "I'll be careful." },
+
+      // ---- prédictions / opinions ----
+      { fr: "Je pense qu'il viendra.", en: "I think he'll come." },
+      { fr: "Je pense qu'elle réussira.", en: "I think she'll succeed." },
+      { fr: "Ça ira.", en: "It'll be fine." },
+      { fr: "Tout ira bien.", en: "Everything will be fine." },
+      { fr: "Ce sera difficile.", en: "It'll be difficult." },
+      { fr: "Ça prendra du temps.", en: "It'll take time." },
+      { fr: "Tu comprendras plus tard.", en: "You'll understand later." },
+      { fr: "Ils regretteront.", en: "They'll regret it." },
+      { fr: "Elle sera contente.", en: "She'll be happy." },
+      { fr: "Il oubliera sûrement.", en: "He'll probably forget." },
+
+      // ---- refus avec won't ----
+      { fr: "Il ne m'écoutera pas.", en: "He won't listen to me." },
+      { fr: "Elle ne changera pas d'avis.", en: "She won't change her mind." },
+      { fr: "Ils ne nous croiront pas.", en: "They won't believe us." },
+      { fr: "Ça ne marchera pas.", en: "It won't work." },
+      { fr: "Je ne ferai pas ça.", en: "I won't do that." },
+      { fr: "Il ne dira jamais la vérité.", en: "He'll never tell the truth." },
+      { fr: "Elle ne comprendra pas.", en: "She won't understand." },
+      { fr: "Ils ne répondront pas.", en: "They won't answer." },
+      { fr: "Je ne changerai pas.", en: "I won't change." },
+      { fr: "Ça ne suffira pas.", en: "It won't be enough." },
+
+      // ---- offres ----
+      { fr: "Je vais porter ton sac.", en: "I'll carry your bag." },
+      { fr: "Je vais t'expliquer.", en: "I'll explain it to you." },
+      { fr: "Je vais te montrer comment faire.", en: "I'll show you how to do it." },
+      { fr: "Je vais fermer la fenêtre.", en: "I'll close the window." },
+      { fr: "Je vais appeler un taxi.", en: "I'll call a taxi." },
+      { fr: "Je vais lui envoyer un message.", en: "I'll send him a message." },
+      { fr: "Je vais nettoyer ça.", en: "I'll clean that up." },
+      { fr: "Je vais chercher de l'aide.", en: "I'll get some help." },
+      { fr: "Je vais te donner un exemple.", en: "I'll give you an example." },
+      { fr: "Je vais attendre avec toi.", en: "I'll wait with you." },
+
+      // ---- questions naturelles avec will ----
+      { fr: "Tu m'aideras ?", en: "Will you help me?" },
+      { fr: "Tu seras là ?", en: "Will you be there?" },
+      { fr: "Tu me rappelleras ?", en: "Will you call me back?" },
+      { fr: "Tu lui diras ?", en: "Will you tell him?" },
+      { fr: "Tu garderas le secret ?", en: "Will you keep the secret?" },
+      { fr: "Est-ce que ça marchera ?", en: "Will it work?" },
+      { fr: "Est-ce qu'il comprendra ?", en: "Will he understand?" },
+      { fr: "Est-ce qu'elle acceptera ?", en: "Will she accept?" },
+      { fr: "Est-ce qu'ils viendront ?", en: "Will they come?" },
+      { fr: "Est-ce qu'on gagnera ?", en: "Will we win?" },
+
+      // ---- WH questions ----
+      { fr: "Que feras-tu si ça arrive ?", en: "What will you do if that happens?" },
+      { fr: "Où iras-tu si tu pars ?", en: "Where will you go if you leave?" },
+      { fr: "Quand reviendra-t-il ?", en: "When will he come back?" },
+      { fr: "Pourquoi dira-t-elle ça ?", en: "Why will she say that?" },
+      { fr: "Comment saurons-nous ?", en: "How will we know?" },
+      { fr: "Qui nous aidera ?", en: "Who will help us?" },
+      { fr: "Combien de temps ça prendra ?", en: "How long will it take?" },
+      { fr: "Que se passera-t-il ensuite ?", en: "What will happen next?" },
+      { fr: "Comment réagira-t-il ?", en: "How will he react?" },
+      { fr: "Pourquoi changeraient-ils d'avis ?", en: "Why will they change their mind?" },
+
+      // ---- if clauses ----
+      { fr: "Si tu viens, je serai content.", en: "If you come, I'll be happy." },
+      { fr: "Si tu travailles, tu progresseras.", en: "If you work, you'll improve." },
+      { fr: "Si elle essaie, elle réussira.", en: "If she tries, she'll succeed." },
+      { fr: "Si on part maintenant, on arrivera à l'heure.", en: "If we leave now, we'll arrive on time." },
+      { fr: "Si tu continues, tu comprendras.", en: "If you keep going, you'll understand." },
+      { fr: "Si tu ne fais rien, rien ne changera.", en: "If you do nothing, nothing will change." },
+      { fr: "Si ça arrive, je t'appellerai.", en: "If that happens, I'll call you." },
+      { fr: "Si elle apprend ça, elle sera énervée.", en: "If she finds out, she'll be angry." },
+      { fr: "Si on perd, ce ne sera pas grave.", en: "If we lose, it won't be a big deal." },
+      { fr: "Si tu demandes gentiment, il acceptera.", en: "If you ask nicely, he'll accept." },
+
+      // ---- prédictions avec probably / maybe / I think ----
+      { fr: "Il viendra probablement.", en: "He'll probably come." },
+      { fr: "Elle dira probablement non.", en: "She'll probably say no." },
+      { fr: "Ils seront sûrement en retard.", en: "They'll probably be late." },
+      { fr: "Ça coûtera sûrement cher.", en: "It'll probably be expensive." },
+      { fr: "Tu aimeras sûrement ça.", en: "You'll probably like it." },
+      { fr: "Peut-être qu'il changera d'avis.", en: "Maybe he'll change his mind." },
+      { fr: "Peut-être qu'elle comprendra.", en: "Maybe she'll understand." },
+      { fr: "Je pense que ça marchera.", en: "I think it'll work." },
+      { fr: "Je pense qu'ils accepteront.", en: "I think they'll accept." },
+      { fr: "Je pense que tu réussiras.", en: "I think you'll succeed." },
+
+      // ---- phrases plus avancées ----
+      { fr: "Je te dirai ce que je pense.", en: "I'll tell you what I think." },
+      { fr: "On verra comment ça se passe.", en: "We'll see how it goes." },
+      { fr: "Je verrai ce que je peux faire.", en: "I'll see what I can do." },
+      { fr: "Il comprendra pourquoi plus tard.", en: "He'll understand why later." },
+      { fr: "Elle saura quoi faire.", en: "She'll know what to do." },
+      { fr: "Ils finiront par comprendre.", en: "They'll eventually understand." },
+      { fr: "Ça deviendra plus facile.", en: "It'll get easier." },
+      { fr: "Tu t'y habitueras.", en: "You'll get used to it." },
+      { fr: "Il changera peut-être avec le temps.", en: "He might change with time." },
+      { fr: "On trouvera bien une solution.", en: "We'll find a solution somehow." },
+      { fr: "Je t'enverrai un message.", en: "I'll send you a message." },
+      { fr: "Je reviendrai plus tard.", en: "I'll come back later." },
+      { fr: "Je te le dirai demain.", en: "I'll tell you tomorrow." },
+      { fr: "Je prendrai une pause.", en: "I'll take a break." },
+      { fr: "Je regarderai ça.", en: "I'll look at that." },
+      { fr: "Je réfléchirai à ça.", en: "I'll think about it." },
+      { fr: "Je ferai attention cette fois.", en: "I'll be careful this time." },
+      { fr: "Je t'expliquerai.", en: "I'll explain it to you." },
+      { fr: "Je m'améliorerai.", en: "I'll improve." },
+      { fr: "Je continuerai d'essayer.", en: "I'll keep trying." },
+
+      { fr: "On s'adaptera.", en: "We'll adapt." },
+      { fr: "On trouvera une autre solution.", en: "We'll find another solution." },
+      { fr: "On fera mieux la prochaine fois.", en: "We'll do better next time." },
+      { fr: "On apprendra de nos erreurs.", en: "We'll learn from our mistakes." },
+      { fr: "On fera attention.", en: "We'll be careful." },
+      { fr: "On s'améliorera.", en: "We'll improve." },
+      { fr: "On comprendra avec le temps.", en: "We'll understand with time." },
+      { fr: "On s'en sortira.", en: "We'll get through it." },
+      { fr: "On verra plus tard.", en: "We'll see later." },
+      { fr: "On fera comme ça.", en: "We'll do it like that." },
+
+      { fr: "Elle changera d'avis.", en: "She'll change her mind." },
+      { fr: "Elle comprendra un jour.", en: "She'll understand one day." },
+      { fr: "Elle finira par accepter.", en: "She'll eventually accept." },
+      { fr: "Elle reviendra.", en: "She'll come back." },
+      { fr: "Elle réussira à faire ça.", en: "She'll manage to do that." },
+      { fr: "Elle trouvera une solution.", en: "She'll find a solution." },
+      { fr: "Elle apprendra rapidement.", en: "She'll learn quickly." },
+      { fr: "Elle dira la vérité.", en: "She'll tell the truth." },
+      { fr: "Elle fera mieux.", en: "She'll do better." },
+      { fr: "Elle s'en sortira.", en: "She'll get through it." },
+
+      { fr: "Il changera.", en: "He'll change." },
+      { fr: "Il comprendra bientôt.", en: "He'll understand soon." },
+      { fr: "Il fera ce qu'il faut.", en: "He'll do what's necessary." },
+      { fr: "Il reviendra demain.", en: "He'll come back tomorrow." },
+      { fr: "Il s'excusera.", en: "He'll apologize." },
+      { fr: "Il trouvera une excuse.", en: "He'll find an excuse." },
+      { fr: "Il s'améliorera.", en: "He'll improve." },
+      { fr: "Il apprendra de ses erreurs.", en: "He'll learn from his mistakes." },
+      { fr: "Il fera attention.", en: "He'll be careful." },
+      { fr: "Il changera peut-être.", en: "He might change." },
+
+      { fr: "Ils comprendront.", en: "They'll understand." },
+      { fr: "Ils changeront d'avis.", en: "They'll change their mind." },
+      { fr: "Ils accepteront.", en: "They'll accept." },
+      { fr: "Ils refuseront.", en: "They'll refuse." },
+      { fr: "Ils apprendront vite.", en: "They'll learn fast." },
+      { fr: "Ils feront une erreur.", en: "They'll make a mistake." },
+      { fr: "Ils réussiront.", en: "They'll succeed." },
+      { fr: "Ils perdront.", en: "They'll lose." },
+      { fr: "Ils reviendront.", en: "They'll come back." },
+      { fr: "Ils continueront.", en: "They'll continue." },
+
+      { fr: "Je ne dirai rien de plus.", en: "I won't say anything more." },
+      { fr: "Je ne reviendrai pas.", en: "I won't come back." },
+      { fr: "Je ne changerai pas d'avis.", en: "I won't change my mind." },
+      { fr: "Je ne ferai pas d'erreur.", en: "I won't make a mistake." },
+      { fr: "Je ne répondrai pas.", en: "I won't answer." },
+      { fr: "Je ne t'oublierai jamais.", en: "I won't ever forget you." },
+      { fr: "Je ne partirai pas.", en: "I won't leave." },
+      { fr: "Je ne le ferai pas.", en: "I won't do it." },
+      { fr: "Je ne céderai pas.", en: "I won't give in." },
+      { fr: "Je ne changerai jamais.", en: "I will never change." },
+
+      { fr: "Tu comprendras bientôt.", en: "You'll understand soon." },
+      { fr: "Tu verras la différence.", en: "You'll see the difference." },
+      { fr: "Tu apprendras vite.", en: "You'll learn fast." },
+      { fr: "Tu feras mieux.", en: "You'll do better." },
+      { fr: "Tu changeras d'avis.", en: "You'll change your mind." },
+      { fr: "Tu réussiras.", en: "You'll succeed." },
+      { fr: "Tu regretteras ça.", en: "You'll regret that." },
+      { fr: "Tu comprendras pourquoi.", en: "You'll understand why." },
+      { fr: "Tu verras.", en: "You'll see." },
+      { fr: "Tu feras une erreur.", en: "You'll make a mistake." },
+
+      { fr: "Est-ce que tu comprendras ?", en: "Will you understand?" },
+      { fr: "Est-ce que tu changeras ?", en: "Will you change?" },
+      { fr: "Est-ce que tu accepteras ?", en: "Will you accept?" },
+      { fr: "Est-ce que tu refuseras ?", en: "Will you refuse?" },
+      { fr: "Est-ce que tu réussiras ?", en: "Will you succeed?" },
+      { fr: "Est-ce que tu essayeras ?", en: "Will you try?" },
+      { fr: "Est-ce que tu écouteras ?", en: "Will you listen?" },
+      { fr: "Est-ce que tu comprendras ça ?", en: "Will you understand that?" },
+      { fr: "Est-ce que tu changeras d'avis ?", en: "Will you change your mind?" },
+      { fr: "Est-ce que tu répondras ?", en: "Will you answer?" },
+
+      { fr: "Que feras-tu ensuite ?", en: "What will you do next?" },
+      { fr: "Où iras-tu après ?", en: "Where will you go after?" },
+      { fr: "Quand décideras-tu ?", en: "When will you decide?" },
+      { fr: "Pourquoi changeras-tu ?", en: "Why will you change?" },
+      { fr: "Comment feras-tu ça ?", en: "How will you do that?" },
+      { fr: "Qui viendra avec toi ?", en: "Who will come with you?" },
+      { fr: "Que diras-tu ?", en: "What will you say?" },
+      { fr: "Comment réagiront-ils ?", en: "How will they react?" },
+      { fr: "Pourquoi refusera-t-elle ?", en: "Why will she refuse?" },
+      { fr: "Quand reviendras-tu ?", en: "When will you come back?" }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>
