@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../../index.html">Accueil</a>
+        <a href="../../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi avec les Pronoms sujets, objets et réflexifs</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+
+      { fr: "Je le vois.", en: "I see him." },
+      { fr: "Je la vois.", en: "I see her." },
+      { fr: "Je les vois.", en: "I see them." },
+      { fr: "Il me voit.", en: "He sees me." },
+      { fr: "Elle nous voit.", en: "She sees us." },
+
+      { fr: "Je lui parle.", en: "I talk to him." },
+      { fr: "Je lui parle d'elle.", en: "I talk to him about her." },
+      { fr: "Je leur parle.", en: "I talk to them." },
+      { fr: "Il me parle d'eux.", en: "He talks to me about them." },
+      { fr: "Elle lui parle de moi.", en: "She talks to him about me." },
+
+      { fr: "Je lui donne ça.", en: "I give it to him." },
+      { fr: "Je lui donne ça pour elle.", en: "I give it to him for her." },
+      { fr: "Il me donne ça.", en: "He gives it to me." },
+      { fr: "Elle leur donne ça.", en: "She gives it to them." },
+      { fr: "Ils nous donnent ça.", en: "They give it to us." },
+
+      { fr: "Je pense à lui.", en: "I think about him." },
+      { fr: "Je pense à elle.", en: "I think about her." },
+      { fr: "Je pense à eux.", en: "I think about them." },
+      { fr: "Il pense à moi.", en: "He thinks about me." },
+      { fr: "Elle pense à nous.", en: "She thinks about us." },
+
+      { fr: "Je travaille avec lui.", en: "I work with him." },
+      { fr: "Je travaille avec elle.", en: "I work with her." },
+      { fr: "Je travaille avec eux.", en: "I work with them." },
+      { fr: "Il travaille avec moi.", en: "He works with me." },
+      { fr: "Elle travaille avec nous.", en: "She works with us." },
+
+      { fr: "Je le connais.", en: "I know him." },
+      { fr: "Je la connais.", en: "I know her." },
+      { fr: "Je les connais.", en: "I know them." },
+      { fr: "Il me connaît.", en: "He knows me." },
+      { fr: "Elle nous connaît.", en: "She knows us." },
+
+      { fr: "Je le vois avec elle.", en: "I see him with her." },
+      { fr: "Je la vois avec lui.", en: "I see her with him." },
+      { fr: "Je les vois avec nous.", en: "I see them with us." },
+      { fr: "Il me voit avec eux.", en: "He sees me with them." },
+      { fr: "Elle nous voit avec lui.", en: "She sees us with him." },
+
+      { fr: "Je parle de lui.", en: "I talk about him." },
+      { fr: "Je parle d'elle.", en: "I talk about her." },
+      { fr: "Je parle d'eux.", en: "I talk about them." },
+      { fr: "Il parle de moi.", en: "He talks about me." },
+      { fr: "Elle parle de nous.", en: "She talks about us." },
+
+      { fr: "Je vais avec lui.", en: "I go with him." },
+      { fr: "Je vais avec elle.", en: "I go with her." },
+      { fr: "Je vais avec eux.", en: "I go with them." },
+      { fr: "Il vient avec moi.", en: "He comes with me." },
+      { fr: "Elle vient avec nous.", en: "She comes with us." },
+
+      { fr: "Je le regarde.", en: "I look at him." },
+      { fr: "Je la regarde.", en: "I look at her." },
+      { fr: "Je les regarde.", en: "I look at them." },
+      { fr: "Il me regarde.", en: "He looks at me." },
+      { fr: "Elle nous regarde.", en: "She looks at us." },
+
+      // reflexive
+      { fr: "Je me parle.", en: "I talk to myself." },
+      { fr: "Il se regarde.", en: "He looks at himself." },
+      { fr: "Elle se regarde.", en: "She looks at herself." },
+      { fr: "Ils se regardent.", en: "They look at themselves." },
+      { fr: "On se débrouille seuls.", en: "We manage by ourselves." },
+
+      { fr: "Je le fais moi-même.", en: "I do it myself." },
+      { fr: "Il le fait lui-même.", en: "He does it himself." },
+      { fr: "Elle le fait elle-même.", en: "She does it herself." },
+      { fr: "Ils le font eux-mêmes.", en: "They do it themselves." },
+      { fr: "Vous le faites vous-mêmes.", en: "You do it yourselves." },
+
+      { fr: "Je me vois dans le miroir.", en: "I see myself in the mirror." },
+      { fr: "Il s'est blessé.", en: "He hurt himself." },
+      { fr: "Elle s'est coupée.", en: "She cut herself." },
+      { fr: "Ils se sont perdus.", en: "They lost themselves." },
+      { fr: "On s'est trompés.", en: "We made a mistake ourselves." },
+
+      // combos avancés
+      { fr: "Je lui parle d'elle.", en: "I talk to him about her." },
+      { fr: "Je lui parle d'eux.", en: "I talk to him about them." },
+      { fr: "Il me parle d'elle.", en: "He talks to me about her." },
+      { fr: "Elle lui parle d'eux.", en: "She talks to him about them." },
+      { fr: "Ils nous parlent de lui.", en: "They talk to us about him." },
+
+      { fr: "Je travaille avec lui pour elle.", en: "I work with him for her." },
+      { fr: "Je fais ça pour eux avec lui.", en: "I do that for them with him." },
+      { fr: "Il fait ça pour moi avec eux.", en: "He does that for me with them." },
+      { fr: "Elle fait ça pour lui avec nous.", en: "She does that for him with us." },
+      { fr: "Ils font ça pour elle avec moi.", en: "They do that for her with me." },
+
+      // questions
+      { fr: "Tu le vois ?", en: "Do you see him?" },
+      { fr: "Tu la vois ?", en: "Do you see her?" },
+      { fr: "Tu les vois ?", en: "Do you see them?" },
+      { fr: "Il te voit ?", en: "Does he see you?" },
+      { fr: "Elle vous voit ?", en: "Does she see you?" },
+
+      { fr: "Tu lui parles ?", en: "Do you talk to him?" },
+      { fr: "Tu leur parles ?", en: "Do you talk to them?" },
+      { fr: "Il me parle ?", en: "Does he talk to me?" },
+      { fr: "Elle lui parle ?", en: "Does she talk to him?" },
+      { fr: "Ils nous parlent ?", en: "Do they talk to us?" },
+
+      // négatif
+      { fr: "Je ne le vois pas.", en: "I don't see him." },
+      { fr: "Je ne la vois pas.", en: "I don't see her." },
+      { fr: "Je ne les vois pas.", en: "I don't see them." },
+      { fr: "Il ne me voit pas.", en: "He doesn't see me." },
+      { fr: "Elle ne nous voit pas.", en: "She doesn't see us." },
+
+      { fr: "Je ne lui parle pas.", en: "I don't talk to him." },
+      { fr: "Je ne leur parle pas.", en: "I don't talk to them." },
+      { fr: "Il ne me parle pas.", en: "He doesn't talk to me." },
+      { fr: "Elle ne lui parle pas.", en: "She doesn't talk to him." },
+      { fr: "Ils ne nous parlent pas.", en: "They don't talk to us." },
+
+      // remplissage final variations naturelles
+      { fr: "Je lui en parle.", en: "I talk to him about it." },
+      { fr: "Je leur en parle.", en: "I talk to them about it." },
+      { fr: "Il m'en parle.", en: "He talks to me about it." },
+      { fr: "Elle lui en parle.", en: "She talks to him about it." },
+      { fr: "Ils nous en parlent.", en: "They talk to us about it." },
+
+      { fr: "Je fais ça pour lui.", en: "I do that for him." },
+      { fr: "Je fais ça pour elle.", en: "I do that for her." },
+      { fr: "Je fais ça pour eux.", en: "I do that for them." },
+      { fr: "Il fait ça pour moi.", en: "He does that for me." },
+      { fr: "Elle fait ça pour nous.", en: "She does that for us." }
+
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>

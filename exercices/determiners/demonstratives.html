@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../../index.html">Accueil</a>
+        <a href="../../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi à utiliser les déterminants démonstratifs</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+      { fr: "Ce livre (là) est intéressant.", en: "This book is interesting." },
+      { fr: "Ces livres (là) sont intéressants.", en: "These books are interesting." },
+      { fr: "Ce chien (là) est gentil.", en: "This dog is nice." },
+      { fr: "Ces chiens (là) sont gentils.", en: "These dogs are nice." },
+      { fr: "Ce film (là) est incroyable.", en: "This movie is amazing." },
+      { fr: "Ces films (là) sont incroyables.", en: "These movies are amazing." },
+      { fr: "Ce restaurant (là) est bon.", en: "This restaurant is good." },
+      { fr: "Ces restaurants (là) sont bons.", en: "These restaurants are good." },
+      { fr: "Ce téléphone (là) est nouveau.", en: "This phone is new." },
+      { fr: "Ces téléphones (là) sont nouveaux.", en: "These phones are new." },
+      { fr: "Ce jeu (là) est amusant.", en: "This game is fun." },
+      { fr: "Ces jeux (là) sont amusants.", en: "These games are fun." },
+      { fr: "Ce sac (là) est pratique.", en: "This bag is useful." },
+      { fr: "Ces sacs (là) sont pratiques.", en: "These bags are useful." },
+      { fr: "Ce vélo (là) est rapide.", en: "This bike is fast." },
+      { fr: "Ces vélos (là) sont rapides.", en: "These bikes are fast." },
+      { fr: "Ce gâteau (là) est bon.", en: "This cake is good." },
+      { fr: "Ces gâteaux (là) sont bons.", en: "These cakes are good." },
+      { fr: "Ce pull (là) est beau.", en: "This sweater is nice." },
+      { fr: "Ces pulls (là) sont beaux.", en: "These sweaters are nice." },
+      { fr: "Cette chaussure (là) est confortable.", en: "This shoe is comfortable." },
+      { fr: "Ces chaussures (là) sont confortables.", en: "These shoes are comfortable." },
+      { fr: "Cette chaise (là) est solide.", en: "This chair is solid." },
+      { fr: "Ces chaises (là) sont solides.", en: "These chairs are solid." },
+      { fr: "Cette table (là) est propre.", en: "This table is clean." },
+      { fr: "Ces tables (là) sont propres.", en: "These tables are clean." },
+      { fr: "Cette photo (là) est belle.", en: "This picture is beautiful." },
+      { fr: "Ces photos (là) sont belles.", en: "These pictures are beautiful." },
+      { fr: "Cette voiture (là) est rapide.", en: "This car is fast." },
+      { fr: "Ces voitures (là) sont rapides.", en: "These cars are fast." },
+      { fr: "Cette maison (là) est grande.", en: "This house is big." },
+      { fr: "Ces maisons (là) sont grandes.", en: "These houses are big." },
+      { fr: "Cette porte (là) est fermée.", en: "This door is closed." },
+      { fr: "Ces portes (là) sont fermées.", en: "These doors are closed." },
+      { fr: "Cette fenêtre (là) est ouverte.", en: "This window is open." },
+      { fr: "Ces fenêtres (là) sont ouvertes.", en: "These windows are open." },
+      { fr: "Cet ordinateur (là) est cher.", en: "This computer is expensive." },
+      { fr: "Ces ordinateurs (là) sont chers.", en: "These computers are expensive." },
+      { fr: "Cette chemise (là) est élégante.", en: "This shirt is elegant." },
+      { fr: "Ces chemises (là) sont élégantes.", en: "These shirts are elegant." },
+      { fr: "Ce pantalon (là) est cool.", en: "This pair of pants is cool." },
+      { fr: "Ces pantalons (là) sont cool.", en: "These pants are cool." },
+      { fr: "Cette montre (là) est belle.", en: "This watch is beautiful." },
+      { fr: "Ces montres (là) sont belles.", en: "These watches are beautiful." },
+      { fr: "Cette lampe (là) est allumée.", en: "This lamp is on." },
+      { fr: "Ces lampes (là) sont allumées.", en: "These lamps are on." },
+      { fr: "Cette clé (là) est importante.", en: "This key is important." },
+      { fr: "Ces clés (là) sont importantes.", en: "These keys are important." },
+      { fr: "Ce bâtiment (là) est moderne.", en: "This building is modern." },
+      { fr: "Ces bâtiments (là) sont modernes.", en: "These buildings are modern." },
+
+      { fr: "Ce livre (là-bas) est nul.", en: "That book is bad." },
+      { fr: "Ces livres (là-bas) sont nuls.", en: "Those books are bad." },
+      { fr: "Ce chien (là-bas) est dangereux.", en: "That dog is dangerous." },
+      { fr: "Ces chiens (là-bas) sont dangereux.", en: "Those dogs are dangerous." },
+      { fr: "Ce film (là-bas) est mauvais.", en: "That movie is bad." },
+      { fr: "Ces films (là-bas) sont mauvais.", en: "Those movies are bad." },
+      { fr: "Ce restaurant (là-bas) est cher.", en: "That restaurant is expensive." },
+      { fr: "Ces restaurants (là-bas) sont chers.", en: "Those restaurants are expensive." },
+      { fr: "Ce téléphone (là-bas) est vieux.", en: "That phone is old." },
+      { fr: "Ces téléphones (là-bas) sont vieux.", en: "Those phones are old." },
+      { fr: "Ce jeu (là-bas) est ennuyeux.", en: "That game is boring." },
+      { fr: "Ces jeux (là-bas) sont ennuyeux.", en: "Those games are boring." },
+      { fr: "Ce sac (là-bas) est sale.", en: "That bag is dirty." },
+      { fr: "Ces sacs (là-bas) sont sales.", en: "Those bags are dirty." },
+      { fr: "Ce vélo (là-bas) est lent.", en: "That bike is slow." },
+      { fr: "Ces vélos (là-bas) sont lents.", en: "Those bikes are slow." },
+      { fr: "Ce gâteau (là-bas) est mauvais.", en: "That cake is bad." },
+      { fr: "Ces gâteaux (là-bas) sont mauvais.", en: "Those cakes are bad." },
+      { fr: "Ce pull (là-bas) est moche.", en: "That sweater is ugly." },
+      { fr: "Ces pulls (là-bas) sont moches.", en: "Those sweaters are ugly." },
+      { fr: "Cette chaussure (là-bas) est abîmée.", en: "That shoe is damaged." },
+      { fr: "Ces chaussures (là-bas) sont abîmées.", en: "Those shoes are damaged." },
+      { fr: "Cette chaise (là-bas) est cassée.", en: "That chair is broken." },
+      { fr: "Ces chaises (là-bas) sont cassées.", en: "Those chairs are broken." },
+      { fr: "Cette table (là-bas) est sale.", en: "That table is dirty." },
+      { fr: "Ces tables (là-bas) sont sales.", en: "Those tables are dirty." },
+      { fr: "Cette photo (là-bas) est floue.", en: "That picture is blurry." },
+      { fr: "Ces photos (là-bas) sont floues.", en: "Those pictures are blurry." },
+      { fr: "Cette voiture (là-bas) est lente.", en: "That car is slow." },
+      { fr: "Ces voitures (là-bas) sont lentes.", en: "Those cars are slow." },
+      { fr: "Cette maison (là-bas) est vieille.", en: "That house is old." },
+      { fr: "Ces maisons (là-bas) sont vieilles.", en: "Those houses are old." },
+      { fr: "Cette porte (là-bas) est ouverte.", en: "That door is open." },
+      { fr: "Ces portes (là-bas) sont ouvertes.", en: "Those doors are open." },
+      { fr: "Cette fenêtre (là-bas) est cassée.", en: "That window is broken." },
+      { fr: "Ces fenêtres (là-bas) sont cassées.", en: "Those windows are broken." },
+      { fr: "Cet ordinateur (là-bas) est lent.", en: "That computer is slow." },
+      { fr: "Ces ordinateurs (là-bas) sont lents.", en: "Those computers are slow." },
+      { fr: "Cette chemise (là-bas) est froissée.", en: "That shirt is wrinkled." },
+      { fr: "Ces chemises (là-bas) sont froissées.", en: "Those shirts are wrinkled." },
+      { fr: "Ce pantalon (là-bas) est moche.", en: "That pair of pants is ugly." },
+      { fr: "Ces pantalons (là-bas) sont moches.", en: "Those pants are ugly." },
+      { fr: "Cette montre (là-bas) est cassée.", en: "That watch is broken." },
+      { fr: "Ces montres (là-bas) sont cassées.", en: "Those watches are broken." },
+      { fr: "Cette lampe (là-bas) est éteinte.", en: "That lamp is off." },
+      { fr: "Ces lampes (là-bas) sont éteintes.", en: "Those lamps are off." },
+      { fr: "Cette clé (là-bas) est perdue.", en: "That key is lost." },
+      { fr: "Ces clés (là-bas) sont perdues.", en: "Those keys are lost." },
+      { fr: "Ce bâtiment (là-bas) est vieux.", en: "That building is old." },
+      { fr: "Ces bâtiments (là-bas) sont vieux.", en: "Those buildings are old." },
+
+      { fr: "J'aime beaucoup ce livre.", en: "I really like this book." },
+      { fr: "Elle adore ces livres.", en: "She loves these books." },
+      { fr: "John trouve ce chien adorable.", en: "John finds this dog adorable." },
+      { fr: "Tu trouves ces chiens gentils.", en: "You find these dogs nice." },
+      { fr: "On veut voir ce film.", en: "We want to see this movie." },
+      { fr: "Ils recommandent ces films.", en: "They recommend these movies." },
+      { fr: "Sarah adore ce restaurant.", en: "Sarah loves this restaurant." },
+      { fr: "Nous choisissons ces restaurants.", en: "We choose these restaurants." },
+      { fr: "Il veut acheter ce téléphone.", en: "He wants to buy this phone." },
+      { fr: "Elles préfèrent ces téléphones.", en: "They prefer these phones." },
+
+      { fr: "Tu devrais essayer ce jeu.", en: "You should try this game." },
+      { fr: "John recommande ces jeux.", en: "John recommends these games." },
+      { fr: "Elle utilise souvent ce sac.", en: "She often uses this bag." },
+      { fr: "On garde ces sacs.", en: "We are keeping these bags." },
+      { fr: "Il choisit ce vélo.", en: "He chooses this bike." },
+      { fr: "Sarah veut tester ces vélos.", en: "Sarah wants to try these bikes." },
+      { fr: "Je veux goûter ce gâteau.", en: "I want to try this cake." },
+      { fr: "Ils adorent ces gâteaux.", en: "They love these cakes." },
+      { fr: "Tu portes bien ce pull.", en: "You look good in this sweater." },
+      { fr: "Elle aime porter ces pulls.", en: "She likes wearing these sweaters." },
+
+      { fr: "John veut essayer cette chaussure.", en: "John wants to try this shoe." },
+      { fr: "Elles trouvent ces chaussures confortables.", en: "They find these shoes comfortable." },
+      { fr: "Je vais prendre cette chaise.", en: "I'm going to take this chair." },
+      { fr: "Nous gardons ces chaises.", en: "We are keeping these chairs." },
+      { fr: "Tu peux utiliser cette table.", en: "You can use this table." },
+      { fr: "Ils préfèrent ces tables.", en: "They prefer these tables." },
+      { fr: "Sarah trouve cette photo magnifique.", en: "Sarah finds this picture beautiful." },
+      { fr: "On va imprimer ces photos.", en: "We are going to print these pictures." },
+      { fr: "Il veut conduire cette voiture.", en: "He wants to drive this car." },
+      { fr: "John adore ces voitures.", en: "John loves these cars." },
+
+      { fr: "Elle veut visiter cette maison.", en: "She wants to visit this house." },
+      { fr: "Ils veulent acheter ces maisons.", en: "They want to buy these houses." },
+      { fr: "Tu dois fermer cette porte.", en: "You have to close this door." },
+      { fr: "Nous devons réparer ces portes.", en: "We have to fix these doors." },
+      { fr: "Je vais ouvrir cette fenêtre.", en: "I'm going to open this window." },
+      { fr: "Sarah veut nettoyer ces fenêtres.", en: "Sarah wants to clean these windows." },
+      { fr: "John utilise cet ordinateur.", en: "John uses this computer." },
+      { fr: "Ils veulent vendre ces ordinateurs.", en: "They want to sell these computers." },
+      { fr: "Elle porte souvent cette chemise.", en: "She often wears this shirt." },
+      { fr: "Tu devrais essayer ces chemises.", en: "You should try these shirts." },
+
+      { fr: "Il veut acheter ce pantalon.", en: "He wants to buy this pair of pants." },
+      { fr: "John préfère ces pantalons.", en: "John prefers these pants." },
+      { fr: "Sarah porte cette montre tous les jours.", en: "Sarah wears this watch every day." },
+      { fr: "Elles regardent ces montres.", en: "They are looking at these watches." },
+      { fr: "Je vais allumer cette lampe.", en: "I'm going to turn on this lamp." },
+      { fr: "Nous allons déplacer ces lampes.", en: "We are going to move these lamps." },
+      { fr: "Tu cherches cette clé.", en: "You are looking for this key." },
+      { fr: "Ils ont besoin de ces clés.", en: "They need these keys." },
+      { fr: "On veut visiter ce bâtiment.", en: "We want to visit this building." },
+      { fr: "John admire ces bâtiments.", en: "John admires these buildings." },
+
+      { fr: "Je déteste ce livre.", en: "I hate that book." },
+      { fr: "Elle refuse de lire ces livres.", en: "She refuses to read those books." },
+      { fr: "John n'approche pas ce chien.", en: "John doesn't go near that dog." },
+      { fr: "Tu devrais éviter ces chiens.", en: "You should avoid those dogs." },
+      { fr: "On ne veut pas voir ce film.", en: "We don't want to see that movie." },
+      { fr: "Ils critiquent toujours ces films.", en: "They always criticize those movies." },
+      { fr: "Sarah déteste ce restaurant.", en: "Sarah hates that restaurant." },
+      { fr: "Nous évitons ces restaurants.", en: "We avoid those restaurants." },
+      { fr: "Il regrette d'avoir acheté ce téléphone.", en: "He regrets buying that phone." },
+      { fr: "Elles veulent remplacer ces téléphones.", en: "They want to replace those phones." },
+
+      { fr: "Tu devrais arrêter ce jeu.", en: "You should stop playing that game." },
+      { fr: "John critique ces jeux.", en: "John criticizes those games." },
+      { fr: "Elle veut jeter ce sac.", en: "She wants to throw away that bag." },
+      { fr: "On ne garde pas ces sacs.", en: "We aren't keeping those bags." },
+      { fr: "Il refuse de prendre ce vélo.", en: "He refuses to take that bike." },
+      { fr: "Sarah ne veut pas tester ces vélos.", en: "Sarah doesn't want to try those bikes." },
+      { fr: "Je ne veux pas goûter ce gâteau.", en: "I don't want to try that cake." },
+      { fr: "Ils trouvent ces gâteaux dégoûtants.", en: "They find those cakes disgusting." },
+      { fr: "Tu ne devrais pas porter ce pull.", en: "You shouldn't wear that sweater." },
+      { fr: "Elle déteste ces pulls.", en: "She hates those sweaters." },
+
+      { fr: "John refuse d'essayer cette chaussure.", en: "John refuses to try that shoe." },
+      { fr: "Elles trouvent ces chaussures horribles.", en: "They find those shoes horrible." },
+      { fr: "Je ne vais pas prendre cette chaise.", en: "I'm not going to take that chair." },
+      { fr: "Nous allons jeter ces chaises.", en: "We are going to throw away those chairs." },
+      { fr: "Tu ne peux pas utiliser cette table.", en: "You can't use that table." },
+      { fr: "Ils veulent remplacer ces tables.", en: "They want to replace those tables." },
+      { fr: "Sarah trouve cette photo ratée.", en: "Sarah thinks that picture is bad." },
+      { fr: "On va supprimer ces photos.", en: "We are going to delete those pictures." },
+      { fr: "Il refuse de conduire cette voiture.", en: "He refuses to drive that car." },
+      { fr: "John critique ces voitures.", en: "John criticizes those cars." },
+
+      { fr: "Elle ne veut pas visiter cette maison.", en: "She doesn't want to visit that house." },
+      { fr: "Ils refusent d'acheter ces maisons.", en: "They refuse to buy those houses." },
+      { fr: "Tu dois éviter cette porte.", en: "You have to avoid that door." },
+      { fr: "Nous devons remplacer ces portes.", en: "We have to replace those doors." },
+      { fr: "Je ne vais pas ouvrir cette fenêtre.", en: "I'm not going to open that window." },
+      { fr: "Sarah refuse de nettoyer ces fenêtres.", en: "Sarah refuses to clean those windows." },
+      { fr: "John n'utilise jamais cet ordinateur.", en: "John never uses that computer." },
+      { fr: "Ils veulent jeter ces ordinateurs.", en: "They want to throw away those computers." },
+      { fr: "Elle refuse de porter cette chemise.", en: "She refuses to wear that shirt." },
+      { fr: "Tu devrais éviter ces chemises.", en: "You should avoid those shirts." },
+
+      { fr: "Il regrette d'avoir acheté ce pantalon.", en: "He regrets buying that pair of pants." },
+      { fr: "John déteste ces pantalons.", en: "John hates those pants." },
+      { fr: "Sarah ne porte jamais cette montre.", en: "Sarah never wears that watch." },
+      { fr: "Elles critiquent ces montres.", en: "They criticize those watches." },
+      { fr: "Je ne vais pas allumer cette lampe.", en: "I'm not going to turn on that lamp." },
+      { fr: "Nous allons remplacer ces lampes.", en: "We are going to replace those lamps." },
+      { fr: "Tu as perdu cette clé.", en: "You lost that key." },
+      { fr: "Ils ont oublié ces clés.", en: "They forgot those keys." },
+      { fr: "On ne veut pas visiter ce bâtiment.", en: "We don't want to visit that building." },
+      { fr: "John critique ces bâtiments.", en: "John criticizes those buildings." }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>

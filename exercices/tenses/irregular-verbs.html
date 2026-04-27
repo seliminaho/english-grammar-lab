@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coming Soon - Flashcards</title>
-  <link rel="stylesheet" href="../../style.css" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
   <style>
     * {
       margin: 0;
@@ -29,6 +29,7 @@
       backdrop-filter: blur(8px);
     }
 
+
     main {
       flex: 1;
       display: flex;
@@ -37,7 +38,7 @@
       padding: 2rem;
     }
 
-    .coming-soon-wrapper {
+    .flashcard-wrapper {
       width: 100%;
       max-width: 700px;
       text-align: center;
@@ -55,60 +56,77 @@
       font-size: 1rem;
     }
 
-    .coming-card {
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
       width: 100%;
       min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
       border-radius: 24px;
       padding: 2rem;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      backface-visibility: hidden;
       box-shadow: var(--shadow-medium);
       border: 1px solid var(--border);
-      background: var(--surface);
     }
 
-    .coming-label {
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
       font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--primary);
-      margin-bottom: 1rem;
+      opacity: 0.8;
     }
 
-    .coming-text {
-      font-size: clamp(1.5rem, 3vw, 2.3rem);
-      line-height: 1.4;
-      font-weight: 700;
-      color: var(--text-strong);
-      margin-bottom: 1rem;
-    }
-
-    .coming-description {
-      color: var(--text-soft);
-      font-size: 1rem;
-      line-height: 1.6;
-      max-width: 520px;
-    }
-
-    .back-link {
-      display: inline-block;
+    .helper-text {
       margin-top: 1.5rem;
-      color: var(--primary);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
+      color: var(--text-soft);
+      font-size: 0.95rem;
     }
 
     @media (max-width: 640px) {
-      .coming-card {
+      .flashcard {
         min-height: 260px;
+      }
+
+      .card-face {
         padding: 1.4rem;
       }
 
@@ -133,25 +151,178 @@
   </header>
 
   <main>
-    <div class="coming-soon-wrapper">
-      <h1 class="page-title">Flashcards bientôt disponibles</h1>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi à trouver la forme Past Simple des verbes irréguliers</h1>
       <p class="page-subtitle">
-        Cette section sera ajoutée au fur et à mesure des cours.
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
       </p>
 
-      <div class="coming-card">
-        <div class="coming-label">Coming soon</div>
-        <p class="coming-text">Ce cours sera bientôt disponible ici.</p>
-        <p class="coming-description">
-          Les flashcards correspondantes seront ajoutées après la préparation du cours.
-        </p>
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
       </div>
 
-      <a href="../../categories/tenses.html" class="back-link">← Retour à la catégorie</a>
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
     </div>
   </main>
 
-  <script src="../../theme.js"></script>
+  <script>
+    const cards = [
+
+      { fr: "be", en: "was / were" },
+      { fr: "become", en: "became" },
+      { fr: "begin", en: "began" },
+      { fr: "break", en: "broke" },
+      { fr: "bring", en: "brought" },
+      { fr: "build", en: "built" },
+      { fr: "buy", en: "bought" },
+      { fr: "catch", en: "caught" },
+      { fr: "choose", en: "chose" },
+      { fr: "come", en: "came" },
+
+      { fr: "cost", en: "cost" },
+      { fr: "cut", en: "cut" },
+      { fr: "do", en: "did" },
+      { fr: "draw", en: "drew" },
+      { fr: "drink", en: "drank" },
+      { fr: "drive", en: "drove" },
+      { fr: "eat", en: "ate" },
+      { fr: "fall", en: "fell" },
+      { fr: "feel", en: "felt" },
+      { fr: "find", en: "found" },
+
+      { fr: "fly", en: "flew" },
+      { fr: "forget", en: "forgot" },
+      { fr: "get", en: "got" },
+      { fr: "give", en: "gave" },
+      { fr: "go", en: "went" },
+      { fr: "grow", en: "grew" },
+      { fr: "have", en: "had" },
+      { fr: "hear", en: "heard" },
+      { fr: "hold", en: "held" },
+      { fr: "keep", en: "kept" },
+
+      { fr: "know", en: "knew" },
+      { fr: "leave", en: "left" },
+      { fr: "lend", en: "lent" },
+      { fr: "let", en: "let" },
+      { fr: "lose", en: "lost" },
+      { fr: "make", en: "made" },
+      { fr: "mean", en: "meant" },
+      { fr: "meet", en: "met" },
+      { fr: "pay", en: "paid" },
+      { fr: "put", en: "put" },
+
+      { fr: "read", en: "read" },
+      { fr: "ride", en: "rode" },
+      { fr: "ring", en: "rang" },
+      { fr: "run", en: "ran" },
+      { fr: "say", en: "said" },
+      { fr: "see", en: "saw" },
+      { fr: "sell", en: "sold" },
+      { fr: "send", en: "sent" },
+      { fr: "set", en: "set" },
+      { fr: "show", en: "showed" },
+
+      { fr: "shut", en: "shut" },
+      { fr: "sing", en: "sang" },
+      { fr: "sit", en: "sat" },
+      { fr: "sleep", en: "slept" },
+      { fr: "speak", en: "spoke" },
+      { fr: "spend", en: "spent" },
+      { fr: "stand", en: "stood" },
+      { fr: "steal", en: "stole" },
+      { fr: "swim", en: "swam" },
+      { fr: "take", en: "took" },
+
+      { fr: "teach", en: "taught" },
+      { fr: "tell", en: "told" },
+      { fr: "think", en: "thought" },
+      { fr: "throw", en: "threw" },
+      { fr: "understand", en: "understood" },
+      { fr: "wake", en: "woke" },
+      { fr: "wear", en: "wore" },
+      { fr: "win", en: "won" },
+      { fr: "write", en: "wrote" },
+
+      // ---- AJOUTS POUR ARRIVER À 100 ----
+      { fr: "arise", en: "arose" },
+      { fr: "awake", en: "awoke" },
+      { fr: "beat", en: "beat" },
+      { fr: "bend", en: "bent" },
+      { fr: "bet", en: "bet" },
+      { fr: "bind", en: "bound" },
+      { fr: "bite", en: "bit" },
+      { fr: "bleed", en: "bled" },
+      { fr: "blow", en: "blew" },
+      { fr: "burst", en: "burst" },
+      { fr: "dig", en: "dug" },
+      { fr: "feed", en: "fed" },
+      { fr: "fight", en: "fought" },
+      { fr: "freeze", en: "froze" },
+      { fr: "hang", en: "hung" },
+      { fr: "hide", en: "hid" },
+      { fr: "hit", en: "hit" },
+      { fr: "hurt", en: "hurt" },
+      { fr: "lay", en: "laid" },
+      { fr: "lead", en: "led" },
+      { fr: "light", en: "lit" }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
 </body>
 
 </html>

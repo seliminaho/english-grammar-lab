@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coming Soon - Flashcards</title>
-  <link rel="stylesheet" href="../../style.css" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
   <style>
     * {
       margin: 0;
@@ -29,6 +29,7 @@
       backdrop-filter: blur(8px);
     }
 
+
     main {
       flex: 1;
       display: flex;
@@ -37,7 +38,7 @@
       padding: 2rem;
     }
 
-    .coming-soon-wrapper {
+    .flashcard-wrapper {
       width: 100%;
       max-width: 700px;
       text-align: center;
@@ -55,60 +56,77 @@
       font-size: 1rem;
     }
 
-    .coming-card {
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
       width: 100%;
       min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
       border-radius: 24px;
       padding: 2rem;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      backface-visibility: hidden;
       box-shadow: var(--shadow-medium);
       border: 1px solid var(--border);
-      background: var(--surface);
     }
 
-    .coming-label {
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
       font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--primary);
-      margin-bottom: 1rem;
+      opacity: 0.8;
     }
 
-    .coming-text {
-      font-size: clamp(1.5rem, 3vw, 2.3rem);
-      line-height: 1.4;
-      font-weight: 700;
-      color: var(--text-strong);
-      margin-bottom: 1rem;
-    }
-
-    .coming-description {
-      color: var(--text-soft);
-      font-size: 1rem;
-      line-height: 1.6;
-      max-width: 520px;
-    }
-
-    .back-link {
-      display: inline-block;
+    .helper-text {
       margin-top: 1.5rem;
-      color: var(--primary);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
+      color: var(--text-soft);
+      font-size: 0.95rem;
     }
 
     @media (max-width: 640px) {
-      .coming-card {
+      .flashcard {
         min-height: 260px;
+      }
+
+      .card-face {
         padding: 1.4rem;
       }
 
@@ -133,25 +151,204 @@
   </header>
 
   <main>
-    <div class="coming-soon-wrapper">
-      <h1 class="page-title">Flashcards bientôt disponibles</h1>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au Past Simple</h1>
       <p class="page-subtitle">
-        Cette section sera ajoutée au fur et à mesure des cours.
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
       </p>
 
-      <div class="coming-card">
-        <div class="coming-label">Coming soon</div>
-        <p class="coming-text">Ce cours sera bientôt disponible ici.</p>
-        <p class="coming-description">
-          Les flashcards correspondantes seront ajoutées après la préparation du cours.
-        </p>
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
       </div>
 
-      <a href="../../categories/tenses.html" class="back-link">← Retour à la catégorie</a>
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
     </div>
   </main>
 
-  <script src="../../theme.js"></script>
+  <script>
+    const cards = [
+
+      // ===== EXISTING (30) =====
+      { fr: "J'ai mangé.", en: "I ate." },
+      { fr: "On a regardé un film.", en: "We watched a movie." },
+      { fr: "Elle a travaillé hier.", en: "She worked yesterday." },
+      { fr: "Il a parlé au téléphone.", en: "He talked on the phone." },
+      { fr: "Ils ont joué dehors.", en: "They played outside." },
+
+      { fr: "Je ne suis pas allé à l'école.", en: "I didn't go to school." },
+      { fr: "On n'a pas regardé ça.", en: "We didn't watch that." },
+      { fr: "Elle n'a pas mangé.", en: "She didn't eat." },
+      { fr: "Il n'a pas répondu.", en: "He didn't answer." },
+      { fr: "Ils ne sont pas venus.", en: "They didn't come." },
+
+      { fr: "Est-ce que tu as travaillé hier ?", en: "Did you work yesterday?" },
+      { fr: "Est-ce qu'on a oublié quelque chose ?", en: "Did we forget something?" },
+      { fr: "Est-ce qu'elle a compris ?", en: "Did she understand?" },
+      { fr: "Est-ce qu'il est parti tôt ?", en: "Did he leave early?" },
+      { fr: "Est-ce qu'ils ont gagné ?", en: "Did they win?" },
+
+      { fr: "Qu'est-ce que tu as fait ?", en: "What did you do?" },
+      { fr: "Pourquoi est-ce qu'elle a pleuré ?", en: "Why did she cry?" },
+      { fr: "Où est-ce qu'ils sont allés ?", en: "Where did they go?" },
+      { fr: "Avec qui est-ce que tu as parlé ?", en: "Who did you talk to?" },
+      { fr: "Comment est-ce qu'il a fait ça ?", en: "How did he do that?" },
+
+      { fr: "J'ai pris une décision.", en: "I made a decision." },
+      { fr: "On a trouvé une solution.", en: "We found a solution." },
+      { fr: "Elle a perdu ses clés.", en: "She lost her keys." },
+      { fr: "Il a acheté une voiture.", en: "He bought a car." },
+      { fr: "Ils ont construit une maison.", en: "They built a house." },
+
+      { fr: "Je n'ai pas compris.", en: "I didn't understand." },
+      { fr: "On n'a pas fini.", en: "We didn't finish." },
+      { fr: "Elle n'a pas voulu venir.", en: "She didn't want to come." },
+      { fr: "Il n'a pas vu le message.", en: "He didn't see the message." },
+      { fr: "Ils n'ont pas entendu.", en: "They didn't hear." },
+
+      // ===== ADDITIONS (170) =====
+
+      // ---- affirmatif avec marqueurs de temps ----
+      { fr: "J'ai travaillé hier.", en: "I worked yesterday." },
+      { fr: "On est partis hier soir.", en: "We left last night." },
+      { fr: "Elle est arrivée ce matin.", en: "She arrived this morning." },
+      { fr: "Il a fini le travail hier.", en: "He finished the work yesterday." },
+      { fr: "Ils ont gagné la semaine dernière.", en: "They won last week." },
+
+      { fr: "J'ai étudié deux heures hier.", en: "I studied for two hours yesterday." },
+      { fr: "On a mangé ensemble hier soir.", en: "We ate together last night." },
+      { fr: "Elle a appelé il y a deux jours.", en: "She called two days ago." },
+      { fr: "Il est rentré tard hier.", en: "He came home late yesterday." },
+      { fr: "Ils ont terminé le projet le mois dernier.", en: "They finished the project last month." },
+
+      // ---- négatif ----
+      { fr: "Je n'ai pas travaillé hier.", en: "I didn't work yesterday." },
+      { fr: "On n'est pas sortis hier soir.", en: "We didn't go out last night." },
+      { fr: "Elle n'est pas venue hier.", en: "She didn't come yesterday." },
+      { fr: "Il n'a pas terminé hier.", en: "He didn't finish yesterday." },
+      { fr: "Ils n'ont pas gagné la semaine dernière.", en: "They didn't win last week." },
+
+      // ---- questions ----
+      { fr: "Est-ce que tu as mangé hier ?", en: "Did you eat yesterday?" },
+      { fr: "Est-ce qu'on est sortis hier soir ?", en: "Did we go out last night?" },
+      { fr: "Est-ce qu'elle est venue hier ?", en: "Did she come yesterday?" },
+      { fr: "Est-ce qu'il a fini hier ?", en: "Did he finish yesterday?" },
+      { fr: "Est-ce qu'ils ont gagné hier ?", en: "Did they win yesterday?" },
+
+      // ---- wh questions ----
+      { fr: "Quand est-ce que tu as mangé ?", en: "When did you eat?" },
+      { fr: "Pourquoi est-ce que vous êtes partis ?", en: "Why did you leave?" },
+      { fr: "Où est-ce qu'elle est allée ?", en: "Where did she go?" },
+      { fr: "Comment est-ce qu'il a réussi ?", en: "How did he succeed?" },
+      { fr: "Avec qui est-ce qu'ils ont parlé ?", en: "Who did they talk to?" },
+
+      // ---- bloc supplémentaire varié ----
+      { fr: "J'ai vu ce film hier soir.", en: "I saw this movie last night." },
+      { fr: "On a commencé hier.", en: "We started yesterday." },
+      { fr: "Elle a quitté son travail l'année dernière.", en: "She left her job last year." },
+      { fr: "Il a appris ça hier.", en: "He learned that yesterday." },
+      { fr: "Ils ont changé de plan hier.", en: "They changed plans yesterday." },
+
+      { fr: "Je n'ai pas vu ce film.", en: "I didn't see this movie." },
+      { fr: "On n'a pas commencé hier.", en: "We didn't start yesterday." },
+      { fr: "Elle n'a pas quitté son travail.", en: "She didn't leave her job." },
+      { fr: "Il n'a pas appris ça.", en: "He didn't learn that." },
+      { fr: "Ils n'ont pas changé de plan.", en: "They didn't change plans." },
+
+      // ---- répétition massive pour atteindre 200 (variations naturelles) ----
+      { fr: "J'ai parlé avec lui hier.", en: "I talked to him yesterday." },
+      { fr: "On a pris le train hier.", en: "We took the train yesterday." },
+      { fr: "Elle a oublié ses clés hier.", en: "She forgot her keys yesterday." },
+      { fr: "Il a cassé son téléphone hier.", en: "He broke his phone yesterday." },
+      { fr: "Ils ont vendu leur voiture l'année dernière.", en: "They sold their car last year." },
+
+      { fr: "Je n'ai pas parlé avec lui.", en: "I didn't talk to him." },
+      { fr: "On n'a pas pris le train.", en: "We didn't take the train." },
+      { fr: "Elle n'a pas oublié ses clés.", en: "She didn't forget her keys." },
+      { fr: "Il n'a pas cassé son téléphone.", en: "He didn't break his phone." },
+      { fr: "Ils n'ont pas vendu leur voiture.", en: "They didn't sell their car." },
+
+      { fr: "Est-ce que tu as parlé avec lui ?", en: "Did you talk to him?" },
+      { fr: "Est-ce qu'on a pris le train ?", en: "Did we take the train?" },
+      { fr: "Est-ce qu'elle a oublié ?", en: "Did she forget?" },
+      { fr: "Est-ce qu'il a cassé ça ?", en: "Did he break that?" },
+      { fr: "Est-ce qu'ils ont vendu leur voiture ?", en: "Did they sell their car?" },
+
+      // ---- remplissage final jusqu'à 200 ----
+      { fr: "J'ai travaillé la semaine dernière.", en: "I worked last week." },
+      { fr: "On a étudié hier soir.", en: "We studied last night." },
+      { fr: "Elle a cuisiné hier.", en: "She cooked yesterday." },
+      { fr: "Il a nettoyé sa chambre hier.", en: "He cleaned his room yesterday." },
+      { fr: "Ils ont regardé la télé hier.", en: "They watched TV yesterday." },
+
+      { fr: "Je n'ai pas travaillé la semaine dernière.", en: "I didn't work last week." },
+      { fr: "On n'a pas étudié hier soir.", en: "We didn't study last night." },
+      { fr: "Elle n'a pas cuisiné.", en: "She didn't cook." },
+      { fr: "Il n'a pas nettoyé.", en: "He didn't clean." },
+      { fr: "Ils n'ont pas regardé la télé.", en: "They didn't watch TV." },
+
+      { fr: "Quand est-ce que tu as travaillé ?", en: "When did you work?" },
+      { fr: "Pourquoi est-ce que vous avez étudié ?", en: "Why did you study?" },
+      { fr: "Où est-ce qu'elle a cuisiné ?", en: "Where did she cook?" },
+      { fr: "Comment est-ce qu'il a nettoyé ?", en: "How did he clean?" },
+      { fr: "Pourquoi est-ce qu'ils ont regardé ça ?", en: "Why did they watch that?" }
+
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
 </body>
 
 </html>

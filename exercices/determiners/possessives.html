@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Present Simple - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      .flashcard {
+        min-height: 260px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../../index.html">Accueil</a>
+        <a href="../../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi avec l'utilisation du possessifs</h1>
+      <p class="page-subtitle">
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+      </p>
+
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
+    </div>
+  </main>
+
+  <script>
+    const cards = [
+
+      // ===== MY / MINE =====
+      { fr: "C'est mon livre.", en: "This is my book." },
+      { fr: "Ce livre est à moi.", en: "This book is mine." },
+      { fr: "C'est ma voiture.", en: "This is my car." },
+      { fr: "Cette voiture est à moi.", en: "This car is mine." },
+      { fr: "Ce sont mes livres.", en: "These are my books." },
+      { fr: "Ces livres sont à moi.", en: "These books are mine." },
+      { fr: "C'est mon idée.", en: "This is my idea." },
+      { fr: "Cette idée est à moi.", en: "This idea is mine." },
+      { fr: "Ce sont mes affaires.", en: "These are my things." },
+      { fr: "Ces affaires sont à moi.", en: "These things are mine." },
+
+      // ===== YOUR / YOURS =====
+      { fr: "C'est ton livre.", en: "This is your book." },
+      { fr: "Ce livre est à toi.", en: "This book is yours." },
+      { fr: "C'est ta voiture.", en: "This is your car." },
+      { fr: "Cette voiture est à toi.", en: "This car is yours." },
+      { fr: "Ce sont tes livres.", en: "These are your books." },
+      { fr: "Ces livres sont à toi.", en: "These books are yours." },
+      { fr: "C'est ton idée.", en: "This is your idea." },
+      { fr: "Cette idée est à toi.", en: "This idea is yours." },
+      { fr: "Ce sont tes affaires.", en: "These are your things." },
+      { fr: "Ces affaires sont à toi.", en: "These things are yours." },
+
+      // ===== HIS (à lui) =====
+      { fr: "C'est son livre (à lui).", en: "This is his book." },
+      { fr: "Ce livre est le sien (à lui).", en: "This book is his." },
+      { fr: "C'est sa voiture (à lui).", en: "This is his car." },
+      { fr: "Cette voiture est la sienne (à lui).", en: "This car is his." },
+      { fr: "Ce sont ses livres (à lui).", en: "These are his books." },
+      { fr: "Ces livres sont les siens (à lui).", en: "These books are his." },
+      { fr: "C'est son idée (à lui).", en: "This is his idea." },
+      { fr: "Cette idée est la sienne (à lui).", en: "This idea is his." },
+      { fr: "Ce sont ses affaires (à lui).", en: "These are his things." },
+      { fr: "Ces affaires sont les siennes (à lui).", en: "These things are his." },
+
+      // ===== HER / HERS (à elle) =====
+      { fr: "C'est son livre (à elle).", en: "This is her book." },
+      { fr: "Ce livre est le sien (à elle).", en: "This book is hers." },
+      { fr: "C'est sa voiture (à elle).", en: "This is her car." },
+      { fr: "Cette voiture est la sienne (à elle).", en: "This car is hers." },
+      { fr: "Ce sont ses livres (à elle).", en: "These are her books." },
+      { fr: "Ces livres sont les siens (à elle).", en: "These books are hers." },
+      { fr: "C'est son idée (à elle).", en: "This is her idea." },
+      { fr: "Cette idée est la sienne (à elle).", en: "This idea is hers." },
+      { fr: "Ce sont ses affaires (à elle).", en: "These are her things." },
+      { fr: "Ces affaires sont les siennes (à elle).", en: "These things are hers." },
+
+      // ===== OUR / OURS =====
+      { fr: "C'est notre livre.", en: "This is our book." },
+      { fr: "Ce livre est le nôtre.", en: "This book is ours." },
+      { fr: "C'est notre voiture.", en: "This is our car." },
+      { fr: "Cette voiture est la nôtre.", en: "This car is ours." },
+      { fr: "Ce sont nos livres.", en: "These are our books." },
+      { fr: "Ces livres sont les nôtres.", en: "These books are ours." },
+      { fr: "C'est notre idée.", en: "This is our idea." },
+      { fr: "Cette idée est la nôtre.", en: "This idea is ours." },
+      { fr: "Ce sont nos affaires.", en: "These are our things." },
+      { fr: "Ces affaires sont les nôtres.", en: "These things are ours." },
+
+      // ===== THEIR / THEIRS (à eux / à elles) =====
+      { fr: "C'est leur livre (à eux).", en: "This is their book." },
+      { fr: "Ce livre est le leur (à eux).", en: "This book is theirs." },
+      { fr: "C'est leur voiture (à eux).", en: "This is their car." },
+      { fr: "Cette voiture est la leur (à eux).", en: "This car is theirs." },
+      { fr: "Ce sont leurs livres (à eux).", en: "These are their books." },
+      { fr: "Ces livres sont les leurs (à eux).", en: "These books are theirs." },
+
+      { fr: "C'est leur livre (à elles).", en: "This is their book." },
+      { fr: "Ce livre est le leur (à elles).", en: "This book is theirs." },
+      { fr: "C'est leur voiture (à elles).", en: "This is their car." },
+      { fr: "Cette voiture est la leur (à elles).", en: "This car is theirs." },
+      { fr: "Ce sont leurs livres (à elles).", en: "These are their books." },
+      { fr: "Ces livres sont les leurs (à elles).", en: "These books are theirs." },
+
+      // ===== ITS =====
+      { fr: "Le chien a perdu sa balle.", en: "The dog lost its ball." },
+      { fr: "La voiture a perdu sa roue.", en: "The car lost its wheel." },
+      { fr: "L'entreprise a changé sa stratégie.", en: "The company changed its strategy." },
+      { fr: "Le téléphone a perdu sa batterie.", en: "The phone lost its battery." },
+      { fr: "L'animal protège ses petits.", en: "The animal protects its babies." },
+
+      // ===== 'S =====
+      { fr: "C'est la voiture de John.", en: "This is John's car." },
+      { fr: "C'est le livre de Sarah.", en: "This is Sarah's book." },
+      { fr: "C'est la maison de mon frère.", en: "This is my brother's house." },
+      { fr: "C'est le téléphone de ma sœur.", en: "This is my sister's phone." },
+      { fr: "C'est la voiture de mes parents.", en: "This is my parents' car." },
+      { fr: "C'est la maison de mes amis.", en: "This is my friends' house." },
+      { fr: "C'est le bureau du patron.", en: "This is the boss's office." },
+      { fr: "C'est la décision du professeur.", en: "This is the teacher's decision." },
+
+      // ===== double possessif =====
+      { fr: "Un ami à moi.", en: "A friend of mine." },
+      { fr: "Un ami à toi.", en: "A friend of yours." },
+      { fr: "Un ami à lui.", en: "A friend of his." },
+      { fr: "Une amie à elle.", en: "A friend of hers." },
+      { fr: "Un ami à nous.", en: "A friend of ours." },
+      { fr: "Un ami à eux.", en: "A friend of theirs." },
+
+      // ===== comparaisons =====
+      { fr: "Ma voiture est plus rapide que la sienne (à lui).", en: "My car is faster than his." },
+      { fr: "Ma voiture est plus rapide que la sienne (à elle).", en: "My car is faster than hers." },
+      { fr: "Notre maison est plus grande que la leur.", en: "Our house is bigger than theirs." },
+      { fr: "Leur idée est meilleure que la nôtre.", en: "Their idea is better than ours." },
+
+      // ===== remplissage cohérent =====
+      { fr: "Mon frère aime sa voiture (à lui).", en: "My brother likes his car." },
+      { fr: "Ma sœur aime sa voiture (à elle).", en: "My sister likes her car." },
+      { fr: "Ils aiment leurs enfants.", en: "They love their children." },
+      { fr: "Nous aimons notre maison.", en: "We love our house." },
+      { fr: "Tu aimes ton travail.", en: "You like your job." },
+
+      { fr: "Il a perdu son téléphone (à lui).", en: "He lost his phone." },
+      { fr: "Elle a perdu son téléphone (à elle).", en: "She lost her phone." },
+      { fr: "Ils ont perdu leurs clés.", en: "They lost their keys." },
+      { fr: "Nous avons perdu notre sac.", en: "We lost our bag." },
+      { fr: "Tu as perdu ton livre.", en: "You lost your book." }
+
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
+</body>
+
+</html>
