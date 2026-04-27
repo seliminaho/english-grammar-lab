@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coming Soon - Flashcards</title>
+  <link rel="stylesheet" href="../../style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .coming-soon-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .coming-card {
+      width: 100%;
+      min-height: 320px;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .coming-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .coming-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+      color: var(--text-strong);
+      margin-bottom: 1rem;
+    }
+
+    .coming-description {
+      color: var(--text-soft);
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 520px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 640px) {
+      .coming-card {
+        min-height: 260px;
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../../index.html">Accueil</a>
+        <a href="../../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="coming-soon-wrapper">
+      <h1 class="page-title">Flashcards bientôt disponibles</h1>
+      <p class="page-subtitle">
+        Cette section sera ajoutée au fur et à mesure des cours.
+      </p>
+
+      <div class="coming-card">
+        <div class="coming-label">Coming soon</div>
+        <p class="coming-text">Ce cours sera bientôt disponible ici.</p>
+        <p class="coming-description">
+          Les flashcards correspondantes seront ajoutées après la préparation du cours.
+        </p>
+      </div>
+
+      <a href="../../categories/tenses.html" class="back-link">← Retour à la catégorie</a>
+    </div>
+  </main>
+
+  <script src="../../theme.js"></script>
+</body>
+
+</html>
