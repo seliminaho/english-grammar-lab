@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video Study - English Grammar Lab</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .video-study-main {
+      padding: 4rem 2rem;
+      background: var(--hero-bg);
+      min-height: 100vh;
+    }
+
+    .video-study-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .video-carousel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 3rem 0;
+    }
+
+    .carousel-btn {
+      border: none;
+      background: var(--primary);
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-medium);
+    }
+
+    .video-card {
+      width: 700px;
+      max-width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-medium);
+    }
+
+    .video-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 18px;
+      border: none;
+      background: black;
+    }
+
+    .video-title {
+      margin-top: 1rem;
+      color: var(--text-strong);
+      font-size: 1.5rem;
+    }
+
+    .video-description {
+      margin-top: 0.5rem;
+      color: var(--text-soft);
+    }
+
+    .script-box {
+      margin-top: 2rem;
+      text-align: left;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: var(--shadow-medium);
+    }
+
+    .script-box h2 {
+      color: var(--text-strong);
+      margin-bottom: 1rem;
+    }
+
+    .script-text {
+      color: var(--text);
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+
+    .vocab-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      text-decoration: none;
+    }
+
+    @media (max-width: 760px) {
+      .video-carousel {
+        gap: 0.5rem;
+      }
+
+      .carousel-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+      }
+
+      .video-card {
+        padding: 1rem;
+      }
+
+      .script-box {
+        padding: 1.4rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="index.html">Accueil</a>
+        <a href="index.html#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="video-study-main">
+    <div class="video-study-wrapper">
+
+      <div class="video-carousel">
+        <button class="carousel-btn" id="prevBtn">‹</button>
+
+        <article class="video-card">
+          <iframe class="video-frame" id="videoFrame" src="" allowfullscreen></iframe>
+          <h2 class="video-title" id="videoTitle"></h2>
+          <p class="video-description" id="videoDescription"></p>
+        </article>
+
+        <button class="carousel-btn" id="nextBtn">›</button>
+      </div>
+
+      <section class="script-box">
+        <h2>Script</h2>
+        <p class="script-text" id="scriptText"></p>
+        <a href="#" class="btn btn-primary vocab-link" id="vocabLink">
+          S’entraîner sur le vocabulaire
+        </a>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    const videos = [
+      {
+        title: "Job Interview | THE PURSUIT OF HAPPYNESS",
+        src: "https://www.youtube.com/embed/F1XHG56WNSg",
+        script: `Chris: Chris Gardner. How are you? Good morning. Chris Gardner. Chris Gardner. Good to see you again. Chris Gardner, pleasure.
+        I’ve been sitting out there for the last half hour trying to come up with a story that would explain my being here dressed like this. And I wanted to come up with a story that would demonstrate qualities that I’m sure you all admire here, like earnestness, diligence, and team playing... something. And I couldn’t think of anything. So the truth is, I was arrested for failure to pay parking tickets.
+        
+        Jay: Parking tickets!
+
+        Chris: And I ran all the way here from the Polk Station... the police station.
+
+        Interviewer: What were you doing before you were arrested?
+
+        Chris: I was painting my apartment.
+
+        Interviewer: Is it dry now?
+
+        Chris: I hope so.
+
+        Interviewer: Jay says you’re pretty determined.
+
+        Jay: Oh, he’s been waiting outside the front of the building with some forty-pound gizmo for over a month.
+
+        Interviewer: He says you’re smart.
+
+        Chris: I like to think so.
+
+        Interviewer: And you want to learn this business?
+
+        Chris: Yes sir, I want to learn this business.
+
+        Interviewer: Have you already started learning on your own?
+
+        Chris: Absolutely!
+
+        Interviewer: How many times have you seen Chris?
+
+        Jay: You know, I don’t know. One too many, apparently.
+
+        Interviewer: Has he ever dressed like this?
+
+        Jay: No, no. Jacket and tie.
+
+        Interviewer: First in your class in school? High school.
+
+        Chris: Yes, sir.
+
+        Interviewer: How many in the class?
+
+        Chris: Twelve. It’s a small town.
+
+        Interviewer: I’ll say.
+
+        Chris: But I was also first in my radar class in the Navy, and that was a class of twenty.
+        Can I say something? I’m the type of person — if you ask me a question and I don’t know the answer, I’m going to tell you that I don’t know.
+        But I’ll bet you what: I know how to find the answer, and I will find the answer.
+        Is that fair enough?
+
+        Interviewer: Chris, what would you say if a guy walk in for an interview without a shirt on, and I hire him? What would you say?
+
+        Chris: He must’ve had some really nice pants!`,
+
+        vocabLink: "vocabulary/video-1.html"
+      },
+      {
+        title: "Joey's Bad Birthday Gift | FRIENDS",
+        src: "https://www.youtube.com/embed/221F55VPp2M",
+        script: `Colle ici le script de la deuxième vidéo.`,
+        vocabLink: "vocabulary/video-2.html"
+      },
+      {
+        title: "Jimmy Tricks The Court | BETTER CALL SAUL",
+        src: "https://www.youtube.com/embed/DvkYRhu-TP0",
+        script: `Colle ici le script de la troisième vidéo.`,
+        vocabLink: "vocabulary/video-3.html"
+      },
+      {
+        title: "Joey Finds Out | FRIENDS",
+        src: "https://www.youtube.com/embed/XZVHmRvfDHM",
+        script: `Colle ici le script de la troisième vidéo.`,
+        vocabLink: "vocabulary/video-3.html"
+      }
+    ];
+
+    const videoFrame = document.getElementById("videoFrame");
+    const videoTitle = document.getElementById("videoTitle");
+    const videoDescription = document.getElementById("videoDescription");
+    const scriptText = document.getElementById("scriptText");
+    const vocabLink = document.getElementById("vocabLink");
+
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let currentVideo = 0;
+
+    function showVideo(index) {
+      const video = videos[index];
+
+      videoFrame.src = video.src;
+      videoTitle.textContent = video.title;
+      videoDescription.textContent = video.description;
+      scriptText.textContent = video.script;
+      vocabLink.href = video.vocabLink;
+    }
+
+    prevBtn.addEventListener("click", () => {
+      currentVideo = (currentVideo - 1 + videos.length) % videos.length;
+      showVideo(currentVideo);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      currentVideo = (currentVideo + 1) % videos.length;
+      showVideo(currentVideo);
+    });
+
+    showVideo(currentVideo);
+  </script>
+
+  <script src="theme.js"></script>
+</body>
+
+</html>

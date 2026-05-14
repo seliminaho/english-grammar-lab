@@ -463,3 +463,73 @@ button {
   font-size: 1.2rem;
   opacity: 0.8;
 }
+
+.video-study-section {
+  background: var(--hero-bg);
+}
+
+.video-thumbnails {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  margin-top: 2rem;
+}
+
+.video-thumb {
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid var(--border);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+/* image centrale */
+.main-thumb {
+  width: 520px;
+  height: 320px;
+  opacity: 1;
+  z-index: 5;
+}
+
+/* images proches du centre */
+.soft-faded {
+  width: 400px;
+  height: 250px;
+  opacity: 0.7;
+  z-index: 4;
+}
+
+/* images extérieures */
+.faded {
+  width: 300px;
+  height: 190px;
+  opacity: 0.35;
+  z-index: 3;
+}
+
+.video-thumbnails:hover .video-thumb {
+  transform: translateY(-6px);
+}
+
+.video-thumbnails:hover .main-thumb {
+  transform: translateY(-6px) scale(1.04);
+}
+
+@media (max-width: 760px) {
+
+  .main-thumb {
+    width: 200px;
+    height: 127px;
+  }
+
+  .soft-faded {
+    width: 147px;
+    height: 93px;
+  }
+
+  .faded {
+    width: 107px;
+    height: 67px;
+  }
+}
