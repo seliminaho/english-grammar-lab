@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coming Soon - Flashcards</title>
-  <link rel="stylesheet" href="../../style.css" />
+  <title>Future Mix - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
   <style>
     * {
       margin: 0;
@@ -29,6 +29,7 @@
       backdrop-filter: blur(8px);
     }
 
+
     main {
       flex: 1;
       display: flex;
@@ -37,7 +38,7 @@
       padding: 2rem;
     }
 
-    .coming-soon-wrapper {
+    .flashcard-wrapper {
       width: 100%;
       max-width: 700px;
       text-align: center;
@@ -55,60 +56,77 @@
       font-size: 1rem;
     }
 
-    .coming-card {
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
       width: 100%;
       min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
       border-radius: 24px;
       padding: 2rem;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      backface-visibility: hidden;
       box-shadow: var(--shadow-medium);
       border: 1px solid var(--border);
-      background: var(--surface);
     }
 
-    .coming-label {
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
       font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--primary);
-      margin-bottom: 1rem;
+      opacity: 0.8;
     }
 
-    .coming-text {
-      font-size: clamp(1.5rem, 3vw, 2.3rem);
-      line-height: 1.4;
-      font-weight: 700;
-      color: var(--text-strong);
-      margin-bottom: 1rem;
-    }
-
-    .coming-description {
-      color: var(--text-soft);
-      font-size: 1rem;
-      line-height: 1.6;
-      max-width: 520px;
-    }
-
-    .back-link {
-      display: inline-block;
+    .helper-text {
       margin-top: 1.5rem;
-      color: var(--primary);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
+      color: var(--text-soft);
+      font-size: 0.95rem;
     }
 
     @media (max-width: 640px) {
-      .coming-card {
+      .flashcard {
         min-height: 260px;
+      }
+
+      .card-face {
         padding: 1.4rem;
       }
 
@@ -133,25 +151,289 @@
   </header>
 
   <main>
-    <div class="coming-soon-wrapper">
-      <h1 class="page-title">Flashcards bientôt disponibles</h1>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au Future Simple et Continuous</h1>
       <p class="page-subtitle">
-        Cette section sera ajoutée au fur et à mesure des cours.
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
       </p>
 
-      <div class="coming-card">
-        <div class="coming-label">Coming soon</div>
-        <p class="coming-text">Ce cours sera bientôt disponible ici.</p>
-        <p class="coming-description">
-          Les flashcards correspondantes seront ajoutées après la préparation du cours.
-        </p>
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
       </div>
 
-      <a href="../../categories/tenses.html" class="back-link">← Retour à la catégorie</a>
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
     </div>
   </main>
 
-  <script src="../../theme.js"></script>
+  <script>
+
+    const cards = [
+
+      // FUTURE SIMPLE — décisions spontanées / offres
+
+      { fr: "D'accord, je t'aiderai.", en: "Okay, I'll help you." },
+      { fr: "Attends, je vais ouvrir la porte.", en: "Wait, I'll open the door." },
+      { fr: "Je vais répondre.", en: "I'll answer it." },
+      { fr: "Je vais vérifier.", en: "I'll check." },
+      { fr: "Je vais lui demander.", en: "I'll ask him." },
+      { fr: "Je vais prendre celui-ci.", en: "I'll take this one." },
+      { fr: "Je vais payer.", en: "I'll pay." },
+      { fr: "Je vais m'en occuper.", en: "I'll take care of it." },
+      { fr: "Je vais te montrer.", en: "I'll show you." },
+      { fr: "Je vais corriger ça.", en: "I'll fix that." },
+
+      // FUTURE SIMPLE — promesses
+
+      { fr: "Je te rappellerai.", en: "I'll call you back." },
+      { fr: "Je ne dirai rien.", en: "I won't say anything." },
+      { fr: "Je serai là.", en: "I'll be there." },
+      { fr: "Je ne t'oublierai pas.", en: "I won't forget you." },
+      { fr: "Je ferai de mon mieux.", en: "I'll do my best." },
+      { fr: "Je garderai le secret.", en: "I'll keep the secret." },
+      { fr: "Je t'aiderai demain.", en: "I'll help you tomorrow." },
+      { fr: "Je ne recommencerai pas.", en: "I won't do it again." },
+      { fr: "Je te le rendrai.", en: "I'll give it back to you." },
+      { fr: "Je serai prudent.", en: "I'll be careful." },
+
+      // FUTURE SIMPLE — prédictions / opinions
+
+      { fr: "Je pense qu'il viendra.", en: "I think he'll come." },
+      { fr: "Je pense qu'elle réussira.", en: "I think she'll succeed." },
+      { fr: "Ça ira.", en: "It'll be fine." },
+      { fr: "Tout ira bien.", en: "Everything will be fine." },
+      { fr: "Ce sera difficile.", en: "It'll be difficult." },
+      { fr: "Ça prendra du temps.", en: "It'll take time." },
+      { fr: "Tu comprendras plus tard.", en: "You'll understand later." },
+      { fr: "Ils regretteront.", en: "They'll regret it." },
+      { fr: "Elle sera contente.", en: "She'll be happy." },
+      { fr: "Il oubliera sûrement.", en: "He'll probably forget." },
+
+      // FUTURE SIMPLE — refus avec won't
+
+      { fr: "Il ne m'écoutera pas.", en: "He won't listen to me." },
+      { fr: "Elle ne changera pas d'avis.", en: "She won't change her mind." },
+      { fr: "Ils ne nous croiront pas.", en: "They won't believe us." },
+      { fr: "Ça ne marchera pas.", en: "It won't work." },
+      { fr: "Je ne ferai pas ça.", en: "I won't do that." },
+      { fr: "Il ne dira jamais la vérité.", en: "He'll never tell the truth." },
+      { fr: "Elle ne comprendra pas.", en: "She won't understand." },
+      { fr: "Ils ne répondront pas.", en: "They won't answer." },
+      { fr: "Je ne changerai pas.", en: "I won't change." },
+      { fr: "Ça ne suffira pas.", en: "It won't be enough." },
+
+      // FUTURE SIMPLE — questions
+
+      { fr: "Tu m'aideras ?", en: "Will you help me?" },
+      { fr: "Tu seras là ?", en: "Will you be there?" },
+      { fr: "Tu me rappelleras ?", en: "Will you call me back?" },
+      { fr: "Tu lui diras ?", en: "Will you tell him?" },
+      { fr: "Tu garderas le secret ?", en: "Will you keep the secret?" },
+      { fr: "Est-ce que ça marchera ?", en: "Will it work?" },
+      { fr: "Est-ce qu'il comprendra ?", en: "Will he understand?" },
+      { fr: "Est-ce qu'elle acceptera ?", en: "Will she accept?" },
+      { fr: "Est-ce qu'ils viendront ?", en: "Will they come?" },
+      { fr: "Est-ce qu'on gagnera ?", en: "Will we win?" },
+
+      // FUTURE SIMPLE — if clauses
+
+      { fr: "Si tu viens, je serai content.", en: "If you come, I'll be happy." },
+      { fr: "Si tu travailles, tu progresseras.", en: "If you work, you'll improve." },
+      { fr: "Si elle essaie, elle réussira.", en: "If she tries, she'll succeed." },
+      { fr: "Si on part maintenant, on arrivera à l'heure.", en: "If we leave now, we'll arrive on time." },
+      { fr: "Si tu continues, tu comprendras.", en: "If you keep going, you'll understand." },
+      { fr: "Si tu ne fais rien, rien ne changera.", en: "If you do nothing, nothing will change." },
+      { fr: "Si ça arrive, je t'appellerai.", en: "If that happens, I'll call you." },
+      { fr: "Si elle apprend ça, elle sera énervée.", en: "If she finds out, she'll be angry." },
+      { fr: "Si on perd, ce ne sera pas grave.", en: "If we lose, it won't be a big deal." },
+      { fr: "Si tu demandes gentiment, il acceptera.", en: "If you ask nicely, he'll accept." },
+
+      // FUTURE SIMPLE — phrases naturelles
+
+      { fr: "On verra comment ça se passe.", en: "We'll see how it goes." },
+      { fr: "Je verrai ce que je peux faire.", en: "I'll see what I can do." },
+      { fr: "Elle saura quoi faire.", en: "She'll know what to do." },
+      { fr: "Ils finiront par comprendre.", en: "They'll eventually understand." },
+      { fr: "Ça deviendra plus facile.", en: "It'll get easier." },
+      { fr: "Tu t'y habitueras.", en: "You'll get used to it." },
+      { fr: "On trouvera bien une solution.", en: "We'll find a solution somehow." },
+      { fr: "Je t'enverrai un message.", en: "I'll send you a message." },
+      { fr: "Je reviendrai plus tard.", en: "I'll come back later." },
+      { fr: "Je regarderai ça.", en: "I'll look at that." },
+
+      // FUTURE CONTINUOUS — action en cours à un moment futur
+
+      { fr: "Demain à 8h, je travaillerai.", en: "Tomorrow at 8, I’ll be working." },
+      { fr: "Ce soir à 21h, elle regardera un film.", en: "Tonight at 9, she’ll be watching a movie." },
+      { fr: "À midi, nous déjeunerons.", en: "At noon, we’ll be having lunch." },
+      { fr: "Demain matin, ils voyageront vers Londres.", en: "Tomorrow morning, they’ll be traveling to London." },
+      { fr: "À cette heure demain, tu dormiras.", en: "At this time tomorrow, you’ll be sleeping." },
+      { fr: "Lundi prochain, je passerai mon examen.", en: "Next Monday, I’ll be taking my exam." },
+      { fr: "À 18h, il conduira vers la maison.", en: "At 6 p.m., he’ll be driving home." },
+      { fr: "Ce week-end, nous rendrons visite à nos cousins.", en: "This weekend, we’ll be visiting our cousins." },
+      { fr: "Demain après-midi, elle étudiera à la bibliothèque.", en: "Tomorrow afternoon, she’ll be studying at the library." },
+      { fr: "À minuit, ils danseront encore.", en: "At midnight, they’ll still be dancing." },
+
+      // FUTURE CONTINUOUS — action future interrompue
+
+      { fr: "Je dormirai quand tu arriveras.", en: "I’ll be sleeping when you arrive." },
+      { fr: "Elle travaillera quand tu l’appelleras.", en: "She’ll be working when you call her." },
+      { fr: "Nous dînerons quand ils arriveront.", en: "We’ll be having dinner when they arrive." },
+      { fr: "Ils regarderont la télévision quand tu rentreras.", en: "They’ll be watching TV when you get home." },
+      { fr: "Je conduirai quand tu m’enverras le message.", en: "I’ll be driving when you send me the message." },
+      { fr: "Il prendra sa douche quand tu arriveras.", en: "He’ll be taking a shower when you arrive." },
+      { fr: "Tu dormiras quand je partirai.", en: "You’ll be sleeping when I leave." },
+      { fr: "Nous étudierons quand le professeur viendra.", en: "We’ll be studying when the teacher comes." },
+      { fr: "Elle cuisinera quand les invités arriveront.", en: "She’ll be cooking when the guests arrive." },
+      { fr: "Ils joueront dehors quand il commencera à pleuvoir.", en: "They’ll be playing outside when it starts raining." },
+
+      // FUTURE CONTINUOUS — plans déjà prévus
+
+      { fr: "Je travaillerai demain, donc je ne peux pas venir.", en: "I’ll be working tomorrow, so I can’t come." },
+      { fr: "Elle voyagera toute la semaine prochaine.", en: "She’ll be traveling all next week." },
+      { fr: "Nous resterons chez mes parents ce week-end.", en: "We’ll be staying at my parents’ this weekend." },
+      { fr: "Ils passeront la soirée avec nous.", en: "They’ll be spending the evening with us." },
+      { fr: "Tu utiliseras mon ordinateur demain.", en: "You’ll be using my computer tomorrow." },
+      { fr: "Je prendrai le train de 8h demain.", en: "I’ll be taking the 8 o’clock train tomorrow." },
+      { fr: "Elle rencontrera son équipe lundi.", en: "She’ll be meeting her team on Monday." },
+      { fr: "Nous visiterons le musée demain matin.", en: "We’ll be visiting the museum tomorrow morning." },
+      { fr: "Ils dormiront chez nous samedi soir.", en: "They’ll be sleeping at our place on Saturday night." },
+      { fr: "Je porterai un costume pour la réunion.", en: "I’ll be wearing a suit for the meeting." },
+
+      // FUTURE CONTINUOUS — questions polies / plans
+
+      { fr: "Est-ce que tu utiliseras la voiture demain ?", en: "Will you be using the car tomorrow?" },
+      { fr: "Est-ce que vous dînerez avec nous ce soir ?", en: "Will you be having dinner with us tonight?" },
+      { fr: "Est-ce qu’elle travaillera demain matin ?", en: "Will she be working tomorrow morning?" },
+      { fr: "Est-ce qu’ils viendront à la réunion ?", en: "Will they be coming to the meeting?" },
+      { fr: "Est-ce que tu passeras par la gare ?", en: "Will you be passing by the station?" },
+      { fr: "Est-ce que vous prendrez le train de 9h ?", en: "Will you be taking the 9 o’clock train?" },
+      { fr: "Est-ce qu’il utilisera cette salle demain ?", en: "Will he be using this room tomorrow?" },
+      { fr: "Est-ce que tu verras Paul ce week-end ?", en: "Will you be seeing Paul this weekend?" },
+      { fr: "Est-ce qu’elle portera cette robe ce soir ?", en: "Will she be wearing this dress tonight?" },
+      { fr: "Est-ce que vous resterez ici longtemps ?", en: "Will you be staying here long?" },
+
+      // FUTURE CONTINUOUS — deux actions futures en parallèle
+
+      { fr: "Pendant que je cuisinerai, elle mettra la table.", en: "While I’m cooking, she’ll be setting the table." },
+      { fr: "Pendant que nous travaillerons, ils se reposeront.", en: "While we’re working, they’ll be resting." },
+      { fr: "Pendant qu’elle étudiera, son frère jouera.", en: "While she’s studying, her brother will be playing." },
+      { fr: "Pendant qu’ils voyageront, nous garderons leur chien.", en: "While they’re traveling, we’ll be looking after their dog." },
+      { fr: "Pendant que tu dormiras, je conduirai.", en: "While you’re sleeping, I’ll be driving." },
+      { fr: "Pendant que je prendrai ma douche, tu prépareras le café.", en: "While I’m taking a shower, you’ll be making coffee." },
+      { fr: "Pendant qu’il parlera, nous prendrons des notes.", en: "While he’s speaking, we’ll be taking notes." },
+      { fr: "Pendant que nous regarderons le film, ils cuisineront.", en: "While we’re watching the movie, they’ll be cooking." },
+      { fr: "Pendant qu’elle attendra, je chercherai la voiture.", en: "While she’s waiting, I’ll be looking for the car." },
+      { fr: "Pendant qu’ils joueront, nous préparerons le dîner.", en: "While they’re playing, we’ll be preparing dinner." },
+
+      // FUTURE CONTINUOUS — prédiction sur ce qui sera en cours
+
+      { fr: "Il sera sûrement en train de dormir à cette heure-là.", en: "He’ll probably be sleeping at that time." },
+      { fr: "Elle sera sûrement en train de travailler maintenant.", en: "She’ll probably be working now." },
+      { fr: "Ils seront probablement en train de dîner.", en: "They’ll probably be having dinner." },
+      { fr: "Nous serons sûrement en train d’attendre dehors.", en: "We’ll probably be waiting outside." },
+      { fr: "Tu seras sûrement en train de conduire à ce moment-là.", en: "You’ll probably be driving at that moment." },
+      { fr: "Il sera probablement en train de regarder le match.", en: "He’ll probably be watching the match." },
+      { fr: "Elle sera sûrement en train de lire.", en: "She’ll probably be reading." },
+      { fr: "Ils seront en train de chercher un hôtel.", en: "They’ll be looking for a hotel." },
+      { fr: "Je serai probablement en train de réviser.", en: "I’ll probably be revising." },
+      { fr: "Nous serons sûrement en train de parler de toi.", en: "We’ll probably be talking about you." },
+
+      // FUTURE CONTINUOUS — négatif
+
+      { fr: "Demain à 8h, je ne dormirai pas.", en: "Tomorrow at 8, I won’t be sleeping." },
+      { fr: "Ce soir, elle ne travaillera pas.", en: "Tonight, she won’t be working." },
+      { fr: "Nous ne regarderons pas la télévision demain.", en: "We won’t be watching TV tomorrow." },
+      { fr: "Ils ne voyageront pas ce week-end.", en: "They won’t be traveling this weekend." },
+      { fr: "Tu n’utiliseras pas mon ordinateur demain.", en: "You won’t be using my computer tomorrow." },
+      { fr: "Je ne conduirai pas à cette heure-là.", en: "I won’t be driving at that time." },
+      { fr: "Il ne participera pas à la réunion.", en: "He won’t be attending the meeting." },
+      { fr: "Elle ne portera pas cette robe.", en: "She won’t be wearing this dress." },
+      { fr: "Nous ne resterons pas longtemps.", en: "We won’t be staying long." },
+      { fr: "Ils ne joueront pas demain.", en: "They won’t be playing tomorrow." },
+
+      // MIX — choisir entre future simple et future continuous
+
+      { fr: "Que feras-tu demain à cette heure-ci ?", en: "What will you be doing at this time tomorrow?" },
+      { fr: "Que feras-tu si ça arrive ?", en: "What will you do if that happens?" },
+      { fr: "Où dormirez-vous demain soir ?", en: "Where will you be sleeping tomorrow night?" },
+      { fr: "Où iras-tu si tu pars ?", en: "Where will you go if you leave?" },
+      { fr: "Avec qui travailleras-tu demain ?", en: "Who will you be working with tomorrow?" },
+      { fr: "Qui nous aidera ?", en: "Who will help us?" },
+      { fr: "Que regarderont-ils ce soir ?", en: "What will they be watching tonight?" },
+      { fr: "Que se passera-t-il ensuite ?", en: "What will happen next?" },
+      { fr: "À quelle heure travailleras-tu demain ?", en: "What time will you be working tomorrow?" },
+      { fr: "Combien de temps ça prendra ?", en: "How long will it take?" },
+
+      // MIX — will simple / will continuous
+
+      { fr: "Je pense que ça marchera.", en: "I think it'll work." },
+      { fr: "Demain à cette heure-ci, je travaillerai.", en: "At this time tomorrow, I’ll be working." },
+      { fr: "Elle dira probablement non.", en: "She'll probably say no." },
+      { fr: "Elle sera probablement en train de travailler à ce moment-là.", en: "She’ll probably be working at that moment." },
+      { fr: "Ils accepteront sûrement.", en: "They’ll probably accept." },
+      { fr: "Ils seront sûrement en train d’attendre devant la gare.", en: "They’ll probably be waiting outside the station." },
+      { fr: "Je te dirai ce que je pense.", en: "I'll tell you what I think." },
+      { fr: "Je parlerai avec lui demain à 10h.", en: "I’ll be talking to him tomorrow at 10." },
+      { fr: "On trouvera une solution.", en: "We'll find a solution." },
+      { fr: "Pendant ce temps, nous chercherons une solution.", en: "Meanwhile, we’ll be looking for a solution." }
+
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
 </body>
 
 </html>

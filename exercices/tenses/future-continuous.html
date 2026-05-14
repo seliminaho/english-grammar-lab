@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coming Soon - Flashcards</title>
-  <link rel="stylesheet" href="../../style.css" />
+  <title>Future Continuous - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
   <style>
     * {
       margin: 0;
@@ -29,6 +29,7 @@
       backdrop-filter: blur(8px);
     }
 
+
     main {
       flex: 1;
       display: flex;
@@ -37,7 +38,7 @@
       padding: 2rem;
     }
 
-    .coming-soon-wrapper {
+    .flashcard-wrapper {
       width: 100%;
       max-width: 700px;
       text-align: center;
@@ -55,60 +56,77 @@
       font-size: 1rem;
     }
 
-    .coming-card {
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
       width: 100%;
       min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
       border-radius: 24px;
       padding: 2rem;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      backface-visibility: hidden;
       box-shadow: var(--shadow-medium);
       border: 1px solid var(--border);
-      background: var(--surface);
     }
 
-    .coming-label {
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
       font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--primary);
-      margin-bottom: 1rem;
+      opacity: 0.8;
     }
 
-    .coming-text {
-      font-size: clamp(1.5rem, 3vw, 2.3rem);
-      line-height: 1.4;
-      font-weight: 700;
-      color: var(--text-strong);
-      margin-bottom: 1rem;
-    }
-
-    .coming-description {
-      color: var(--text-soft);
-      font-size: 1rem;
-      line-height: 1.6;
-      max-width: 520px;
-    }
-
-    .back-link {
-      display: inline-block;
+    .helper-text {
       margin-top: 1.5rem;
-      color: var(--primary);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
+      color: var(--text-soft);
+      font-size: 0.95rem;
     }
 
     @media (max-width: 640px) {
-      .coming-card {
+      .flashcard {
         min-height: 260px;
+      }
+
+      .card-face {
         padding: 1.4rem;
       }
 
@@ -133,25 +151,306 @@
   </header>
 
   <main>
-    <div class="coming-soon-wrapper">
-      <h1 class="page-title">Flashcards bientôt disponibles</h1>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au Future Continuous</h1>
       <p class="page-subtitle">
-        Cette section sera ajoutée au fur et à mesure des cours.
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
       </p>
 
-      <div class="coming-card">
-        <div class="coming-label">Coming soon</div>
-        <p class="coming-text">Ce cours sera bientôt disponible ici.</p>
-        <p class="coming-description">
-          Les flashcards correspondantes seront ajoutées après la préparation du cours.
-        </p>
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
       </div>
 
-      <a href="../../categories/tenses.html" class="back-link">← Retour à la catégorie</a>
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
     </div>
   </main>
 
-  <script src="../../theme.js"></script>
+  <script>
+
+    const cards = [
+
+      // ACTION EN COURS À UN MOMENT FUTUR
+
+      { fr: "Demain à 8h, je travaillerai.", en: "Tomorrow at 8, I’ll be working." },
+      { fr: "Ce soir à 21h, elle regardera un film.", en: "Tonight at 9, she’ll be watching a movie." },
+      { fr: "À midi, nous déjeunerons.", en: "At noon, we’ll be having lunch." },
+      { fr: "Demain matin, ils voyageront vers Londres.", en: "Tomorrow morning, they’ll be traveling to London." },
+      { fr: "À cette heure demain, tu dormiras.", en: "At this time tomorrow, you’ll be sleeping." },
+      { fr: "Lundi prochain, je passerai mon examen.", en: "Next Monday, I’ll be taking my exam." },
+      { fr: "À 18h, il conduira vers la maison.", en: "At 6 p.m., he’ll be driving home." },
+      { fr: "Ce week-end, nous rendrons visite à nos cousins.", en: "This weekend, we’ll be visiting our cousins." },
+      { fr: "Demain après-midi, elle étudiera à la bibliothèque.", en: "Tomorrow afternoon, she’ll be studying at the library." },
+      { fr: "À minuit, ils danseront encore.", en: "At midnight, they’ll still be dancing." },
+      { fr: "Pendant la réunion, je prendrai des notes.", en: "During the meeting, I’ll be taking notes." },
+      { fr: "À ce moment-là, nous attendrons devant l’école.", en: "At that moment, we’ll be waiting outside the school." },
+      { fr: "Demain à 10h, elle donnera un cours.", en: "Tomorrow at 10, she’ll be teaching a class." },
+      { fr: "Ce soir, ils joueront au football.", en: "Tonight, they’ll be playing football." },
+      { fr: "À 7h, je prendrai mon petit-déjeuner.", en: "At 7, I’ll be having breakfast." },
+      { fr: "Demain soir, tu réviseras tes leçons.", en: "Tomorrow evening, you’ll be revising your lessons." },
+      { fr: "À cette heure samedi, nous serons dans le train.", en: "At this time on Saturday, we’ll be sitting on the train." },
+      { fr: "Dans une heure, elle parlera avec son patron.", en: "In an hour, she’ll be talking with her boss." },
+      { fr: "Demain toute la journée, je travaillerai sur ce projet.", en: "Tomorrow all day, I’ll be working on this project." },
+      { fr: "À 15h, ils passeront leur entretien.", en: "At 3 p.m., they’ll be having their interview." },
+      { fr: "Ce soir à cette heure-ci, je dînerai avec ma famille.", en: "At this time tonight, I’ll be having dinner with my family." },
+      { fr: "Demain, nous marcherons dans Paris.", en: "Tomorrow, we’ll be walking around Paris." },
+      { fr: "À 11h, il fera son entraînement.", en: "At 11, he’ll be doing his workout." },
+      { fr: "Demain matin, elle préparera ses affaires.", en: "Tomorrow morning, she’ll be preparing her things." },
+      { fr: "À cette heure demain soir, ils dormiront à l’hôtel.", en: "At this time tomorrow night, they’ll be sleeping at the hotel." },
+
+      // ACTION FUTURE INTERROMPUE PAR UNE AUTRE ACTION
+
+      { fr: "Je dormirai quand tu arriveras.", en: "I’ll be sleeping when you arrive." },
+      { fr: "Elle travaillera quand tu l’appelleras.", en: "She’ll be working when you call her." },
+      { fr: "Nous dînerons quand ils arriveront.", en: "We’ll be having dinner when they arrive." },
+      { fr: "Ils regarderont la télévision quand tu rentreras.", en: "They’ll be watching TV when you get home." },
+      { fr: "Je conduirai quand tu m’enverras le message.", en: "I’ll be driving when you send me the message." },
+      { fr: "Il prendra sa douche quand tu arriveras.", en: "He’ll be taking a shower when you arrive." },
+      { fr: "Tu dormiras quand je partirai.", en: "You’ll be sleeping when I leave." },
+      { fr: "Nous étudierons quand le professeur viendra.", en: "We’ll be studying when the teacher comes." },
+      { fr: "Elle cuisinera quand les invités arriveront.", en: "She’ll be cooking when the guests arrive." },
+      { fr: "Ils joueront dehors quand il commencera à pleuvoir.", en: "They’ll be playing outside when it starts raining." },
+      { fr: "Je travaillerai quand le colis arrivera.", en: "I’ll be working when the package arrives." },
+      { fr: "Nous attendrons quand le train arrivera.", en: "We’ll be waiting when the train arrives." },
+      { fr: "Elle parlera au téléphone quand tu entreras.", en: "She’ll be talking on the phone when you come in." },
+      { fr: "Ils dormiront quand nous rentrerons.", en: "They’ll be sleeping when we get back." },
+      { fr: "Tu mangeras quand je t’appellerai.", en: "You’ll be eating when I call you." },
+      { fr: "Je prendrai des notes quand il expliquera la leçon.", en: "I’ll be taking notes when he explains the lesson." },
+      { fr: "Elle lira quand son frère arrivera.", en: "She’ll be reading when her brother arrives." },
+      { fr: "Nous regarderons un film quand tu passeras.", en: "We’ll be watching a movie when you come over." },
+      { fr: "Ils travailleront quand le directeur arrivera.", en: "They’ll be working when the manager arrives." },
+      { fr: "Je marcherai vers la gare quand tu me verras.", en: "I’ll be walking to the station when you see me." },
+      { fr: "Il jouera de la guitare quand tu arriveras.", en: "He’ll be playing the guitar when you arrive." },
+      { fr: "Nous voyagerons quand tu nous appelleras.", en: "We’ll be traveling when you call us." },
+      { fr: "Elle fera ses devoirs quand sa mère rentrera.", en: "She’ll be doing her homework when her mother gets home." },
+      { fr: "Ils parleront de toi quand tu arriveras.", en: "They’ll be talking about you when you arrive." },
+      { fr: "Je serai en train de réviser quand l’examen commencera.", en: "I’ll be revising when the exam starts." },
+
+      // PLANS DÉJÀ PRÉVUS / ORGANISATION FUTURE
+
+      { fr: "Je travaillerai demain, donc je ne peux pas venir.", en: "I’ll be working tomorrow, so I can’t come." },
+      { fr: "Elle voyagera toute la semaine prochaine.", en: "She’ll be traveling all next week." },
+      { fr: "Nous resterons chez mes parents ce week-end.", en: "We’ll be staying at my parents’ this weekend." },
+      { fr: "Ils passeront la soirée avec nous.", en: "They’ll be spending the evening with us." },
+      { fr: "Tu utiliseras mon ordinateur demain.", en: "You’ll be using my computer tomorrow." },
+      { fr: "Je prendrai le train de 8h demain.", en: "I’ll be taking the 8 o’clock train tomorrow." },
+      { fr: "Elle rencontrera son équipe lundi.", en: "She’ll be meeting her team on Monday." },
+      { fr: "Nous visiterons le musée demain matin.", en: "We’ll be visiting the museum tomorrow morning." },
+      { fr: "Ils dormiront chez nous samedi soir.", en: "They’ll be sleeping at our place on Saturday night." },
+      { fr: "Je porterai un costume pour la réunion.", en: "I’ll be wearing a suit for the meeting." },
+      { fr: "Il aidera son père tout l’après-midi.", en: "He’ll be helping his father all afternoon." },
+      { fr: "Nous mangerons avec eux ce soir.", en: "We’ll be eating with them tonight." },
+      { fr: "Elle s’occupera des enfants demain.", en: "She’ll be looking after the children tomorrow." },
+      { fr: "Ils prendront des photos pendant le mariage.", en: "They’ll be taking pictures during the wedding." },
+      { fr: "Tu travailleras avec Sarah demain.", en: "You’ll be working with Sarah tomorrow." },
+      { fr: "Je dormirai chez mon frère ce soir.", en: "I’ll be sleeping at my brother’s tonight." },
+      { fr: "Nous préparerons la salle demain matin.", en: "We’ll be preparing the room tomorrow morning." },
+      { fr: "Elle conduira jusqu’à Lyon demain.", en: "She’ll be driving to Lyon tomorrow." },
+      { fr: "Ils étudieront ensemble ce week-end.", en: "They’ll be studying together this weekend." },
+      { fr: "Je regarderai les enfants demain soir.", en: "I’ll be watching the children tomorrow evening." },
+      { fr: "Nous ferons les courses après le travail.", en: "We’ll be doing the shopping after work." },
+      { fr: "Il travaillera de nuit cette semaine.", en: "He’ll be working nights this week." },
+      { fr: "Elle attendra ton appel demain.", en: "She’ll be waiting for your call tomorrow." },
+      { fr: "Ils joueront contre notre équipe samedi.", en: "They’ll be playing against our team on Saturday." },
+      { fr: "Tu dormiras dans la chambre d’amis.", en: "You’ll be sleeping in the guest room." },
+
+      // QUESTIONS POLIES / DEMANDER LES PLANS DE QUELQU’UN
+
+      { fr: "Est-ce que tu utiliseras la voiture demain ?", en: "Will you be using the car tomorrow?" },
+      { fr: "Est-ce que vous dînerez avec nous ce soir ?", en: "Will you be having dinner with us tonight?" },
+      { fr: "Est-ce qu’elle travaillera demain matin ?", en: "Will she be working tomorrow morning?" },
+      { fr: "Est-ce qu’ils viendront à la réunion ?", en: "Will they be coming to the meeting?" },
+      { fr: "Est-ce que tu passeras par la gare ?", en: "Will you be passing by the station?" },
+      { fr: "Est-ce que vous prendrez le train de 9h ?", en: "Will you be taking the 9 o’clock train?" },
+      { fr: "Est-ce qu’il utilisera cette salle demain ?", en: "Will he be using this room tomorrow?" },
+      { fr: "Est-ce que tu verras Paul ce week-end ?", en: "Will you be seeing Paul this weekend?" },
+      { fr: "Est-ce qu’elle portera cette robe ce soir ?", en: "Will she be wearing this dress tonight?" },
+      { fr: "Est-ce que vous resterez ici longtemps ?", en: "Will you be staying here long?" },
+      { fr: "Est-ce qu’ils voyageront avec nous ?", en: "Will they be traveling with us?" },
+      { fr: "Est-ce que tu travailleras tard ce soir ?", en: "Will you be working late tonight?" },
+      { fr: "Est-ce qu’elle conduira demain ?", en: "Will she be driving tomorrow?" },
+      { fr: "Est-ce que vous regarderez le match ?", en: "Will you be watching the match?" },
+      { fr: "Est-ce qu’ils mangeront avec nous ?", en: "Will they be eating with us?" },
+      { fr: "Est-ce que tu attendras devant l’école ?", en: "Will you be waiting outside the school?" },
+      { fr: "Est-ce qu’il participera à la conférence ?", en: "Will he be attending the conference?" },
+      { fr: "Est-ce que vous dormirez à l’hôtel ?", en: "Will you be sleeping at the hotel?" },
+      { fr: "Est-ce qu’elle nous aidera demain ?", en: "Will she be helping us tomorrow?" },
+      { fr: "Est-ce que tu prendras des notes ?", en: "Will you be taking notes?" },
+      { fr: "Est-ce qu’ils joueront demain soir ?", en: "Will they be playing tomorrow evening?" },
+      { fr: "Est-ce que vous travaillerez sur le projet ?", en: "Will you be working on the project?" },
+      { fr: "Est-ce qu’elle parlera au directeur ?", en: "Will she be speaking to the manager?" },
+      { fr: "Est-ce que tu passeras près de chez moi ?", en: "Will you be passing near my house?" },
+      { fr: "Est-ce que vous utiliserez cette application ?", en: "Will you be using this app?" },
+
+      // DEUX ACTIONS EN COURS EN MÊME TEMPS DANS LE FUTUR
+
+      { fr: "Pendant que je cuisinerai, elle mettra la table.", en: "While I’m cooking, she’ll be setting the table." },
+      { fr: "Pendant que nous travaillerons, ils se reposeront.", en: "While we’re working, they’ll be resting." },
+      { fr: "Pendant qu’elle étudiera, son frère jouera.", en: "While she’s studying, her brother will be playing." },
+      { fr: "Pendant qu’ils voyageront, nous garderons leur chien.", en: "While they’re traveling, we’ll be looking after their dog." },
+      { fr: "Pendant que tu dormiras, je conduirai.", en: "While you’re sleeping, I’ll be driving." },
+      { fr: "Pendant que je prendrai ma douche, tu prépareras le café.", en: "While I’m taking a shower, you’ll be making coffee." },
+      { fr: "Pendant qu’il parlera, nous prendrons des notes.", en: "While he’s speaking, we’ll be taking notes." },
+      { fr: "Pendant que nous regarderons le film, ils cuisineront.", en: "While we’re watching the movie, they’ll be cooking." },
+      { fr: "Pendant qu’elle attendra, je chercherai la voiture.", en: "While she’s waiting, I’ll be looking for the car." },
+      { fr: "Pendant qu’ils joueront, nous préparerons le dîner.", en: "While they’re playing, we’ll be preparing dinner." },
+      { fr: "Pendant que je travaillerai, tu étudieras.", en: "While I’m working, you’ll be studying." },
+      { fr: "Pendant qu’elle conduira, il dormira.", en: "While she’s driving, he’ll be sleeping." },
+      { fr: "Pendant que nous marcherons, ils prendront des photos.", en: "While we’re walking, they’ll be taking pictures." },
+      { fr: "Pendant que tu liras, je répondrai aux emails.", en: "While you’re reading, I’ll be answering emails." },
+      { fr: "Pendant qu’il réparera la voiture, elle nettoiera le garage.", en: "While he’s fixing the car, she’ll be cleaning the garage." },
+      { fr: "Pendant que nous mangerons, ils discuteront.", en: "While we’re eating, they’ll be talking." },
+      { fr: "Pendant que je ferai les courses, elle travaillera.", en: "While I’m doing the shopping, she’ll be working." },
+      { fr: "Pendant qu’ils attendront le train, nous chercherons un taxi.", en: "While they’re waiting for the train, we’ll be looking for a taxi." },
+      { fr: "Pendant que tu joueras, je regarderai.", en: "While you’re playing, I’ll be watching." },
+      { fr: "Pendant qu’elle chantera, ils danseront.", en: "While she’s singing, they’ll be dancing." },
+      { fr: "Pendant que nous voyagerons, vous travaillerez.", en: "While we’re traveling, you’ll be working." },
+      { fr: "Pendant que je réviserai, tu regarderas la télévision.", en: "While I’m revising, you’ll be watching TV." },
+      { fr: "Pendant qu’ils prépareront la fête, nous achèterons le gâteau.", en: "While they’re preparing the party, we’ll be buying the cake." },
+      { fr: "Pendant qu’elle dormira, je lirai.", en: "While she’s sleeping, I’ll be reading." },
+      { fr: "Pendant que vous parlerez, je vous écouterai.", en: "While you’re speaking, I’ll be listening to you." },
+
+      // PRÉDICTION SUR CE QUI SERA EN TRAIN DE SE PASSER
+
+      { fr: "Il sera sûrement en train de dormir à cette heure-là.", en: "He’ll probably be sleeping at that time." },
+      { fr: "Elle sera sûrement en train de travailler maintenant.", en: "She’ll probably be working now." },
+      { fr: "Ils seront probablement en train de dîner.", en: "They’ll probably be having dinner." },
+      { fr: "Nous serons sûrement en train d’attendre dehors.", en: "We’ll probably be waiting outside." },
+      { fr: "Tu seras sûrement en train de conduire à ce moment-là.", en: "You’ll probably be driving at that moment." },
+      { fr: "Il sera probablement en train de regarder le match.", en: "He’ll probably be watching the match." },
+      { fr: "Elle sera sûrement en train de lire.", en: "She’ll probably be reading." },
+      { fr: "Ils seront en train de chercher un hôtel.", en: "They’ll be looking for a hotel." },
+      { fr: "Je serai probablement en train de réviser.", en: "I’ll probably be revising." },
+      { fr: "Nous serons sûrement en train de parler de toi.", en: "We’ll probably be talking about you." },
+      { fr: "Elle sera probablement en train de préparer le dîner.", en: "She’ll probably be preparing dinner." },
+      { fr: "Ils seront sûrement en train de dormir dans l’avion.", en: "They’ll probably be sleeping on the plane." },
+      { fr: "Tu seras probablement en train de travailler tard.", en: "You’ll probably be working late." },
+      { fr: "Il sera sûrement en train d’aider son père.", en: "He’ll probably be helping his father." },
+      { fr: "Nous serons probablement en train de marcher dans le centre-ville.", en: "We’ll probably be walking downtown." },
+      { fr: "Je serai sûrement en train de répondre aux messages.", en: "I’ll probably be answering messages." },
+      { fr: "Elle sera probablement en train de faire du sport.", en: "She’ll probably be exercising." },
+      { fr: "Ils seront sûrement en train de jouer aux cartes.", en: "They’ll probably be playing cards." },
+      { fr: "Tu seras probablement en train de regarder une série.", en: "You’ll probably be watching a series." },
+      { fr: "Nous serons sûrement en train de préparer nos valises.", en: "We’ll probably be packing our bags." },
+      { fr: "Il sera probablement en train de parler au téléphone.", en: "He’ll probably be talking on the phone." },
+      { fr: "Elle sera sûrement en train de faire ses devoirs.", en: "She’ll probably be doing her homework." },
+      { fr: "Ils seront probablement en train d’attendre le bus.", en: "They’ll probably be waiting for the bus." },
+      { fr: "Je serai sûrement en train de cuisiner.", en: "I’ll probably be cooking." },
+      { fr: "Tu seras probablement en train de dormir.", en: "You’ll probably be sleeping." },
+
+      // FORME NÉGATIVE
+
+      { fr: "Demain à 8h, je ne dormirai pas.", en: "Tomorrow at 8, I won’t be sleeping." },
+      { fr: "Ce soir, elle ne travaillera pas.", en: "Tonight, she won’t be working." },
+      { fr: "Nous ne regarderons pas la télévision demain.", en: "We won’t be watching TV tomorrow." },
+      { fr: "Ils ne voyageront pas ce week-end.", en: "They won’t be traveling this weekend." },
+      { fr: "Tu n’utiliseras pas mon ordinateur demain.", en: "You won’t be using my computer tomorrow." },
+      { fr: "Je ne conduirai pas à cette heure-là.", en: "I won’t be driving at that time." },
+      { fr: "Il ne participera pas à la réunion.", en: "He won’t be attending the meeting." },
+      { fr: "Elle ne portera pas cette robe.", en: "She won’t be wearing this dress." },
+      { fr: "Nous ne resterons pas longtemps.", en: "We won’t be staying long." },
+      { fr: "Ils ne joueront pas demain.", en: "They won’t be playing tomorrow." },
+      { fr: "Je ne travaillerai pas tard ce soir.", en: "I won’t be working late tonight." },
+      { fr: "Tu ne regarderas pas le match avec nous.", en: "You won’t be watching the match with us." },
+      { fr: "Elle ne conduira pas demain matin.", en: "She won’t be driving tomorrow morning." },
+      { fr: "Nous ne mangerons pas à la maison ce soir.", en: "We won’t be eating at home tonight." },
+      { fr: "Ils ne dormiront pas ici.", en: "They won’t be sleeping here." },
+      { fr: "Je ne prendrai pas ce train.", en: "I won’t be taking this train." },
+      { fr: "Il ne travaillera pas sur ce projet.", en: "He won’t be working on this project." },
+      { fr: "Elle ne parlera pas au directeur.", en: "She won’t be speaking to the manager." },
+      { fr: "Nous ne préparerons pas le repas.", en: "We won’t be preparing the meal." },
+      { fr: "Ils ne nous attendront pas.", en: "They won’t be waiting for us." },
+      { fr: "Tu ne feras pas les courses demain.", en: "You won’t be doing the shopping tomorrow." },
+      { fr: "Je ne lirai pas ce soir.", en: "I won’t be reading tonight." },
+      { fr: "Elle ne fera pas ses devoirs à ce moment-là.", en: "She won’t be doing her homework at that moment." },
+      { fr: "Nous ne marcherons pas sous la pluie.", en: "We won’t be walking in the rain." },
+      { fr: "Ils ne regarderont pas ce film.", en: "They won’t be watching this movie." },
+
+      // QUESTIONS MIXTES
+
+      { fr: "Que feras-tu demain à cette heure-ci ?", en: "What will you be doing at this time tomorrow?" },
+      { fr: "Où dormirez-vous demain soir ?", en: "Where will you be sleeping tomorrow night?" },
+      { fr: "Avec qui travailleras-tu demain ?", en: "Who will you be working with tomorrow?" },
+      { fr: "Pourquoi conduira-t-elle si tard ?", en: "Why will she be driving so late?" },
+      { fr: "Que regarderont-ils ce soir ?", en: "What will they be watching tonight?" },
+      { fr: "Où nous attendras-tu ?", en: "Where will you be waiting for us?" },
+      { fr: "À quelle heure travailleras-tu demain ?", en: "What time will you be working tomorrow?" },
+      { fr: "Pourquoi portera-t-il un costume ?", en: "Why will he be wearing a suit?" },
+      { fr: "Que préparera-t-elle pour le dîner ?", en: "What will she be preparing for dinner?" },
+      { fr: "Avec qui voyageront-ils ?", en: "Who will they be traveling with?" },
+      { fr: "Où étudieras-tu demain ?", en: "Where will you be studying tomorrow?" },
+      { fr: "Pourquoi attendrons-nous dehors ?", en: "Why will we be waiting outside?" },
+      { fr: "Que feront les enfants pendant la réunion ?", en: "What will the children be doing during the meeting?" },
+      { fr: "Qui utilisera cette salle demain ?", en: "Who will be using this room tomorrow?" },
+      { fr: "Que liras-tu ce soir ?", en: "What will you be reading tonight?" },
+      { fr: "Où dîneront-ils demain ?", en: "Where will they be having dinner tomorrow?" },
+      { fr: "Pourquoi dormiront-ils à l’hôtel ?", en: "Why will they be sleeping at the hotel?" },
+      { fr: "Que feras-tu pendant que je travaillerai ?", en: "What will you be doing while I’m working?" },
+      { fr: "Qui parlera pendant la présentation ?", en: "Who will be speaking during the presentation?" },
+      { fr: "Que portera-t-elle au mariage ?", en: "What will she be wearing at the wedding?" },
+      { fr: "Où jouerez-vous samedi ?", en: "Where will you be playing on Saturday?" },
+      { fr: "Pourquoi ne viendras-tu pas avec nous ?", en: "Why won’t you be coming with us?" },
+      { fr: "Que feront-ils pendant le voyage ?", en: "What will they be doing during the trip?" },
+      { fr: "Avec qui parleras-tu demain ?", en: "Who will you be talking to tomorrow?" },
+      { fr: "À quelle heure nous attendront-ils ?", en: "What time will they be waiting for us?" }
+
+    ];
+
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
 </body>
 
 </html>

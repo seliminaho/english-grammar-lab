@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coming Soon - Flashcards</title>
-  <link rel="stylesheet" href="../../style.css" />
+  <title>Present Perfect - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
   <style>
     * {
       margin: 0;
@@ -29,6 +29,7 @@
       backdrop-filter: blur(8px);
     }
 
+
     main {
       flex: 1;
       display: flex;
@@ -37,7 +38,7 @@
       padding: 2rem;
     }
 
-    .coming-soon-wrapper {
+    .flashcard-wrapper {
       width: 100%;
       max-width: 700px;
       text-align: center;
@@ -55,60 +56,77 @@
       font-size: 1rem;
     }
 
-    .coming-card {
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
       width: 100%;
       min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
       border-radius: 24px;
       padding: 2rem;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      backface-visibility: hidden;
       box-shadow: var(--shadow-medium);
       border: 1px solid var(--border);
-      background: var(--surface);
     }
 
-    .coming-label {
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
       font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--primary);
-      margin-bottom: 1rem;
+      opacity: 0.8;
     }
 
-    .coming-text {
-      font-size: clamp(1.5rem, 3vw, 2.3rem);
-      line-height: 1.4;
-      font-weight: 700;
-      color: var(--text-strong);
-      margin-bottom: 1rem;
-    }
-
-    .coming-description {
-      color: var(--text-soft);
-      font-size: 1rem;
-      line-height: 1.6;
-      max-width: 520px;
-    }
-
-    .back-link {
-      display: inline-block;
+    .helper-text {
       margin-top: 1.5rem;
-      color: var(--primary);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
+      color: var(--text-soft);
+      font-size: 0.95rem;
     }
 
     @media (max-width: 640px) {
-      .coming-card {
+      .flashcard {
         min-height: 260px;
+      }
+
+      .card-face {
         padding: 1.4rem;
       }
 
@@ -133,25 +151,281 @@
   </header>
 
   <main>
-    <div class="coming-soon-wrapper">
-      <h1 class="page-title">Flashcards bientôt disponibles</h1>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au Present Perfect</h1>
       <p class="page-subtitle">
-        Cette section sera ajoutée au fur et à mesure des cours.
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
       </p>
 
-      <div class="coming-card">
-        <div class="coming-label">Coming soon</div>
-        <p class="coming-text">Ce cours sera bientôt disponible ici.</p>
-        <p class="coming-description">
-          Les flashcards correspondantes seront ajoutées après la préparation du cours.
-        </p>
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
       </div>
 
-      <a href="../../categories/tenses.html" class="back-link">← Retour à la catégorie</a>
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
     </div>
   </main>
 
-  <script src="../../theme.js"></script>
+  <script>
+
+    const cards = [
+
+      // =========================
+      // ALREADY / JUST / YET
+      // =========================
+
+      { fr: "J’ai déjà mangé.", en: "I’ve already eaten." },
+      { fr: "Elle a déjà terminé ses devoirs.", en: "She has already finished her homework." },
+      { fr: "Nous avons déjà vu ce film.", en: "We’ve already seen this movie." },
+      { fr: "Ils ont déjà quitté la maison.", en: "They’ve already left the house." },
+      { fr: "Tu as déjà appelé ta mère ?", en: "Have you already called your mother?" },
+      { fr: "Je viens juste de finir.", en: "I’ve just finished." },
+      { fr: "Il vient juste d’arriver.", en: "He has just arrived." },
+      { fr: "Elle vient juste d’envoyer le message.", en: "She has just sent the message." },
+      { fr: "Nous venons juste de manger.", en: "We’ve just eaten." },
+      { fr: "Ils viennent juste de partir.", en: "They’ve just left." },
+      { fr: "Tu n’as pas encore répondu.", en: "You haven’t answered yet." },
+      { fr: "Je n’ai pas encore terminé.", en: "I haven’t finished yet." },
+      { fr: "Elle n’a pas encore appelé.", en: "She hasn’t called yet." },
+      { fr: "Nous n’avons pas encore choisi.", en: "We haven’t chosen yet." },
+      { fr: "Ils n’ont pas encore payé.", en: "They haven’t paid yet." },
+      { fr: "As-tu déjà essayé la nourriture coréenne ?", en: "Have you ever tried Korean food?" },
+      { fr: "A-t-elle déjà conduit une moto ?", en: "Has she ever driven a motorcycle?" },
+      { fr: "Avez-vous déjà rencontré une célébrité ?", en: "Have you ever met a celebrity?" },
+      { fr: "Ont-ils déjà visité Londres ?", en: "Have they ever visited London?" },
+      { fr: "As-tu déjà dormi dehors ?", en: "Have you ever slept outside?" },
+      { fr: "J’ai déjà lu ce livre trois fois.", en: "I’ve already read this book three times." },
+      { fr: "Il a déjà perdu ses clés deux fois cette semaine.", en: "He has already lost his keys twice this week." },
+      { fr: "Nous avons déjà regardé cette série.", en: "We’ve already watched this series." },
+      { fr: "Elle vient juste de se réveiller.", en: "She has just woken up." },
+      { fr: "Tu n’as toujours pas rangé ta chambre.", en: "You still haven’t tidied your room." },
+
+      // =========================
+      // NEVER
+      // =========================
+
+      { fr: "Je n’ai jamais vu la neige.", en: "I’ve never seen snow." },
+      { fr: "Elle n’a jamais pris l’avion.", en: "She has never taken a plane." },
+      { fr: "Nous n’avons jamais essayé ce restaurant.", en: "We’ve never tried this restaurant." },
+      { fr: "Ils n’ont jamais vécu à l’étranger.", en: "They’ve never lived abroad." },
+      { fr: "Tu n’as jamais entendu cette chanson ?", en: "Have you never heard this song?" },
+      { fr: "Je n’ai jamais cassé un os.", en: "I’ve never broken a bone." },
+      { fr: "Il n’a jamais appris l’espagnol.", en: "He has never learned Spanish." },
+      { fr: "Elle n’a jamais conduit de voiture.", en: "She has never driven a car." },
+      { fr: "Nous n’avons jamais rencontré cette personne.", en: "We’ve never met this person." },
+      { fr: "Ils n’ont jamais regardé ce film.", en: "They’ve never watched this movie." },
+      { fr: "Je n’ai jamais mangé de sushi.", en: "I’ve never eaten sushi." },
+      { fr: "Tu n’as jamais nagé dans l’océan ?", en: "Have you never swum in the ocean?" },
+      { fr: "Elle n’a jamais oublié mon anniversaire.", en: "She has never forgotten my birthday." },
+      { fr: "Nous n’avons jamais perdu un match ici.", en: "We’ve never lost a match here." },
+      { fr: "Ils n’ont jamais entendu parler de ça.", en: "They’ve never heard about that." },
+      { fr: "Je n’ai jamais autant travaillé.", en: "I’ve never worked this much." },
+      { fr: "Il n’a jamais été aussi stressé.", en: "He has never been this stressed." },
+      { fr: "Elle n’a jamais voyagé seule.", en: "She has never traveled alone." },
+      { fr: "Nous n’avons jamais vu un coucher de soleil aussi beau.", en: "We’ve never seen such a beautiful sunset." },
+      { fr: "Ils n’ont jamais gagné ce tournoi.", en: "They’ve never won this tournament." },
+      { fr: "Je n’ai jamais parlé à quelqu’un d’aussi célèbre.", en: "I’ve never spoken to someone this famous." },
+      { fr: "Tu n’as jamais essayé de cuisiner ?", en: "Have you never tried cooking?" },
+      { fr: "Elle n’a jamais dormi dans une tente.", en: "She has never slept in a tent." },
+      { fr: "Nous n’avons jamais oublié cette journée.", en: "We’ve never forgotten that day." },
+      { fr: "Ils n’ont jamais appris à nager.", en: "They’ve never learned how to swim." },
+
+      // =========================
+      // EXPERIENCE / LIFE
+      // =========================
+
+      { fr: "J’ai visité Rome plusieurs fois.", en: "I’ve visited Rome several times." },
+      { fr: "Elle a rencontré beaucoup de personnes intéressantes.", en: "She has met many interesting people." },
+      { fr: "Nous avons vécu dans trois pays différents.", en: "We’ve lived in three different countries." },
+      { fr: "Ils ont travaillé ensemble pendant des années.", en: "They’ve worked together for years." },
+      { fr: "Tu as déjà fait du ski ?", en: "Have you ever gone skiing?" },
+      { fr: "J’ai appris l’anglais tout seul.", en: "I’ve learned English by myself." },
+      { fr: "Il a changé plusieurs fois de travail.", en: "He has changed jobs several times." },
+      { fr: "Elle a déjà participé à une compétition.", en: "She has already participated in a competition." },
+      { fr: "Nous avons essayé beaucoup de restaurants ici.", en: "We’ve tried many restaurants here." },
+      { fr: "Ils ont déjà traversé l’Europe en voiture.", en: "They’ve already traveled across Europe by car." },
+      { fr: "J’ai lu tous les livres de cette série.", en: "I’ve read all the books in this series." },
+      { fr: "Tu as déjà perdu ton passeport ?", en: "Have you ever lost your passport?" },
+      { fr: "Elle a déjà vu ce chanteur en concert.", en: "She has already seen this singer live." },
+      { fr: "Nous avons déjà travaillé avec lui.", en: "We’ve already worked with him." },
+      { fr: "Ils ont déjà entendu cette histoire.", en: "They’ve already heard this story." },
+      { fr: "J’ai appris beaucoup de choses cette année.", en: "I’ve learned many things this year." },
+      { fr: "Il a déjà essayé de créer une entreprise.", en: "He has already tried to start a company." },
+      { fr: "Elle a déjà gagné une médaille.", en: "She has already won a medal." },
+      { fr: "Nous avons déjà pris ce train.", en: "We’ve already taken this train." },
+      { fr: "Ils ont déjà parlé de ce problème.", en: "They’ve already talked about this problem." },
+      { fr: "J’ai changé d’avis plusieurs fois.", en: "I’ve changed my mind several times." },
+      { fr: "Tu as déjà rencontré quelqu’un de célèbre ?", en: "Have you ever met someone famous?" },
+      { fr: "Elle a déjà vendu sa voiture.", en: "She has already sold her car." },
+      { fr: "Nous avons déjà essayé cette méthode.", en: "We’ve already tried this method." },
+      { fr: "Ils ont déjà oublié son prénom.", en: "They’ve already forgotten his name." },
+
+      // =========================
+      // RESULT IN THE PRESENT
+      // =========================
+
+      { fr: "J’ai perdu mes clés.", en: "I’ve lost my keys." },
+      { fr: "Elle a cassé son téléphone.", en: "She has broken her phone." },
+      { fr: "Nous avons raté le bus.", en: "We’ve missed the bus." },
+      { fr: "Ils ont oublié les billets.", en: "They’ve forgotten the tickets." },
+      { fr: "Tu as sali ton t-shirt.", en: "You’ve stained your t-shirt." },
+      { fr: "J’ai fini mon travail.", en: "I’ve finished my work." },
+      { fr: "Il a fermé la porte.", en: "He has closed the door." },
+      { fr: "Elle a éteint la lumière.", en: "She has turned off the light." },
+      { fr: "Nous avons nettoyé la cuisine.", en: "We’ve cleaned the kitchen." },
+      { fr: "Ils ont changé les règles.", en: "They’ve changed the rules." },
+      { fr: "J’ai oublié mon mot de passe.", en: "I’ve forgotten my password." },
+      { fr: "Tu as cassé mes lunettes.", en: "You’ve broken my glasses." },
+      { fr: "Elle a perdu son portefeuille.", en: "She has lost her wallet." },
+      { fr: "Nous avons vendu notre voiture.", en: "We’ve sold our car." },
+      { fr: "Ils ont annulé la réunion.", en: "They’ve canceled the meeting." },
+      { fr: "J’ai pris une décision.", en: "I’ve made a decision." },
+      { fr: "Il a trouvé un nouveau travail.", en: "He has found a new job." },
+      { fr: "Elle a changé de coiffure.", en: "She has changed her hairstyle." },
+      { fr: "Nous avons réparé l’ordinateur.", en: "We’ve fixed the computer." },
+      { fr: "Ils ont déménagé à Paris.", en: "They’ve moved to Paris." },
+      { fr: "J’ai terminé le livre.", en: "I’ve finished the book." },
+      { fr: "Tu as vidé la bouteille.", en: "You’ve emptied the bottle." },
+      { fr: "Elle a coupé ses cheveux.", en: "She has cut her hair." },
+      { fr: "Nous avons réservé un hôtel.", en: "We’ve booked a hotel." },
+      { fr: "Ils ont acheté une maison.", en: "They’ve bought a house." },
+
+      // =========================
+      // STILL TRUE / FOR / SINCE
+      // =========================
+
+      { fr: "Je vis ici depuis 2020.", en: "I’ve lived here since 2020." },
+      { fr: "Elle travaille ici depuis trois ans.", en: "She has worked here for three years." },
+      { fr: "Nous nous connaissons depuis longtemps.", en: "We’ve known each other for a long time." },
+      { fr: "Ils sont mariés depuis dix ans.", en: "They’ve been married for ten years." },
+      { fr: "Tu attends depuis une heure.", en: "You’ve waited for an hour." },
+      { fr: "J’étudie l’anglais depuis mon enfance.", en: "I’ve studied English since childhood." },
+      { fr: "Il joue au piano depuis des années.", en: "He has played the piano for years." },
+      { fr: "Elle habite à Paris depuis 2018.", en: "She has lived in Paris since 2018." },
+      { fr: "Nous travaillons ensemble depuis janvier.", en: "We’ve worked together since January." },
+      { fr: "Ils connaissent cette famille depuis longtemps.", en: "They’ve known this family for a long time." },
+      { fr: "Je porte ces chaussures depuis ce matin.", en: "I’ve worn these shoes since this morning." },
+      { fr: "Tu apprends le coréen depuis six mois.", en: "You’ve learned Korean for six months." },
+      { fr: "Elle attend le bus depuis midi.", en: "She has waited for the bus since noon." },
+      { fr: "Nous utilisons ce logiciel depuis des années.", en: "We’ve used this software for years." },
+      { fr: "Ils vivent dans cette maison depuis leur mariage.", en: "They’ve lived in this house since their wedding." },
+      { fr: "J’ai ce téléphone depuis deux ans.", en: "I’ve had this phone for two years." },
+      { fr: "Il est malade depuis lundi.", en: "He has been sick since Monday." },
+      { fr: "Elle connaît mon frère depuis l’école primaire.", en: "She has known my brother since elementary school." },
+      { fr: "Nous attendons depuis très longtemps.", en: "We’ve waited for a very long time." },
+      { fr: "Ils travaillent sur ce projet depuis janvier.", en: "They’ve worked on this project since January." },
+      { fr: "Je fais du sport depuis mon adolescence.", en: "I’ve done sports since my teenage years." },
+      { fr: "Tu portes cette veste depuis ce matin.", en: "You’ve worn this jacket since this morning." },
+      { fr: "Elle enseigne ici depuis quinze ans.", en: "She has taught here for fifteen years." },
+      { fr: "Nous avons cette voiture depuis 2019.", en: "We’ve had this car since 2019." },
+      { fr: "Ils utilisent le même ordinateur depuis des années.", en: "They’ve used the same computer for years." },
+
+      // =========================
+      // THIS WEEK / TODAY / RECENT PERIOD
+      // =========================
+
+      { fr: "J’ai beaucoup travaillé cette semaine.", en: "I’ve worked a lot this week." },
+      { fr: "Elle a vu trois films ce mois-ci.", en: "She has seen three movies this month." },
+      { fr: "Nous avons mangé au restaurant plusieurs fois cette semaine.", en: "We’ve eaten at restaurants several times this week." },
+      { fr: "Ils ont eu beaucoup de problèmes récemment.", en: "They’ve had many problems recently." },
+      { fr: "Tu as beaucoup progressé cette année.", en: "You’ve improved a lot this year." },
+      { fr: "J’ai parlé avec lui aujourd’hui.", en: "I’ve spoken with him today." },
+      { fr: "Il a déjà plu trois fois cette semaine.", en: "It has already rained three times this week." },
+      { fr: "Elle a lu beaucoup de livres cette année.", en: "She has read many books this year." },
+      { fr: "Nous avons passé beaucoup de temps ensemble récemment.", en: "We’ve spent a lot of time together recently." },
+      { fr: "Ils ont changé leurs habitudes ces derniers mois.", en: "They’ve changed their habits in recent months." },
+      { fr: "J’ai fait beaucoup d’erreurs aujourd’hui.", en: "I’ve made many mistakes today." },
+      { fr: "Tu as été très occupé récemment.", en: "You’ve been very busy recently." },
+      { fr: "Elle a beaucoup appris cette année.", en: "She has learned a lot this year." },
+      { fr: "Nous avons eu plusieurs réunions cette semaine.", en: "We’ve had several meetings this week." },
+      { fr: "Ils ont beaucoup voyagé ces derniers temps.", en: "They’ve traveled a lot lately." },
+      { fr: "J’ai dormi seulement cinq heures cette nuit.", en: "I’ve slept only five hours tonight." },
+      { fr: "Il a beaucoup changé récemment.", en: "He has changed a lot recently." },
+      { fr: "Elle a travaillé tous les jours cette semaine.", en: "She has worked every day this week." },
+      { fr: "Nous avons déjà parlé de ça aujourd’hui.", en: "We’ve already talked about that today." },
+      { fr: "Ils ont dépensé beaucoup d’argent ce mois-ci.", en: "They’ve spent a lot of money this month." },
+
+      // =========================
+      // QUESTIONS / MIXED
+      // =========================
+
+      { fr: "As-tu déjà oublié un examen ?", en: "Have you ever forgotten an exam?" },
+      { fr: "Avez-vous déjà perdu votre téléphone ?", en: "Have you ever lost your phone?" },
+      { fr: "A-t-elle déjà parlé devant un grand public ?", en: "Has she ever spoken in front of a large audience?" },
+      { fr: "Ont-ils déjà essayé de vivre à l’étranger ?", en: "Have they ever tried living abroad?" },
+      { fr: "As-tu déjà eu peur dans un avion ?", en: "Have you ever been scared on a plane?" },
+      { fr: "Combien de fois as-tu vu ce film ?", en: "How many times have you seen this movie?" },
+      { fr: "Pourquoi as-tu changé d’avis ?", en: "Why have you changed your mind?" },
+      { fr: "Depuis combien de temps vis-tu ici ?", en: "How long have you lived here?" },
+      { fr: "Qu’est-ce qu’elle a dit ?", en: "What has she said?" },
+      { fr: "Qui a pris mon téléphone ?", en: "Who has taken my phone?" },
+      { fr: "Pourquoi ont-ils annulé la réunion ?", en: "Why have they canceled the meeting?" },
+      { fr: "As-tu déjà entendu parler de ce livre ?", en: "Have you ever heard about this book?" },
+      { fr: "Depuis combien de temps travaillez-vous ici ?", en: "How long have you worked here?" },
+      { fr: "Qu’est-ce qui a changé ?", en: "What has changed?" },
+      { fr: "Qui a cassé la fenêtre ?", en: "Who has broken the window?" },
+      { fr: "As-tu déjà rencontré quelqu’un de célèbre ?", en: "Have you ever met someone famous?" },
+      { fr: "Pourquoi a-t-elle quitté son travail ?", en: "Why has she left her job?" },
+      { fr: "Depuis combien de temps connaissent-ils cette famille ?", en: "How long have they known this family?" },
+      { fr: "Qui a mangé le dernier gâteau ?", en: "Who has eaten the last cake?" },
+      { fr: "Pourquoi as-tu vendu ta voiture ?", en: "Why have you sold your car?" }
+
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
 </body>
 
 </html>

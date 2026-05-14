@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coming Soon - Flashcards</title>
-  <link rel="stylesheet" href="../../style.css" />
+  <title>For vs Since - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
   <style>
     * {
       margin: 0;
@@ -29,6 +29,7 @@
       backdrop-filter: blur(8px);
     }
 
+
     main {
       flex: 1;
       display: flex;
@@ -37,7 +38,7 @@
       padding: 2rem;
     }
 
-    .coming-soon-wrapper {
+    .flashcard-wrapper {
       width: 100%;
       max-width: 700px;
       text-align: center;
@@ -55,60 +56,77 @@
       font-size: 1rem;
     }
 
-    .coming-card {
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
       width: 100%;
       min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
       border-radius: 24px;
       padding: 2rem;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      backface-visibility: hidden;
       box-shadow: var(--shadow-medium);
       border: 1px solid var(--border);
-      background: var(--surface);
     }
 
-    .coming-label {
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
       font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--primary);
-      margin-bottom: 1rem;
+      opacity: 0.8;
     }
 
-    .coming-text {
-      font-size: clamp(1.5rem, 3vw, 2.3rem);
-      line-height: 1.4;
-      font-weight: 700;
-      color: var(--text-strong);
-      margin-bottom: 1rem;
-    }
-
-    .coming-description {
-      color: var(--text-soft);
-      font-size: 1rem;
-      line-height: 1.6;
-      max-width: 520px;
-    }
-
-    .back-link {
-      display: inline-block;
+    .helper-text {
       margin-top: 1.5rem;
-      color: var(--primary);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
+      color: var(--text-soft);
+      font-size: 0.95rem;
     }
 
     @media (max-width: 640px) {
-      .coming-card {
+      .flashcard {
         min-height: 260px;
+      }
+
+      .card-face {
         padding: 1.4rem;
       }
 
@@ -133,25 +151,175 @@
   </header>
 
   <main>
-    <div class="coming-soon-wrapper">
-      <h1 class="page-title">Flashcards bientôt disponibles</h1>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi à utiliser for et since</h1>
       <p class="page-subtitle">
-        Cette section sera ajoutée au fur et à mesure des cours.
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
       </p>
 
-      <div class="coming-card">
-        <div class="coming-label">Coming soon</div>
-        <p class="coming-text">Ce cours sera bientôt disponible ici.</p>
-        <p class="coming-description">
-          Les flashcards correspondantes seront ajoutées après la préparation du cours.
-        </p>
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
       </div>
 
-      <a href="../../categories/tenses.html" class="back-link">← Retour à la catégorie</a>
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
     </div>
   </main>
 
-  <script src="../../theme.js"></script>
+  <script>
+
+    const cards = [
+
+      // =========================
+      // FOR OR SINCE
+      // =========================
+
+      { fr: "I’ve lived here ___ 2020.", en: "since" },
+      { fr: "She has worked here ___ three years.", en: "for" },
+      { fr: "We’ve been waiting ___ this morning.", en: "since" },
+      { fr: "They’ve played together ___ a long time.", en: "for" },
+      { fr: "You’ve been learning English ___ six months.", en: "for" },
+
+      { fr: "I’ve known this person ___ my childhood.", en: "since" },
+      { fr: "She has been sleeping ___ two hours.", en: "for" },
+      { fr: "We’ve been working on this project ___ January.", en: "since" },
+      { fr: "They’ve been married ___ ten years.", en: "for" },
+      { fr: "You’ve been waiting for the bus ___ noon.", en: "since" },
+
+      { fr: "I’ve been wearing these shoes ___ this morning.", en: "since" },
+      { fr: "She has studied French ___ a long time.", en: "for" },
+      { fr: "We’ve lived in Paris ___ 2018.", en: "since" },
+      { fr: "They’ve been watching this series ___ several weeks.", en: "for" },
+      { fr: "You’ve been working too hard ___ a few days.", en: "for" },
+
+      { fr: "I’ve known my best friend ___ fifteen years.", en: "for" },
+      { fr: "She has been learning Korean ___ last year.", en: "since" },
+      { fr: "We’ve been exercising together ___ years.", en: "for" },
+      { fr: "They’ve lived in this house ___ their wedding.", en: "since" },
+      { fr: "You’ve been reading this book ___ a week.", en: "for" },
+
+      { fr: "I’ve been sick ___ Monday.", en: "since" },
+      { fr: "She has used this phone ___ two years.", en: "for" },
+      { fr: "We’ve been talking about that ___ this morning.", en: "since" },
+      { fr: "They’ve been waiting here ___ an hour.", en: "for" },
+      { fr: "Have you known this song ___ a long time?", en: "for" },
+
+      { fr: "I’ve worked here ___ 2022.", en: "since" },
+      { fr: "She has been crying ___ earlier.", en: "since" },
+      { fr: "We’ve been learning English ___ several years.", en: "for" },
+      { fr: "They’ve been friends ___ elementary school.", en: "since" },
+      { fr: "How long have you been waiting ___ ?", en: "for" },
+
+      { fr: "I’ve been looking for my keys ___ this morning.", en: "since" },
+      { fr: "She has lived alone ___ a long time.", en: "for" },
+      { fr: "We’ve been saving money ___ January.", en: "since" },
+      { fr: "They’ve played football ___ their childhood.", en: "since" },
+      { fr: "You’ve been working on this project ___ months.", en: "for" },
+
+      { fr: "I’ve known this city ___ a very long time.", en: "for" },
+      { fr: "She has been watching TV ___ two hours.", en: "for" },
+      { fr: "We’ve lived here ___ our birth.", en: "since" },
+      { fr: "They’ve been waiting for an answer ___ yesterday.", en: "since" },
+      { fr: "How long have you been studying English ___ ?", en: "for" },
+
+      { fr: "I’ve played the piano ___ my teenage years.", en: "since" },
+      { fr: "She has been working a lot ___ recently.", en: "for" },
+      { fr: "We’ve known this family ___ years.", en: "for" },
+      { fr: "They’ve lived here ___ 2015.", en: "since" },
+      { fr: "You’ve been using this computer ___ this morning.", en: "since" },
+
+      { fr: "I’ve been watching this series ___ several months.", en: "for" },
+      { fr: "She has been a teacher here ___ a long time.", en: "for" },
+      { fr: "We’ve been waiting ___ half an hour.", en: "for" },
+      { fr: "They’ve worked together ___ January.", en: "since" },
+      { fr: "You’ve been wearing this jacket ___ this morning.", en: "since" },
+
+      { fr: "I’ve done sports ___ five years.", en: "for" },
+      { fr: "She has been learning Japanese ___ 2023.", en: "since" },
+      { fr: "We’ve been here ___ noon.", en: "since" },
+      { fr: "They’ve been watching videos ___ two hours.", en: "for" },
+      { fr: "Have you known this person ___ a long time?", en: "for" },
+
+      { fr: "I’ve been sleeping badly ___ a few days.", en: "for" },
+      { fr: "She has lived in London ___ her childhood.", en: "since" },
+      { fr: "We’ve played together ___ years.", en: "for" },
+      { fr: "They’ve been waiting for the train ___ 8 o’clock.", en: "since" },
+      { fr: "You’ve been reading this book ___ yesterday.", en: "since" },
+
+      { fr: "I’ve been working on this file ___ three weeks.", en: "for" },
+      { fr: "She has known my brother ___ a long time.", en: "for" },
+      { fr: "We’ve been saving money ___ January.", en: "since" },
+      { fr: "They’ve lived together ___ ten years.", en: "for" },
+      { fr: "Have you been waiting here ___ this morning?", en: "since" },
+
+      { fr: "I’ve been paying attention to my diet ___ a few months.", en: "for" },
+      { fr: "She has used the same phone ___ 2021.", en: "since" },
+      { fr: "We’ve spoken English ___ childhood.", en: "since" },
+      { fr: "They’ve been working too much ___ recently.", en: "for" },
+      { fr: "How many years have you been learning French ___ ?", en: "for" },
+
+      { fr: "I’ve known this song ___ years.", en: "for" },
+      { fr: "She has been waiting for a message ___ this morning.", en: "since" },
+      { fr: "We’ve lived here ___ a very long time.", en: "for" },
+      { fr: "They’ve played basketball ___ they were children.", en: "since" },
+      { fr: "You’ve been studying ___ six hours.", en: "for" }
+
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
 </body>
 
 </html>

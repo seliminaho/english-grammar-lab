@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coming Soon - Flashcards</title>
-  <link rel="stylesheet" href="../../style.css" />
+  <title>Past Continuous - Flashcards</title>
+  <link rel="stylesheet" href="../style.css" />
   <style>
     * {
       margin: 0;
@@ -29,6 +29,7 @@
       backdrop-filter: blur(8px);
     }
 
+
     main {
       flex: 1;
       display: flex;
@@ -37,7 +38,7 @@
       padding: 2rem;
     }
 
-    .coming-soon-wrapper {
+    .flashcard-wrapper {
       width: 100%;
       max-width: 700px;
       text-align: center;
@@ -55,60 +56,77 @@
       font-size: 1rem;
     }
 
-    .coming-card {
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
       width: 100%;
       min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
       border-radius: 24px;
       padding: 2rem;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      backface-visibility: hidden;
       box-shadow: var(--shadow-medium);
       border: 1px solid var(--border);
-      background: var(--surface);
     }
 
-    .coming-label {
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
       font-size: 0.85rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--primary);
-      margin-bottom: 1rem;
+      opacity: 0.8;
     }
 
-    .coming-text {
-      font-size: clamp(1.5rem, 3vw, 2.3rem);
-      line-height: 1.4;
-      font-weight: 700;
-      color: var(--text-strong);
-      margin-bottom: 1rem;
-    }
-
-    .coming-description {
-      color: var(--text-soft);
-      font-size: 1rem;
-      line-height: 1.6;
-      max-width: 520px;
-    }
-
-    .back-link {
-      display: inline-block;
+    .helper-text {
       margin-top: 1.5rem;
-      color: var(--primary);
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
+      color: var(--text-soft);
+      font-size: 0.95rem;
     }
 
     @media (max-width: 640px) {
-      .coming-card {
+      .flashcard {
         min-height: 260px;
+      }
+
+      .card-face {
         padding: 1.4rem;
       }
 
@@ -133,25 +151,319 @@
   </header>
 
   <main>
-    <div class="coming-soon-wrapper">
-      <h1 class="page-title">Flashcards bientôt disponibles</h1>
+    <div class="flashcard-wrapper">
+      <h1 class="page-title">Entraîne-toi au Past Continuous</h1>
       <p class="page-subtitle">
-        Cette section sera ajoutée au fur et à mesure des cours.
+        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
       </p>
 
-      <div class="coming-card">
-        <div class="coming-label">Coming soon</div>
-        <p class="coming-text">Ce cours sera bientôt disponible ici.</p>
-        <p class="coming-description">
-          Les flashcards correspondantes seront ajoutées après la préparation du cours.
-        </p>
+      <div class="card-scene">
+        <div class="flashcard" id="flashcard">
+          <div class="card-face card-front">
+            <span class="card-label">Français</span>
+            <p class="card-text" id="frontText"></p>
+          </div>
+
+          <div class="card-face card-back">
+            <span class="card-label">English</span>
+            <p class="card-text" id="backText"></p>
+          </div>
+        </div>
       </div>
 
-      <a href="../../categories/tenses.html" class="back-link">← Retour à la catégorie</a>
+      <p class="helper-text">
+        1er clic : voir la traduction • 2e clic : nouvelle carte
+      </p>
     </div>
   </main>
 
-  <script src="../../theme.js"></script>
+  <script>
+
+    const cards = [
+      { fr: "Je mangeais.", en: "I was eating." },
+      { fr: "On regardait un film.", en: "We were watching a movie." },
+      { fr: "Elle travaillait hier soir.", en: "She was working last night." },
+      { fr: "Il parlait au téléphone.", en: "He was talking on the phone." },
+      { fr: "Ils jouaient dehors.", en: "They were playing outside." },
+
+      { fr: "Je ne travaillais pas.", en: "I wasn't working." },
+      { fr: "On ne regardait pas ça.", en: "We weren't watching that." },
+      { fr: "Elle ne mangeait pas.", en: "She wasn't eating." },
+      { fr: "Il ne conduisait pas.", en: "He wasn't driving." },
+      { fr: "Ils n'écoutaient pas.", en: "They weren't listening." },
+
+      { fr: "Est-ce que tu travaillais ?", en: "Were you working?" },
+      { fr: "Est-ce qu'on attendait ?", en: "Were we waiting?" },
+      { fr: "Est-ce qu'elle pleurait ?", en: "Was she crying?" },
+      { fr: "Est-ce qu'il dormait ?", en: "Was he sleeping?" },
+      { fr: "Est-ce qu'ils couraient ?", en: "Were they running?" },
+
+      { fr: "Qu'est-ce que tu faisais ?", en: "What were you doing?" },
+      { fr: "Pourquoi est-ce qu'elle pleurait ?", en: "Why was she crying?" },
+      { fr: "Où est-ce qu'ils allaient ?", en: "Where were they going?" },
+      { fr: "Avec qui est-ce que tu parlais ?", en: "Who were you talking to?" },
+      { fr: "Comment est-ce qu'il faisait ça ?", en: "How was he doing that?" },
+
+      { fr: "Je pensais à toi.", en: "I was thinking about you." },
+      { fr: "On essayait de comprendre.", en: "We were trying to understand." },
+      { fr: "Elle préparait le dîner.", en: "She was preparing dinner." },
+      { fr: "Il réparait son téléphone.", en: "He was fixing his phone." },
+      { fr: "Ils discutaient du problème.", en: "They were discussing the problem." },
+
+      { fr: "Je ne faisais pas attention.", en: "I wasn't paying attention." },
+      { fr: "On ne faisait pas ça correctement.", en: "We weren't doing that properly." },
+      { fr: "Elle ne disait pas la vérité.", en: "She wasn't telling the truth." },
+      { fr: "Il ne perdait pas son temps.", en: "He wasn't wasting his time." },
+      { fr: "Ils ne travaillaient pas dessus.", en: "They weren't working on it." },
+
+      { fr: "Pendant que je mangeais, il m'a appelé.", en: "While I was eating, he called me." },
+      { fr: "Pendant qu'on regardait le film, elle est arrivée.", en: "While we were watching the movie, she arrived." },
+      { fr: "Il dormait quand je suis rentré.", en: "He was sleeping when I came home." },
+      { fr: "Ils jouaient quand il a commencé à pleuvoir.", en: "They were playing when it started to rain." },
+      { fr: "Je conduisais quand tu as appelé.", en: "I was driving when you called." },
+
+      { fr: "Je lisais à huit heures hier soir.", en: "I was reading at eight o'clock last night." },
+      { fr: "On dînait quand tu as envoyé le message.", en: "We were having dinner when you sent the message." },
+      { fr: "Elle étudiait toute la soirée.", en: "She was studying all evening." },
+      { fr: "Il travaillait encore à minuit.", en: "He was still working at midnight." },
+      { fr: "Ils marchaient dans le parc hier après-midi.", en: "They were walking in the park yesterday afternoon." },
+
+      { fr: "Je regardais la télé quand la lumière s'est éteinte.", en: "I was watching TV when the lights went out." },
+      { fr: "On parlait de toi hier soir.", en: "We were talking about you last night." },
+      { fr: "Elle chantait sous la douche ce matin.", en: "She was singing in the shower this morning." },
+      { fr: "Il courait quand il est tombé.", en: "He was running when he fell." },
+      { fr: "Ils attendaient le bus à sept heures.", en: "They were waiting for the bus at seven o'clock." },
+
+      { fr: "Je faisais mes devoirs quand maman est entrée.", en: "I was doing my homework when Mom came in." },
+      { fr: "On jouait aux cartes hier soir.", en: "We were playing cards last night." },
+      { fr: "Elle écrivait un message pendant le cours.", en: "She was writing a message during the class." },
+      { fr: "Il cherchait ses clés ce matin.", en: "He was looking for his keys this morning." },
+      { fr: "Ils regardaient le match hier soir.", en: "They were watching the game last night." },
+
+      { fr: "Je travaillais sur mon projet toute la matinée.", en: "I was working on my project all morning." },
+      { fr: "On préparait le repas quand ils sont arrivés.", en: "We were preparing the meal when they arrived." },
+      { fr: "Elle dessinait pendant que je lisais.", en: "She was drawing while I was reading." },
+      { fr: "Il conduisait trop vite quand la police l'a arrêté.", en: "He was driving too fast when the police stopped him." },
+      { fr: "Ils riaient pendant le film.", en: "They were laughing during the movie." },
+
+      { fr: "Je nettoyais ma chambre hier après-midi.", en: "I was cleaning my room yesterday afternoon." },
+      { fr: "On faisait du sport à six heures.", en: "We were exercising at six o'clock." },
+      { fr: "Elle attendait devant l'école.", en: "She was waiting in front of the school." },
+      { fr: "Il jouait de la guitare quand je suis arrivé.", en: "He was playing the guitar when I arrived." },
+      { fr: "Ils parlaient anglais pendant la réunion.", en: "They were speaking English during the meeting." },
+
+      { fr: "Je buvais un café quand tu m'as appelé.", en: "I was drinking coffee when you called me." },
+      { fr: "On révisait pour l'examen hier soir.", en: "We were revising for the exam last night." },
+      { fr: "Elle dormait encore à dix heures.", en: "She was still sleeping at ten o'clock." },
+      { fr: "Il pleuvait quand on est sortis.", en: "It was raining when we went out." },
+      { fr: "Ils voyageaient en Espagne l'été dernier.", en: "They were traveling in Spain last summer." },
+
+      { fr: "Je ne lisais pas hier soir.", en: "I wasn't reading last night." },
+      { fr: "On ne dînait pas quand tu as appelé.", en: "We weren't having dinner when you called." },
+      { fr: "Elle n'étudiait pas à ce moment-là.", en: "She wasn't studying at that moment." },
+      { fr: "Il ne travaillait pas hier matin.", en: "He wasn't working yesterday morning." },
+      { fr: "Ils ne marchaient pas vite.", en: "They weren't walking fast." },
+
+      { fr: "Je ne regardais pas la télé.", en: "I wasn't watching TV." },
+      { fr: "On ne parlait pas de toi.", en: "We weren't talking about you." },
+      { fr: "Elle ne chantait pas sous la douche.", en: "She wasn't singing in the shower." },
+      { fr: "Il ne courait pas quand il est tombé.", en: "He wasn't running when he fell." },
+      { fr: "Ils n'attendaient pas le bus.", en: "They weren't waiting for the bus." },
+
+      { fr: "Je ne faisais pas mes devoirs.", en: "I wasn't doing my homework." },
+      { fr: "On ne jouait pas aux cartes.", en: "We weren't playing cards." },
+      { fr: "Elle n'écrivait pas un message.", en: "She wasn't writing a message." },
+      { fr: "Il ne cherchait pas ses clés.", en: "He wasn't looking for his keys." },
+      { fr: "Ils ne regardaient pas le match.", en: "They weren't watching the game." },
+
+      { fr: "Je ne travaillais pas sur ce projet.", en: "I wasn't working on that project." },
+      { fr: "On ne préparait pas le repas.", en: "We weren't preparing the meal." },
+      { fr: "Elle ne dessinait pas pendant le cours.", en: "She wasn't drawing during the class." },
+      { fr: "Il ne conduisait pas trop vite.", en: "He wasn't driving too fast." },
+      { fr: "Ils ne riaient pas pendant le film.", en: "They weren't laughing during the movie." },
+
+      { fr: "Je ne nettoyais pas ma chambre.", en: "I wasn't cleaning my room." },
+      { fr: "On ne faisait pas de sport.", en: "We weren't exercising." },
+      { fr: "Elle n'attendait pas devant l'école.", en: "She wasn't waiting in front of the school." },
+      { fr: "Il ne jouait pas de la guitare.", en: "He wasn't playing the guitar." },
+      { fr: "Ils ne parlaient pas anglais.", en: "They weren't speaking English." },
+
+      { fr: "Je ne buvais pas de café.", en: "I wasn't drinking coffee." },
+      { fr: "On ne révisait pas pour l'examen.", en: "We weren't revising for the exam." },
+      { fr: "Elle ne dormait pas encore.", en: "She wasn't still sleeping." },
+      { fr: "Il ne pleuvait pas hier matin.", en: "It wasn't raining yesterday morning." },
+      { fr: "Ils ne voyageaient pas en Espagne.", en: "They weren't traveling in Spain." },
+
+      { fr: "Est-ce que tu lisais à huit heures hier soir ?", en: "Were you reading at eight o'clock last night?" },
+      { fr: "Est-ce qu'on dînait quand il est arrivé ?", en: "Were we having dinner when he arrived?" },
+      { fr: "Est-ce qu'elle étudiait toute la soirée ?", en: "Was she studying all evening?" },
+      { fr: "Est-ce qu'il travaillait encore à minuit ?", en: "Was he still working at midnight?" },
+      { fr: "Est-ce qu'ils marchaient dans le parc ?", en: "Were they walking in the park?" },
+
+      { fr: "Est-ce que tu regardais la télé quand j'ai appelé ?", en: "Were you watching TV when I called?" },
+      { fr: "Est-ce qu'on parlait trop fort ?", en: "Were we speaking too loudly?" },
+      { fr: "Est-ce qu'elle chantait ce matin ?", en: "Was she singing this morning?" },
+      { fr: "Est-ce qu'il courait quand il est tombé ?", en: "Was he running when he fell?" },
+      { fr: "Est-ce qu'ils attendaient le bus ?", en: "Were they waiting for the bus?" },
+
+      { fr: "Est-ce que tu faisais tes devoirs ?", en: "Were you doing your homework?" },
+      { fr: "Est-ce qu'on jouait aux cartes hier soir ?", en: "Were we playing cards last night?" },
+      { fr: "Est-ce qu'elle écrivait un message ?", en: "Was she writing a message?" },
+      { fr: "Est-ce qu'il cherchait ses clés ?", en: "Was he looking for his keys?" },
+      { fr: "Est-ce qu'ils regardaient le match ?", en: "Were they watching the game?" },
+
+      { fr: "Est-ce que tu travaillais sur ton projet ?", en: "Were you working on your project?" },
+      { fr: "Est-ce qu'on préparait le repas ?", en: "Were we preparing the meal?" },
+      { fr: "Est-ce qu'elle dessinait pendant le cours ?", en: "Was she drawing during the class?" },
+      { fr: "Est-ce qu'il conduisait trop vite ?", en: "Was he driving too fast?" },
+      { fr: "Est-ce qu'ils riaient pendant le film ?", en: "Were they laughing during the movie?" },
+
+      { fr: "Est-ce que tu nettoyais ta chambre ?", en: "Were you cleaning your room?" },
+      { fr: "Est-ce qu'on faisait du sport ?", en: "Were we exercising?" },
+      { fr: "Est-ce qu'elle attendait devant l'école ?", en: "Was she waiting in front of the school?" },
+      { fr: "Est-ce qu'il jouait de la guitare ?", en: "Was he playing the guitar?" },
+      { fr: "Est-ce qu'ils parlaient anglais ?", en: "Were they speaking English?" },
+
+      { fr: "Est-ce que tu buvais un café ?", en: "Were you drinking coffee?" },
+      { fr: "Est-ce qu'on révisait pour l'examen ?", en: "Were we revising for the exam?" },
+      { fr: "Est-ce qu'elle dormait encore ?", en: "Was she still sleeping?" },
+      { fr: "Est-ce qu'il pleuvait quand tu es sorti ?", en: "Was it raining when you went out?" },
+      { fr: "Est-ce qu'ils voyageaient l'été dernier ?", en: "Were they traveling last summer?" },
+
+      { fr: "Qu'est-ce que tu lisais hier soir ?", en: "What were you reading last night?" },
+      { fr: "Pourquoi est-ce qu'on dînait si tard ?", en: "Why were we having dinner so late?" },
+      { fr: "Où est-ce qu'elle étudiait hier ?", en: "Where was she studying yesterday?" },
+      { fr: "Pourquoi est-ce qu'il travaillait encore à minuit ?", en: "Why was he still working at midnight?" },
+      { fr: "Où est-ce qu'ils marchaient hier après-midi ?", en: "Where were they walking yesterday afternoon?" },
+
+      { fr: "Qu'est-ce que tu regardais quand j'ai appelé ?", en: "What were you watching when I called?" },
+      { fr: "De quoi est-ce qu'on parlait ?", en: "What were we talking about?" },
+      { fr: "Pourquoi est-ce qu'elle chantait ?", en: "Why was she singing?" },
+      { fr: "Où est-ce qu'il courait ?", en: "Where was he running?" },
+      { fr: "Qui est-ce qu'ils attendaient ?", en: "Who were they waiting for?" },
+
+      { fr: "Qu'est-ce que tu faisais à ce moment-là ?", en: "What were you doing at that moment?" },
+      { fr: "À quoi est-ce qu'on jouait hier soir ?", en: "What were we playing last night?" },
+      { fr: "Qu'est-ce qu'elle écrivait ?", en: "What was she writing?" },
+      { fr: "Qu'est-ce qu'il cherchait ?", en: "What was he looking for?" },
+      { fr: "Quel match est-ce qu'ils regardaient ?", en: "Which game were they watching?" },
+
+      { fr: "Sur quoi est-ce que tu travaillais ?", en: "What were you working on?" },
+      { fr: "Qu'est-ce qu'on préparait ?", en: "What were we preparing?" },
+      { fr: "Qu'est-ce qu'elle dessinait ?", en: "What was she drawing?" },
+      { fr: "Pourquoi est-ce qu'il conduisait si vite ?", en: "Why was he driving so fast?" },
+      { fr: "Pourquoi est-ce qu'ils riaient ?", en: "Why were they laughing?" },
+
+      { fr: "Quelle chambre est-ce que tu nettoyais ?", en: "Which room were you cleaning?" },
+      { fr: "Quel sport est-ce qu'on faisait ?", en: "What sport were we doing?" },
+      { fr: "Où est-ce qu'elle attendait ?", en: "Where was she waiting?" },
+      { fr: "Quel morceau est-ce qu'il jouait ?", en: "What song was he playing?" },
+      { fr: "Quelle langue est-ce qu'ils parlaient ?", en: "What language were they speaking?" },
+
+      { fr: "Qu'est-ce que tu buvais ?", en: "What were you drinking?" },
+      { fr: "Pourquoi est-ce qu'on révisait si tard ?", en: "Why were we revising so late?" },
+      { fr: "Pourquoi est-ce qu'elle dormait encore ?", en: "Why was she still sleeping?" },
+      { fr: "Quand est-ce qu'il pleuvait ?", en: "When was it raining?" },
+      { fr: "Où est-ce qu'ils voyageaient ?", en: "Where were they traveling?" },
+
+      { fr: "Pendant que je lisais, mon frère jouait.", en: "While I was reading, my brother was playing." },
+      { fr: "Pendant qu'on mangeait, le téléphone a sonné.", en: "While we were eating, the phone rang." },
+      { fr: "Elle chantait pendant qu'il cuisinait.", en: "She was singing while he was cooking." },
+      { fr: "Il dormait pendant que nous travaillions.", en: "He was sleeping while we were working." },
+      { fr: "Ils parlaient pendant que le professeur expliquait.", en: "They were talking while the teacher was explaining." },
+
+      { fr: "Je marchais dans la rue quand je l'ai vu.", en: "I was walking down the street when I saw him." },
+      { fr: "On attendait le bus quand il a commencé à pleuvoir.", en: "We were waiting for the bus when it started to rain." },
+      { fr: "Elle pleurait quand je suis entré.", en: "She was crying when I came in." },
+      { fr: "Il regardait son téléphone quand je lui ai parlé.", en: "He was looking at his phone when I talked to him." },
+      { fr: "Ils jouaient au foot quand la cloche a sonné.", en: "They were playing football when the bell rang." },
+
+      { fr: "Je faisais la cuisine quand elle est arrivée.", en: "I was cooking when she arrived." },
+      { fr: "On discutait quand il a changé de sujet.", en: "We were talking when he changed the subject." },
+      { fr: "Elle travaillait quand l'ordinateur s'est éteint.", en: "She was working when the computer turned off." },
+      { fr: "Il écrivait un mail quand son chef l'a appelé.", en: "He was writing an email when his boss called him." },
+      { fr: "Ils regardaient un film quand je suis passé.", en: "They were watching a movie when I came by." },
+
+      { fr: "Je dormais quand tu as envoyé le message.", en: "I was sleeping when you sent the message." },
+      { fr: "On révisait quand le cours a commencé.", en: "We were revising when the class started." },
+      { fr: "Elle traversait la rue quand la voiture s'est arrêtée.", en: "She was crossing the street when the car stopped." },
+      { fr: "Il prenait une douche quand quelqu'un a frappé à la porte.", en: "He was taking a shower when someone knocked on the door." },
+      { fr: "Ils mangeaient quand la nouvelle est tombée.", en: "They were eating when the news came out." },
+
+      { fr: "Je ne regardais pas quand il est tombé.", en: "I wasn't watching when he fell." },
+      { fr: "On ne dormait pas quand tu es rentré.", en: "We weren't sleeping when you came home." },
+      { fr: "Elle ne travaillait pas quand je l'ai appelée.", en: "She wasn't working when I called her." },
+      { fr: "Il ne conduisait pas quand l'accident est arrivé.", en: "He wasn't driving when the accident happened." },
+      { fr: "Ils ne jouaient pas quand il a commencé à pleuvoir.", en: "They weren't playing when it started to rain." },
+
+      { fr: "Est-ce que tu dormais quand j'ai appelé ?", en: "Were you sleeping when I called?" },
+      { fr: "Est-ce qu'on parlait quand elle est entrée ?", en: "Were we talking when she came in?" },
+      { fr: "Est-ce qu'elle conduisait quand tu l'as vue ?", en: "Was she driving when you saw her?" },
+      { fr: "Est-ce qu'il travaillait quand le problème est arrivé ?", en: "Was he working when the problem happened?" },
+      { fr: "Est-ce qu'ils mangeaient quand tu es arrivé ?", en: "Were they eating when you arrived?" },
+
+      { fr: "Qu'est-ce que tu faisais quand il t'a appelé ?", en: "What were you doing when he called you?" },
+      { fr: "Où est-ce qu'on allait quand la voiture est tombée en panne ?", en: "Where were we going when the car broke down?" },
+      { fr: "Pourquoi est-ce qu'elle pleurait quand tu es entré ?", en: "Why was she crying when you came in?" },
+      { fr: "Avec qui est-ce qu'il parlait quand tu l'as vu ?", en: "Who was he talking to when you saw him?" },
+      { fr: "Qu'est-ce qu'ils faisaient quand tu es arrivé ?", en: "What were they doing when you arrived?" },
+
+      { fr: "Je travaillais encore quand tout le monde est parti.", en: "I was still working when everyone left." },
+      { fr: "On marchait depuis dix minutes quand il a commencé à pleuvoir.", en: "We were walking for ten minutes when it started to rain." },
+      { fr: "Elle lisait tranquillement quand son père est entré.", en: "She was reading quietly when her father came in." },
+      { fr: "Il faisait ses valises quand je suis arrivé.", en: "He was packing his bags when I arrived." },
+      { fr: "Ils rangeaient la maison quand les invités sont arrivés.", en: "They were tidying the house when the guests arrived." },
+
+      { fr: "Je regardais par la fenêtre quand j'ai entendu un bruit.", en: "I was looking out the window when I heard a noise." },
+      { fr: "On parlait doucement pendant que le bébé dormait.", en: "We were speaking quietly while the baby was sleeping." },
+      { fr: "Elle souriait pendant qu'il racontait l'histoire.", en: "She was smiling while he was telling the story." },
+      { fr: "Il expliquait la règle pendant que les élèves écoutaient.", en: "He was explaining the rule while the students were listening." },
+      { fr: "Ils chantaient pendant que nous dansions.", en: "They were singing while we were dancing." }
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const backText = document.getElementById("backText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      frontText.textContent = cards[index].fr;
+      backText.textContent = cards[index].en;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", () => {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        isFront = true;
+
+        // changer au milieu de l'animation (0.7s / 2)
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    });
+  </script>
+  <script src="../theme.js"></script>
 </body>
 
 </html>
