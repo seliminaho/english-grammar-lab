@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Listening Flashcards - English Grammar Lab</title>
+      <link rel="stylesheet" href="style.css" />
+
+      <style>
+            body {
+                  min-height: 100vh;
+                  display: flex;
+                  flex-direction: column;
+                  background: var(--hero-bg);
+                  color: var(--text);
+            }
+
+            main {
+                  flex: 1;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  padding: 2rem;
+            }
+
+            .listening-wrapper {
+                  width: 100%;
+                  max-width: 760px;
+                  text-align: center;
+            }
+
+            .page-title {
+                  font-size: clamp(1.8rem, 4vw, 2.5rem);
+                  margin-bottom: 0.8rem;
+                  color: var(--text-strong);
+            }
+
+            .page-subtitle {
+                  color: var(--text-soft);
+                  margin-bottom: 1.7rem;
+                  font-size: 1rem;
+            }
+
+            .audio-player {
+                  width: min(100%, 560px);
+                  margin: 0 auto 1.5rem;
+                  padding: 1rem 1.2rem;
+                  border: 1px solid var(--border);
+                  border-radius: 22px;
+                  background: var(--surface);
+                  box-shadow: var(--shadow-soft);
+                  display: flex;
+                  align-items: center;
+                  gap: 1rem;
+            }
+
+            .play-button {
+                  width: 54px;
+                  height: 54px;
+                  border: none;
+                  border-radius: 50%;
+                  background: var(--primary);
+                  color: white;
+                  display: grid;
+                  place-items: center;
+                  cursor: pointer;
+                  box-shadow: var(--shadow-primary);
+                  transition: transform 0.2s ease, background 0.2s ease;
+                  flex: 0 0 auto;
+            }
+
+            .play-button:hover {
+                  transform: translateY(-2px);
+                  background: var(--primary-strong);
+            }
+
+            .play-icon {
+                  font-size: 1.35rem;
+                  line-height: 1;
+                  margin-left: 2px;
+            }
+
+            .audio-bars {
+                  height: 54px;
+                  flex: 1;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 5px;
+                  overflow: hidden;
+            }
+
+            .audio-bars span {
+                  width: 5px;
+                  height: 14px;
+                  border-radius: 999px;
+                  background: var(--primary);
+                  opacity: 0.35;
+                  transform-origin: center;
+                  transition: opacity 0.2s ease;
+            }
+
+            .audio-player.is-playing .audio-bars span {
+                  opacity: 0.9;
+                  animation: soundWave 0.8s ease-in-out infinite;
+            }
+
+            .audio-bars span:nth-child(2n) {
+                  animation-delay: 0.1s;
+                  height: 24px;
+            }
+
+            .audio-bars span:nth-child(3n) {
+                  animation-delay: 0.2s;
+                  height: 34px;
+            }
+
+            .audio-bars span:nth-child(4n) {
+                  animation-delay: 0.3s;
+                  height: 20px;
+            }
+
+            .audio-bars span:nth-child(5n) {
+                  animation-delay: 0.4s;
+                  height: 40px;
+            }
+
+            @keyframes soundWave {
+
+                  0%,
+                  100% {
+                        transform: scaleY(0.45);
+                  }
+
+                  50% {
+                        transform: scaleY(1.25);
+                  }
+            }
+
+            .audio-info {
+                  font-size: 0.85rem;
+                  color: var(--text-soft);
+                  min-width: 70px;
+                  text-align: right;
+            }
+
+            .card-scene {
+                  perspective: 1200px;
+            }
+
+            .flashcard {
+                  width: 100%;
+                  min-height: 330px;
+                  position: relative;
+                  transform-style: preserve-3d;
+                  transition: transform 0.7s ease;
+                  cursor: pointer;
+            }
+
+            .flashcard.is-flipped {
+                  transform: rotateY(180deg);
+            }
+
+            .card-face {
+                  position: absolute;
+                  inset: 0;
+                  border-radius: 24px;
+                  padding: 2rem;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  text-align: center;
+                  backface-visibility: hidden;
+                  box-shadow: var(--shadow-medium);
+                  border: 1px solid var(--border);
+            }
+
+            .card-front {
+                  background: var(--surface);
+                  color: var(--text-strong);
+            }
+
+            .card-back {
+                  background: var(--primary);
+                  color: white;
+                  transform: rotateY(180deg);
+                  flex-direction: column;
+                  gap: 1.2rem;
+            }
+
+            .card-label {
+                  position: absolute;
+                  top: 20px;
+                  left: 20px;
+                  font-size: 0.8rem;
+                  font-weight: 700;
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                  opacity: 0.8;
+            }
+
+            .view-answer {
+                  border: none;
+                  border-radius: 999px;
+                  padding: 1rem 1.6rem;
+                  background: var(--primary);
+                  color: white;
+                  font-weight: 700;
+                  cursor: pointer;
+                  box-shadow: var(--shadow-primary);
+                  transition: transform 0.2s ease, background 0.2s ease;
+            }
+
+            .view-answer:hover {
+                  transform: translateY(-2px);
+                  background: var(--primary-strong);
+            }
+
+            .transcription {
+                  font-size: clamp(1.45rem, 3vw, 2.2rem);
+                  line-height: 1.35;
+                  font-weight: 800;
+            }
+
+            .translation {
+                  font-size: clamp(1rem, 2vw, 1.25rem);
+                  line-height: 1.5;
+                  opacity: 0.92;
+                  max-width: 620px;
+            }
+
+            .controls {
+                  margin-top: 1.4rem;
+                  display: flex;
+                  justify-content: center;
+                  gap: 0.8rem;
+                  flex-wrap: wrap;
+            }
+
+            .control-button {
+                  border: 1px solid var(--border-strong);
+                  border-radius: 12px;
+                  padding: 0.75rem 1rem;
+                  background: var(--surface);
+                  color: var(--text);
+                  cursor: pointer;
+                  font-weight: 700;
+                  transition: transform 0.2s ease, border-color 0.2s ease;
+            }
+
+            .control-button:hover {
+                  transform: translateY(-2px);
+                  border-color: var(--primary);
+            }
+
+            .helper-text {
+                  margin-top: 1rem;
+                  color: var(--text-soft);
+                  font-size: 0.92rem;
+            }
+
+            @media (max-width: 640px) {
+                  main {
+                        padding: 1.2rem;
+                  }
+
+                  .audio-player {
+                        padding: 0.8rem;
+                        gap: 0.7rem;
+                  }
+
+                  .play-button {
+                        width: 48px;
+                        height: 48px;
+                  }
+
+                  .audio-info {
+                        display: none;
+                  }
+
+                  .flashcard {
+                        min-height: 300px;
+                  }
+
+                  .card-face {
+                        padding: 1.4rem;
+                  }
+            }
+      </style>
+</head>
+
+<body>
+      <header class="site-header">
+            <div class="container header-content">
+                  <div class="logo">English Grammar Lab</div>
+
+                  <nav class="main-nav">
+                        <a href="index.html">Accueil</a>
+                        <a href="index.html#categories">Exercices</a>
+                        <a href="video-study.html">Video Study</a>
+                        <button class="theme-toggle" id="themeToggle">🌙</button>
+                  </nav>
+            </div>
+      </header>
+
+      <main>
+            <div class="listening-wrapper">
+                  <p class="eyebrow">Listening practice</p>
+                  <h1 class="page-title">Micro Listening Flashcards</h1>
+                  <p class="page-subtitle">
+                        Écoute l’extrait, essaie de comprendre, puis retourne la carte pour voir la réponse.
+                  </p>
+
+                  <div class="audio-player" id="audioPlayer">
+                        <button class="play-button" id="playButton" type="button" aria-label="Play audio">
+                              <span class="play-icon" id="playIcon">▶</span>
+                        </button>
+
+                        <div class="audio-bars" aria-hidden="true">
+                              <span></span><span></span><span></span><span></span><span></span>
+                              <span></span><span></span><span></span><span></span><span></span>
+                              <span></span><span></span><span></span><span></span><span></span>
+                              <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+
+                        <div class="audio-info" id="audioCounter">1 / 1</div>
+                        <audio id="audio"></audio>
+                  </div>
+
+                  <div class="card-scene">
+                        <div class="flashcard" id="flashcard">
+                              <div class="card-face card-front">
+                                    <span class="card-label">Question</span>
+                                    <button class="view-answer" type="button">View answer</button>
+                              </div>
+
+                              <div class="card-face card-back">
+                                    <span class="card-label">Answer</span>
+                                    <p class="transcription" id="transcriptionText"></p>
+                                    <p class="translation" id="translationText"></p>
+                              </div>
+                        </div>
+                  </div>
+
+                  <div class="controls">
+                        <button class="control-button" id="replayButton" type="button">Replay</button>
+                        <button class="control-button" id="nextButton" type="button">Next card</button>
+                  </div>
+
+                  <p class="helper-text">
+                        Clique sur “View answer” pour voir la transcription et la traduction.
+                  </p>
+            </div>
+      </main>
+
+      <script>
+            const cards = [
+                  {
+                        "audio": "audios/And I couldn't think of anything.mp3",
+                        "transcription": "And I couldn't think of anything.",
+                        "translation": "Et je n’ai rien réussi à trouver."
+                  },
+                  {
+                        "audio": "audios/And I have been wishing for a way back ever since.mp3",
+                        "transcription": "And I have been wishing for a way back ever since.",
+                        "translation": "Et depuis, je rêve de trouver un moyen de revenir en arrière."
+                  },
+                  {
+                        "audio": "audios/And I ran all the way here.mp3",
+                        "transcription": "And I ran all the way here.",
+                        "translation": "Et j’ai couru jusqu’ici."
+                  },
+                  {
+                        "audio": "audios/And it was the exact same thing.mp3",
+                        "transcription": "And it was the exact same thing.",
+                        "translation": "Et c’était exactement la même chose."
+                  },
+                  {
+                        "audio": "audios/And since the camera system wasn't working at the time.mp3",
+                        "transcription": "And since the camera system wasn't working at the time.",
+                        "translation": "Et comme le système de caméras ne fonctionnait pas à ce moment-là."
+                  },
+                  {
+                        "audio": "audios/And there was no one else in the store.mp3",
+                        "transcription": "And there was no one else in the store.",
+                        "translation": "Et il n’y avait personne d’autre dans le magasin."
+                  },
+                  {
+                        "audio": "audios/Because i have an appointment.mp3",
+                        "transcription": "Because I have an appointment.",
+                        "translation": "Parce que j’ai un rendez-vous."
+                  },
+                  {
+                        "audio": "audios/but I'll bet you what.mp3",
+                        "transcription": "but I'll bet you what.",
+                        "translation": "Mais je vais vous dire une chose."
+                  },
+                  {
+                        "audio": "audios/But you say you got a good look at him.mp3",
+                        "transcription": "But you say you got a good look at him.",
+                        "translation": "Mais vous dites que vous l’avez bien vu."
+                  },
+                  {
+                        "audio": "audios/Can i get you anything a coffee or bottled water.mp3",
+                        "transcription": "Can I get you anything a coffee or bottled water?",
+                        "translation": "Je peux vous apporter quelque chose ? Un café ou une bouteille d’eau ?"
+                  },
+                  {
+                        "audio": "audios/Can i help you.mp3",
+                        "transcription": "Can I help you?",
+                        "translation": "Je peux vous aider ?"
+                  },
+                  {
+                        "audio": "audios/Can i say something.mp3",
+                        "transcription": "Can I say something?",
+                        "translation": "Je peux dire quelque chose ?"
+                  },
+                  {
+                        "audio": "audios/do you happen to know the name of that one.mp3",
+                        "transcription": "do you happen to know the name of that one?",
+                        "translation": "tu connaitrais pas, par hasard, comment il s’appelle ?"
+                  },
+                  {
+                        "audio": "audios/Do you know what's going on in there.mp3",
+                        "transcription": "Do you know what's going on in there?",
+                        "translation": "Tu sais ce qui se passe là-dedans ?"
+                  },
+                  {
+                        "audio": "audios/got in at noon left at midnight.mp3",
+                        "transcription": "got in at noon left at midnight.",
+                        "translation": "Je suis arrivé à midi, je suis parti à minuit."
+                  },
+                  {
+                        "audio": "audios/he grabbed up the money.mp3",
+                        "transcription": "he grabbed up the money.",
+                        "translation": "Il a attrapé l’argent."
+                  },
+                  {
+                        "audio": "audios/He saw your gun.mp3",
+                        "transcription": "He saw your gun.",
+                        "translation": "Il a vu ton arme."
+                  },
+                  {
+                        "audio": "audios/He's just walking by.mp3",
+                        "transcription": "He's just walking by.",
+                        "translation": "Il fait que passer."
+                  },
+                  {
+                        "audio": "audios/Hey how was your chef thing.mp3",
+                        "transcription": "Hey how was your chef thing.",
+                        "translation": "Comment s’est passé ton truc de chef cuisine?"
+                  },
+                  {
+                        "audio": "audios/Hey you're back.mp3",
+                        "transcription": "Hey you're back.",
+                        "translation": "Hé, tu es revenu."
+                  },
+                  {
+                        "audio": "audios/How can you know all that.mp3",
+                        "transcription": "How can you know all that?",
+                        "translation": "Comment tu peux savoir tout ça ?"
+                  },
+                  {
+                        "audio": "audios/How did you know that _.mp3",
+                        "transcription": "How did you know that ?",
+                        "translation": "Comment tu savais ça ?"
+                  },
+                  {
+                        "audio": "audios/How many in the class.mp3",
+                        "transcription": "How many in the class?",
+                        "translation": "Combien dans la classe ?"
+                  },
+                  {
+                        "audio": "audios/How the hell did you know they were the police.mp3",
+                        "transcription": "How the hell did you know they were the police?",
+                        "translation": "Comment diable tu savais que c’étaient des policiers ?"
+                  },
+                  {
+                        "audio": "audios/I can barely see straight.mp3",
+                        "transcription": "I can barely see straight.",
+                        "translation": "J’arrive à peine à voir clair."
+                  },
+                  {
+                        "audio": "audios/I don't even feel like i know you anymore man.mp3",
+                        "transcription": "I don't even feel like I know you anymore man.",
+                        "translation": "J’ai même plus l’impression de te connaître, mec."
+                  },
+                  {
+                        "audio": "audios/I don't need time that's him.mp3",
+                        "transcription": "I don't need time that's him.",
+                        "translation": "Je n’ai pas besoin de temps, c’est lui."
+                  },
+                  {
+                        "audio": "audios/I don't really care if you let me in or not.mp3",
+                        "transcription": "I don't really care if you let me in or not.",
+                        "translation": "Je m’en fiche un peu que vous me laissiez entrer ou non."
+                  },
+                  {
+                        "audio": "audios/I don't want to see that.mp3",
+                        "transcription": "I don't want to see that.",
+                        "translation": "Je ne veux pas voir ça."
+                  },
+                  {
+                        "audio": "audios/I got knocked into a different life.mp3",
+                        "transcription": "I got knocked into a different life.",
+                        "translation": "J’ai été projeté dans une autre vie."
+                  },
+                  {
+                        "audio": "audios/I got to see donal trump waiting for an elevator.mp3",
+                        "transcription": "I got to see Donald trump waiting for an elevator.",
+                        "translation": "J’ai pu/eu l'occasion de voir Donald Trump attendre un ascenseur."
+                  },
+                  {
+                        "audio": "audios/I hope so.mp3",
+                        "transcription": "I hope so.",
+                        "translation": "J’espère bien."
+                  },
+                  {
+                        "audio": "audios/I just want to clarify a few things from your testimony if that's okay.mp3",
+                        "transcription": "I just want to clarify a few things from your testimony if that's okay.",
+                        "translation": "Je veux juste clarifier quelques points de votre témoignage, si ça vous va."
+                  },
+                  {
+                        "audio": "audios/I learned it when i studied for the bar.mp3",
+                        "transcription": "I learned it when I studied for the bar.",
+                        "translation": "Je l’ai appris quand j'étudiais pour le barreau."
+                  },
+                  {
+                        "audio": "audios/I like to think so .mp3",
+                        "transcription": "I like to think so.",
+                        "translation": "J’aime à le penser."
+                  },
+                  {
+                        "audio": "audios/I need a grown goddamn man.mp3",
+                        "transcription": "I need a grown goddamn man.",
+                        "translation": "J’ai besoin d’un vrai adulte, bon sang."
+                  },
+                  {
+                        "audio": "audios/I needed some money.mp3",
+                        "transcription": "I needed some money.",
+                        "translation": "J’avais besoin d’argent."
+                  },
+                  {
+                        "audio": "audios/I read this novel in elementary school.mp3",
+                        "transcription": "I read this novel in elementary school.",
+                        "translation": "J’ai lu ce roman à l’école primaire."
+                  },
+                  {
+                        "audio": "audios/I will go out and i will try to find something for her okay_.mp3",
+                        "transcription": "I will go out and I will try to find something for her okay?",
+                        "translation": "Je vais sortir etje vais essayer de lui trouver quelque chose, d’accord ?"
+                  },
+                  {
+                        "audio": "audios/I will have very specific instructions for you tomorrow.mp3",
+                        "transcription": "I will have very specific instructions for you tomorrow.",
+                        "translation": "J’aurai des instructions très précises pour vous demain."
+                  },
+                  {
+                        "audio": "audios/I'd say you're full of crap.mp3",
+                        "transcription": "I'd say you're full of crap.",
+                        "translation": "Je dirais que vous racontez n’importe quoi."
+                  },
+                  {
+                        "audio": "audios/I'll take it.mp3",
+                        "transcription": "I'll take it.",
+                        "translation": "Je prends (lit: je le prendrai)."
+                  },
+                  {
+                        "audio": "audios/I'm gonna show you.mp3",
+                        "transcription": "I'm gonna show you.",
+                        "translation": "Je vais te montrer."
+                  },
+                  {
+                        "audio": "audios/I'm incline to give you another shot.mp3",
+                        "transcription": "I'm inclined to give you another shot.",
+                        "translation": "Je suis tenté de te donner une autre chance."
+                  },
+                  {
+                        "audio": "audios/I'm just gonna ask you this one time.mp3",
+                        "transcription": "I'm just gonna ask you this one time.",
+                        "translation": "Je vais te poser la question une seule fois."
+                  },
+                  {
+                        "audio": "audios/I'm listenning.mp3",
+                        "transcription": "I'm listening.",
+                        "translation": "J’écoute."
+                  },
+                  {
+                        "audio": "audios/I'm the type of person.mp3",
+                        "transcription": "I'm the type of person.",
+                        "translation": "Je suis le genre de personne."
+                  },
+                  {
+                        "audio": "audios/Im gonna tell you that i don't know.mp3",
+                        "transcription": "I'm gonna tell you that I don't know.",
+                        "translation": "Je vais vous dire que je ne sais pas."
+                  },
+                  {
+                        "audio": "audios/Is that fair enough.mp3",
+                        "transcription": "Is that fair enough?",
+                        "translation": "Ça vous semble correct ?"
+                  },
+                  {
+                        "audio": "audios/Is the person who robbed you present in the court today.mp3",
+                        "transcription": "Is the person who robbed you present in the court today?",
+                        "translation": "La personne qui vous a volé est-elle présente au tribunal aujourd’hui ?"
+                  },
+                  {
+                        "audio": "audios/It hapenned in London.mp3",
+                        "transcription": "It happened in London.",
+                        "translation": "Ça s’est passé à Londres."
+                  },
+                  {
+                        "audio": "audios/It's impressive but you're sitting at a computer.mp3",
+                        "transcription": "It's impressive but you're sitting at a computer.",
+                        "translation": "C’est impressionnant, mais tu es assis devant un ordinateur."
+                  },
+                  {
+                        "audio": "audios/Just get a card that has a poem already in it.mp3",
+                        "transcription": "Just get a card that has a poem already in it.",
+                        "translation": "Prends juste une carte avec déjà un poème dedans."
+                  },
+                  {
+                        "audio": "audios/Just promise you won't tell.mp3",
+                        "transcription": "Just promise you won't tell.",
+                        "translation": "Promets juste que tu ne diras rien."
+                  },
+                  {
+                        "audio": "audios/Let me tell you something.mp3",
+                        "transcription": "Let me tell you something.",
+                        "translation": "Laisse-moi te dire quelque chose."
+                  },
+                  {
+                        "audio": "audios/Man, this is unbelievable.mp3",
+                        "transcription": "Man, this is unbelievable.",
+                        "translation": "Mec, c’est incroyable."
+                  },
+                  {
+                        "audio": "audios/Mr Specter will be right with you.mp3",
+                        "transcription": "Mr Specter will be right with you.",
+                        "translation": "Monsieur Specter va arriver tout de suite."
+                  },
+                  {
+                        "audio": "audios/Oh you think that's him.mp3",
+                        "transcription": "Oh you think that's him.",
+                        "translation": "Oh, tu penses que c’est lui ?"
+                  },
+                  {
+                        "audio": "audios/Okay hotshot.mp3",
+                        "transcription": "Okay hotshot.",
+                        "translation": "D’accord, le petit génie."
+                  },
+                  {
+                        "audio": "audios/Okay so when do you want to go.mp3",
+                        "transcription": "Okay so when do you want to go.",
+                        "translation": "D’accord, alors quand est-ce que tu veux y aller ?"
+                  },
+                  {
+                        "audio": "audios/Open it up, read me something .mp3",
+                        "transcription": "Open it up, read me something.",
+                        "translation": "Ouvre-le, lis-moi quelque chose."
+                  },
+                  {
+                        "audio": "audios/Pick a topic.mp3",
+                        "transcription": "Pick a topic.",
+                        "translation": "Choisis un sujet."
+                  },
+                  {
+                        "audio": "audios/Saw him waiting for an elevator.mp3",
+                        "transcription": "Saw him waiting for an elevator.",
+                        "translation": "Je l’ai vu attendre un ascenseur."
+                  },
+                  {
+                        "audio": "audios/she didn't have a bd while we were going out.mp3",
+                        "transcription": "she didn't have a birthday while we were going out.",
+                        "translation": "Elle n’a pas eu d’anniversaire pendant qu’on sortait ensemble."
+                  },
+                  {
+                        "audio": "audios/So the truth is.mp3",
+                        "transcription": "So the truth is.",
+                        "translation": "Donc la vérité, c’est que…"
+                  },
+                  {
+                        "audio": "audios/Sometimes i like to hang out with people who aren't that bright.mp3",
+                        "transcription": "Sometimes I like to hang out with people who aren't that bright.",
+                        "translation": "Parfois, j’aime traîner avec des gens qui ne sont pas très futés."
+                  },
+                  {
+                        "audio": "audios/Sounds like it happened pretty fast.mp3",
+                        "transcription": "Sounds like it happened pretty fast.",
+                        "translation": "A l'entendre, On dirait que c’est arrivé assez vite."
+                  },
+                  {
+                        "audio": "audios/Sure it is.mp3",
+                        "transcription": "Sure it is.",
+                        "translation": "Bien sûr que si."
+                  },
+                  {
+                        "audio": "audios/That hotel you stayed at called.mp3",
+                        "transcription": "That hotel you stayed at called.",
+                        "translation": "L’hôtel où tu as séjourné a appelé"
+                  },
+                  {
+                        "audio": "audios/That would have made more sense.mp3",
+                        "transcription": "That would have made more sense.",
+                        "translation": "Ça aurait eu plus de sens."
+                  },
+                  {
+                        "audio": "audios/That's what you're saying.mp3",
+                        "transcription": "That's what you're saying.",
+                        "translation": "C’est ce que vous dites."
+                  },
+                  {
+                        "audio": "audios/The reason we didn't tell anyone was because we didn't want to make a big deal out of it.mp3",
+                        "transcription": "The reason we didn't tell anyone was because we didn't want to make a big deal out of it.",
+                        "translation": "La raison pour laquelle on n’a rien dit, c’est qu’on ne voulait pas en faire toute une histoire."
+                  },
+                  {
+                        "audio": "audios/They're trying to take joey.mp3",
+                        "transcription": "They're trying to take joey.",
+                        "translation": "Ils essaient de prendre Joey."
+                  },
+                  {
+                        "audio": "audios/This is all pretty fascinating stuff but i'm afraid i gotta get back to work.mp3",
+                        "transcription": "This is all pretty fascinating stuff but I'm afraid I gotta get back to work.",
+                        "translation": "Tout ça est vraiment fascinant, mais je dois retourner travailler."
+                  },
+                  {
+                        "audio": "audios/to come up with a story.mp3",
+                        "transcription": "to come up with a story.",
+                        "translation": "Trouver/inventer une histoire."
+                  },
+                  {
+                        "audio": "audios/Turns out we sold it to the deans daughter.mp3",
+                        "transcription": "Turns out we sold it to the deans daughter.",
+                        "translation": "Il se trouve qu’on l’a vendu à la fille du doyen."
+                  },
+                  {
+                        "audio": "audios/Unfortunately we only hire from harvard.mp3",
+                        "transcription": "Unfortunately we only hire from harvard.",
+                        "translation": "Malheureusement, nous n’embauchons que d'Harvard."
+                  },
+                  {
+                        "audio": "audios/We should hire you.mp3",
+                        "transcription": "We should hire you.",
+                        "translation": "On devrait vous embaucher."
+                  },
+                  {
+                        "audio": "audios/We're gonna call it a day.mp3",
+                        "transcription": "We're gonna call it a day.",
+                        "translation": "On va s’arrêter là pour aujourd’hui."
+                  },
+                  {
+                        "audio": "audios/what he means by that is.mp3",
+                        "transcription": "what he means by that is...",
+                        "translation": "Ce qu’il veut dire par là, c’est que…"
+                  },
+                  {
+                        "audio": "audios/What if i told you that i consume knowledge like no one you've ever met.mp3",
+                        "transcription": "What if I told you that I consume knowledge like no one you've ever met?",
+                        "translation": "Et si je te disais que j’absorbe la connaissance comme personne que tu aies jamais rencontré ?"
+                  },
+                  {
+                        "audio": "audios/What is wrong with you, you look like you'r eleven years old.mp3",
+                        "transcription": "What is wrong with you, you look like you're eleven years old?",
+                        "translation": "Qu’est-ce qui ne va pas chez toi ? On dirait que tu as onze ans."
+                  },
+                  {
+                        "audio": "audios/What makes you think.mp3",
+                        "transcription": "What makes you think...?",
+                        "translation": "Qu’est-ce qui te fait penser ...?"
+                  },
+                  {
+                        "audio": "audios/What were yuou doing before you were arrested.mp3",
+                        "transcription": "What were you doing before you were arrested?",
+                        "translation": "Qu’est-ce que vous faisiez avant d’être arrêté ?"
+                  },
+                  {
+                        "audio": "audios/What would you say _.mp3",
+                        "transcription": "What would you say ?",
+                        "translation": "Qu’est-ce que vous diriez ?"
+                  },
+                  {
+                        "audio": "audios/What's this.mp3",
+                        "transcription": "What's this?",
+                        "translation": "Qu’est-ce que c’est ?"
+                  },
+                  {
+                        "audio": "audios/Whatever you say i'll believe you.mp3",
+                        "transcription": "Whatever you say I'll believe you?",
+                        "translation": "Peu importe ce que tu dis, je te croirai."
+                  },
+                  {
+                        "audio": "audios/When I was in college it was my dream to be a lawyer.mp3",
+                        "transcription": "When I was in college it was my dream to be a lawyer?",
+                        "translation": "Quand j’étais à l’université, c'etait mon rêve de devenir avocat."
+                  },
+                  {
+                        "audio": "audios/While you're at it could you get her a card.mp3",
+                        "transcription": "While you're at it could you get her a card.",
+                        "translation": "Pendant que tu y es, tu pourrais lui prendre une carte ?"
+                  },
+                  {
+                        "audio": "audios/Who are you _.mp3",
+                        "transcription": "Who are you ?",
+                        "translation": "Qui êtes-vous ?"
+                  },
+                  {
+                        "audio": "audios/Why did you ask them what time it was.mp3",
+                        "transcription": "Why did you ask them what time it was?",
+                        "translation": "Pourquoi tu leur as demandé l’heure ?"
+                  },
+                  {
+                        "audio": "audios/Yeah i guess so.mp3",
+                        "transcription": "Yeah I guess so.",
+                        "translation": "Oui, je suppose."
+                  },
+                  {
+                        "audio": "audios/Yes that was mine.mp3",
+                        "transcription": "Yes that was mine.",
+                        "translation": "Oui, c’était à moi."
+                  },
+                  {
+                        "audio": "audios/You are five minutes late, is there a reason why i should let you in.mp3",
+                        "transcription": "You are five minutes late, is there a reason why I should let you in.",
+                        "translation": "Vous avez cinq minutes de retard. Y a-t-il une raison pour laquelle je devrais vous laisser entrer ?"
+                  },
+                  {
+                        "audio": "audios/You can't give her that.mp3",
+                        "transcription": "You can't give her that.",
+                        "translation": "Tu ne peux pas lui offrir ça."
+                  },
+                  {
+                        "audio": "audios/You feel confident.mp3",
+                        "transcription": "You feel confident?",
+                        "translation": "Vous vous sentez confiant ?"
+                  },
+                  {
+                        "audio": "audios/You haven't even gone to any law school.mp3",
+                        "transcription": "You haven't even gone to any law school.",
+                        "translation": "Tu n’as même pas fait d’école de droit."
+                  },
+                  {
+                        "audio": "audios/you know what we should all do.mp3",
+                        "transcription": "you know what we should all do.",
+                        "translation": "Tu sais ce qu’on devrait tous faire ?"
+                  },
+                  {
+                        "audio": "audios/You're the only one who saw the perpetrator.mp3",
+                        "transcription": "You're the only one who saw the perpetrator.",
+                        "translation": "Vous êtes le seul à avoir vu l’auteur des faits."
+                  }
+            ];
+
+            const audio = document.getElementById("audio");
+            const audioPlayer = document.getElementById("audioPlayer");
+            const playButton = document.getElementById("playButton");
+            const playIcon = document.getElementById("playIcon");
+            const replayButton = document.getElementById("replayButton");
+            const nextButton = document.getElementById("nextButton");
+            const flashcard = document.getElementById("flashcard");
+            const transcriptionText = document.getElementById("transcriptionText");
+            const translationText = document.getElementById("translationText");
+            const audioCounter = document.getElementById("audioCounter");
+
+            let currentIndex = 0;
+            let isFront = true;
+
+            function showCard(index) {
+                  const card = cards[index];
+
+                  audio.src = encodeURI(card.audio);
+                  transcriptionText.textContent = card.transcription;
+                  translationText.textContent = card.translation;
+                  audioCounter.textContent = `${index + 1} / ${cards.length}`;
+
+                  flashcard.classList.remove("is-flipped");
+                  isFront = true;
+                  audioPlayer.classList.remove("is-playing");
+                  playIcon.textContent = "▶";
+            }
+
+            function playCurrentAudio() {
+                  audio.currentTime = 0;
+                  audio.play();
+            }
+
+            function nextCard() {
+                  flashcard.classList.remove("is-flipped");
+
+                  setTimeout(() => {
+                        let newIndex = currentIndex;
+
+                        if (cards.length > 1) {
+                              while (newIndex === currentIndex) {
+                                    newIndex = Math.floor(Math.random() * cards.length);
+                              }
+                        }
+
+                        currentIndex = newIndex;
+                        showCard(currentIndex);
+                  }, 700);
+            }
+
+            playButton.addEventListener("click", () => {
+                  if (audio.paused) {
+                        audio.play();
+                  } else {
+                        audio.pause();
+                  }
+            });
+
+            replayButton.addEventListener("click", playCurrentAudio);
+
+            nextButton.addEventListener("click", nextCard);
+
+            flashcard.addEventListener("click", () => {
+                  if (isFront) {
+                        flashcard.classList.add("is-flipped");
+                        isFront = false;
+                  }
+            });
+
+            audio.addEventListener("play", () => {
+                  audioPlayer.classList.add("is-playing");
+                  playIcon.textContent = "❚❚";
+            });
+
+            audio.addEventListener("pause", () => {
+                  audioPlayer.classList.remove("is-playing");
+                  playIcon.textContent = "▶";
+            });
+
+            audio.addEventListener("ended", () => {
+                  audioPlayer.classList.remove("is-playing");
+                  playIcon.textContent = "▶";
+            });
+
+            showCard(currentIndex);
+      </script>
+
+      <script src="theme.js"></script>
+</body>
+
+</html>
