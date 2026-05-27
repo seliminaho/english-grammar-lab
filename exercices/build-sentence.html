@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Construire une phrase - English Grammar Lab</title>
+
+  <link rel="stylesheet" href="../style.css" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .exercise-wrapper {
+      width: 100%;
+      max-width: 950px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .prompt-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .prompt-card {
+      min-height: 150px;
+      border-radius: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-medium);
+      padding: 1.3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .prompt-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+      margin-bottom: 0.7rem;
+    }
+
+    .prompt-value {
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      font-weight: 800;
+      color: var(--text-strong);
+    }
+
+    .answer-scene {
+      perspective: 1200px;
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .answer-card {
+      width: 100%;
+      min-height: 160px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .answer-card.is-flipped {
+      transform: rotateX(180deg);
+    }
+
+    .answer-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .answer-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .answer-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateX(180deg);
+    }
+
+    .answer-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .controls {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 0.9rem 1.5rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--shadow-medium);
+    }
+
+    .helper-text {
+      margin-top: 1rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 760px) {
+      .prompt-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 500px) {
+      main {
+        padding: 1.2rem;
+      }
+
+      .prompt-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+      }
+
+      .prompt-card {
+        min-height: 125px;
+        padding: 1rem;
+      }
+
+      .answer-card {
+        min-height: 140px;
+      }
+
+      .answer-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="logo">English Grammar Lab</div>
+
+      <nav class="main-nav">
+        <a href="../index.html">Accueil</a>
+        <a href="../#categories">Exercices</a>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="exercise-wrapper">
+
+      <h1 class="page-title">Construis la phrase</h1>
+
+      <p class="page-subtitle">
+        Forme la phrase en anglais puis clique sur la carte réponse.
+      </p>
+
+      <div class="prompt-grid">
+
+        <div class="prompt-card">
+          <span class="prompt-label">Temps</span>
+          <p class="prompt-value" id="tenseText"></p>
+        </div>
+
+        <div class="prompt-card">
+          <span class="prompt-label">Mode</span>
+          <p class="prompt-value" id="modeText"></p>
+        </div>
+
+        <div class="prompt-card">
+          <span class="prompt-label">Personne</span>
+          <p class="prompt-value" id="subjectText"></p>
+        </div>
+
+        <div class="prompt-card">
+          <span class="prompt-label">Verbe</span>
+          <p class="prompt-value" id="verbText"></p>
+        </div>
+
+      </div>
+
+      <div class="answer-scene">
+
+        <div class="answer-card" id="answerCard">
+
+          <div class="answer-face answer-front">
+            <p class="answer-text">
+              Clique pour voir la réponse
+            </p>
+          </div>
+
+          <div class="answer-face answer-back">
+            <p class="answer-text" id="answerText"></p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="nextBtn">
+          Nouvelle carte
+        </button>
+      </div>
+
+      <p class="helper-text">
+        Exemple : past simple / négatif / tu / manger
+      </p>
+
+    </div>
+  </main>
+
+  <script>
+
+const cards = [
+  // Present simple — 30
+  { tense: "Present simple", mode: "Affirmatif", subject: "Je", verb: "manger", answer: "I eat." },
+  { tense: "Present simple", mode: "Négatif", subject: "Tu", verb: "boire", answer: "You don't drink." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Elle", verb: "travailler", answer: "Does she work?" },
+  { tense: "Present simple", mode: "Affirmatif", subject: "Il", verb: "jouer", answer: "He plays." },
+  { tense: "Present simple", mode: "Négatif", subject: "Nous", verb: "comprendre", answer: "We don't understand." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Ils", verb: "venir", answer: "Do they come?" },
+  { tense: "Present simple", mode: "Affirmatif", subject: "Elle", verb: "lire", answer: "She reads." },
+  { tense: "Present simple", mode: "Négatif", subject: "Il", verb: "aimer", answer: "He doesn't like." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Tu", verb: "savoir", answer: "Do you know?" },
+  { tense: "Present simple", mode: "Affirmatif", subject: "Nous", verb: "prendre", answer: "We take." },
+  { tense: "Present simple", mode: "Négatif", subject: "Elles", verb: "parler", answer: "They don't speak." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Il", verb: "regarder", answer: "Does he watch?" },
+  { tense: "Present simple", mode: "Affirmatif", subject: "Tu", verb: "écouter", answer: "You listen." },
+  { tense: "Present simple", mode: "Négatif", subject: "Elle", verb: "vouloir", answer: "She doesn't want." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Nous", verb: "avoir besoin", answer: "Do we need?" },
+  { tense: "Present simple", mode: "Affirmatif", subject: "Ils", verb: "habiter", answer: "They live." },
+  { tense: "Present simple", mode: "Négatif", subject: "Je", verb: "penser", answer: "I don't think." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Elle", verb: "utiliser", answer: "Does she use?" },
+  { tense: "Present simple", mode: "Affirmatif", subject: "Il", verb: "finir", answer: "He finishes." },
+  { tense: "Present simple", mode: "Négatif", subject: "Tu", verb: "attendre", answer: "You don't wait." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Ils", verb: "aider", answer: "Do they help?" },
+  { tense: "Present simple", mode: "Affirmatif", subject: "Nous", verb: "commencer", answer: "We start." },
+  { tense: "Present simple", mode: "Négatif", subject: "Elle", verb: "essayer", answer: "She doesn't try." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Tu", verb: "croire", answer: "Do you believe?" },
+  { tense: "Present simple", mode: "Affirmatif", subject: "Je", verb: "rester", answer: "I stay." },
+  { tense: "Present simple", mode: "Négatif", subject: "Il", verb: "répondre", answer: "He doesn't answer." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Nous", verb: "suivre", answer: "Do we follow?" },
+  { tense: "Present simple", mode: "Affirmatif", subject: "Elles", verb: "danser", answer: "They dance." },
+  { tense: "Present simple", mode: "Négatif", subject: "Tu", verb: "trouver", answer: "You don't find." },
+  { tense: "Present simple", mode: "Interrogatif", subject: "Elle", verb: "dire", answer: "Does she say?" },
+
+  // Present continuous — 30
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Je", verb: "manger", answer: "I am eating." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Tu", verb: "boire", answer: "You are not drinking." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Elle", verb: "travailler", answer: "Is she working?" },
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Il", verb: "jouer", answer: "He is playing." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Nous", verb: "comprendre", answer: "We are not understanding." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Ils", verb: "venir", answer: "Are they coming?" },
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Elle", verb: "lire", answer: "She is reading." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Il", verb: "écouter", answer: "He is not listening." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Tu", verb: "regarder", answer: "Are you watching?" },
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Nous", verb: "prendre", answer: "We are taking." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Elles", verb: "parler", answer: "They are not speaking." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Il", verb: "courir", answer: "Is he running?" },
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Tu", verb: "attendre", answer: "You are waiting." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Elle", verb: "écrire", answer: "She is not writing." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Nous", verb: "partir", answer: "Are we leaving?" },
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Ils", verb: "travailler", answer: "They are working." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Je", verb: "penser", answer: "I am not thinking." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Elle", verb: "utiliser", answer: "Is she using?" },
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Il", verb: "finir", answer: "He is finishing." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Tu", verb: "dormir", answer: "You are not sleeping." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Ils", verb: "aider", answer: "Are they helping?" },
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Nous", verb: "commencer", answer: "We are starting." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Elle", verb: "essayer", answer: "She is not trying." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Tu", verb: "apprendre", answer: "Are you learning?" },
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Je", verb: "rester", answer: "I am staying." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Il", verb: "répondre", answer: "He is not answering." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Nous", verb: "suivre", answer: "Are we following?" },
+  { tense: "Present continuous", mode: "Affirmatif", subject: "Elles", verb: "danser", answer: "They are dancing." },
+  { tense: "Present continuous", mode: "Négatif", subject: "Tu", verb: "chercher", answer: "You are not looking." },
+  { tense: "Present continuous", mode: "Interrogatif", subject: "Elle", verb: "chanter", answer: "Is she singing?" },
+
+  // Present perfect — 30
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Je", verb: "finir", answer: "I have finished." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Tu", verb: "manger", answer: "You haven't eaten." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Elle", verb: "voir", answer: "Has she seen?" },
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Il", verb: "partir", answer: "He has left." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Nous", verb: "comprendre", answer: "We haven't understood." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Ils", verb: "venir", answer: "Have they come?" },
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Elle", verb: "écrire", answer: "She has written." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Il", verb: "prendre", answer: "He hasn't taken." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Tu", verb: "lire", answer: "Have you read?" },
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Nous", verb: "commencer", answer: "We have started." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Elles", verb: "parler", answer: "They haven't spoken." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Il", verb: "boire", answer: "Has he drunk?" },
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Tu", verb: "travailler", answer: "You have worked." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Elle", verb: "dormir", answer: "She hasn't slept." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Nous", verb: "essayer", answer: "Have we tried?" },
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Ils", verb: "jouer", answer: "They have played." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Je", verb: "penser", answer: "I haven't thought." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Elle", verb: "utiliser", answer: "Has she used?" },
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Il", verb: "répondre", answer: "He has answered." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Tu", verb: "attendre", answer: "You haven't waited." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Ils", verb: "aider", answer: "Have they helped?" },
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Nous", verb: "regarder", answer: "We have watched." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Elle", verb: "rester", answer: "She hasn't stayed." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Tu", verb: "apprendre", answer: "Have you learned?" },
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Je", verb: "vivre", answer: "I have lived." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Il", verb: "dire", answer: "He hasn't said." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Nous", verb: "suivre", answer: "Have we followed?" },
+  { tense: "Present perfect", mode: "Affirmatif", subject: "Elles", verb: "danser", answer: "They have danced." },
+  { tense: "Present perfect", mode: "Négatif", subject: "Tu", verb: "trouver", answer: "You haven't found." },
+  { tense: "Present perfect", mode: "Interrogatif", subject: "Elle", verb: "chanter", answer: "Has she sung?" },
+
+  // Present perfect continuous — 30
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Je", verb: "travailler", answer: "I have been working." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Tu", verb: "attendre", answer: "You haven't been waiting." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Elle", verb: "étudier", answer: "Has she been studying?" },
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Il", verb: "courir", answer: "He has been running." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Nous", verb: "dormir", answer: "We haven't been sleeping." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Ils", verb: "jouer", answer: "Have they been playing?" },
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Elle", verb: "lire", answer: "She has been reading." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Il", verb: "manger", answer: "He hasn't been eating." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Tu", verb: "parler", answer: "Have you been speaking?" },
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Nous", verb: "travailler", answer: "We have been working." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Elles", verb: "écouter", answer: "They haven't been listening." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Il", verb: "regarder", answer: "Has he been watching?" },
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Tu", verb: "écrire", answer: "You have been writing." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Elle", verb: "chanter", answer: "She hasn't been singing." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Nous", verb: "voyager", answer: "Have we been traveling?" },
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Ils", verb: "attendre", answer: "They have been waiting." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Je", verb: "courir", answer: "I haven't been running." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Elle", verb: "utiliser", answer: "Has she been using?" },
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Il", verb: "apprendre", answer: "He has been learning." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Tu", verb: "essayer", answer: "You haven't been trying." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Ils", verb: "aider", answer: "Have they been helping?" },
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Nous", verb: "regarder", answer: "We have been watching." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Elle", verb: "travailler", answer: "She hasn't been working." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Tu", verb: "attendre", answer: "Have you been waiting?" },
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Je", verb: "vivre", answer: "I have been living." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Il", verb: "marcher", answer: "He hasn't been walking." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Nous", verb: "suivre", answer: "Have we been following?" },
+  { tense: "Present perfect continuous", mode: "Affirmatif", subject: "Elles", verb: "danser", answer: "They have been dancing." },
+  { tense: "Present perfect continuous", mode: "Négatif", subject: "Tu", verb: "chercher", answer: "You haven't been looking." },
+  { tense: "Present perfect continuous", mode: "Interrogatif", subject: "Elle", verb: "chanter", answer: "Has she been singing?" },
+
+    // Future will — 30
+  { tense: "Future will", mode: "Affirmatif", subject: "Je", verb: "venir", answer: "I will come." },
+  { tense: "Future will", mode: "Négatif", subject: "Tu", verb: "manger", answer: "You won't eat." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Elle", verb: "travailler", answer: "Will she work?" },
+  { tense: "Future will", mode: "Affirmatif", subject: "Il", verb: "partir", answer: "He will leave." },
+  { tense: "Future will", mode: "Négatif", subject: "Nous", verb: "comprendre", answer: "We won't understand." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Ils", verb: "venir", answer: "Will they come?" },
+  { tense: "Future will", mode: "Affirmatif", subject: "Elle", verb: "lire", answer: "She will read." },
+  { tense: "Future will", mode: "Négatif", subject: "Il", verb: "écouter", answer: "He won't listen." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Tu", verb: "regarder", answer: "Will you watch?" },
+  { tense: "Future will", mode: "Affirmatif", subject: "Nous", verb: "prendre", answer: "We will take." },
+  { tense: "Future will", mode: "Négatif", subject: "Elles", verb: "parler", answer: "They won't speak." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Il", verb: "courir", answer: "Will he run?" },
+  { tense: "Future will", mode: "Affirmatif", subject: "Tu", verb: "attendre", answer: "You will wait." },
+  { tense: "Future will", mode: "Négatif", subject: "Elle", verb: "écrire", answer: "She won't write." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Nous", verb: "partir", answer: "Will we leave?" },
+  { tense: "Future will", mode: "Affirmatif", subject: "Ils", verb: "jouer", answer: "They will play." },
+  { tense: "Future will", mode: "Négatif", subject: "Je", verb: "penser", answer: "I won't think." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Elle", verb: "utiliser", answer: "Will she use?" },
+  { tense: "Future will", mode: "Affirmatif", subject: "Il", verb: "finir", answer: "He will finish." },
+  { tense: "Future will", mode: "Négatif", subject: "Tu", verb: "dormir", answer: "You won't sleep." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Ils", verb: "aider", answer: "Will they help?" },
+  { tense: "Future will", mode: "Affirmatif", subject: "Nous", verb: "commencer", answer: "We will start." },
+  { tense: "Future will", mode: "Négatif", subject: "Elle", verb: "essayer", answer: "She won't try." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Tu", verb: "apprendre", answer: "Will you learn?" },
+  { tense: "Future will", mode: "Affirmatif", subject: "Je", verb: "rester", answer: "I will stay." },
+  { tense: "Future will", mode: "Négatif", subject: "Il", verb: "répondre", answer: "He won't answer." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Nous", verb: "suivre", answer: "Will we follow?" },
+  { tense: "Future will", mode: "Affirmatif", subject: "Elles", verb: "danser", answer: "They will dance." },
+  { tense: "Future will", mode: "Négatif", subject: "Tu", verb: "chercher", answer: "You won't look." },
+  { tense: "Future will", mode: "Interrogatif", subject: "Elle", verb: "chanter", answer: "Will she sing?" },
+
+  // Future going to — 30
+  { tense: "Future going to", mode: "Affirmatif", subject: "Je", verb: "manger", answer: "I am going to eat." },
+  { tense: "Future going to", mode: "Négatif", subject: "Tu", verb: "boire", answer: "You are not going to drink." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Elle", verb: "travailler", answer: "Is she going to work?" },
+  { tense: "Future going to", mode: "Affirmatif", subject: "Il", verb: "jouer", answer: "He is going to play." },
+  { tense: "Future going to", mode: "Négatif", subject: "Nous", verb: "comprendre", answer: "We are not going to understand." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Ils", verb: "venir", answer: "Are they going to come?" },
+  { tense: "Future going to", mode: "Affirmatif", subject: "Elle", verb: "lire", answer: "She is going to read." },
+  { tense: "Future going to", mode: "Négatif", subject: "Il", verb: "écouter", answer: "He is not going to listen." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Tu", verb: "regarder", answer: "Are you going to watch?" },
+  { tense: "Future going to", mode: "Affirmatif", subject: "Nous", verb: "prendre", answer: "We are going to take." },
+  { tense: "Future going to", mode: "Négatif", subject: "Elles", verb: "parler", answer: "They are not going to speak." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Il", verb: "courir", answer: "Is he going to run?" },
+  { tense: "Future going to", mode: "Affirmatif", subject: "Tu", verb: "attendre", answer: "You are going to wait." },
+  { tense: "Future going to", mode: "Négatif", subject: "Elle", verb: "écrire", answer: "She is not going to write." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Nous", verb: "partir", answer: "Are we going to leave?" },
+  { tense: "Future going to", mode: "Affirmatif", subject: "Ils", verb: "jouer", answer: "They are going to play." },
+  { tense: "Future going to", mode: "Négatif", subject: "Je", verb: "penser", answer: "I am not going to think." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Elle", verb: "utiliser", answer: "Is she going to use?" },
+  { tense: "Future going to", mode: "Affirmatif", subject: "Il", verb: "finir", answer: "He is going to finish." },
+  { tense: "Future going to", mode: "Négatif", subject: "Tu", verb: "dormir", answer: "You are not going to sleep." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Ils", verb: "aider", answer: "Are they going to help?" },
+  { tense: "Future going to", mode: "Affirmatif", subject: "Nous", verb: "commencer", answer: "We are going to start." },
+  { tense: "Future going to", mode: "Négatif", subject: "Elle", verb: "essayer", answer: "She is not going to try." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Tu", verb: "apprendre", answer: "Are you going to learn?" },
+  { tense: "Future going to", mode: "Affirmatif", subject: "Je", verb: "rester", answer: "I am going to stay." },
+  { tense: "Future going to", mode: "Négatif", subject: "Il", verb: "répondre", answer: "He is not going to answer." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Nous", verb: "suivre", answer: "Are we going to follow?" },
+  { tense: "Future going to", mode: "Affirmatif", subject: "Elles", verb: "danser", answer: "They are going to dance." },
+  { tense: "Future going to", mode: "Négatif", subject: "Tu", verb: "chercher", answer: "You are not going to look." },
+  { tense: "Future going to", mode: "Interrogatif", subject: "Elle", verb: "chanter", answer: "Is she going to sing?" },
+
+    // Past simple — 30
+  { tense: "Past simple", mode: "Affirmatif", subject: "Je", verb: "manger", answer: "I ate." },
+  { tense: "Past simple", mode: "Négatif", subject: "Tu", verb: "boire", answer: "You didn't drink." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Elle", verb: "travailler", answer: "Did she work?" },
+  { tense: "Past simple", mode: "Affirmatif", subject: "Il", verb: "jouer", answer: "He played." },
+  { tense: "Past simple", mode: "Négatif", subject: "Nous", verb: "comprendre", answer: "We didn't understand." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Ils", verb: "venir", answer: "Did they come?" },
+  { tense: "Past simple", mode: "Affirmatif", subject: "Elle", verb: "lire", answer: "She read." },
+  { tense: "Past simple", mode: "Négatif", subject: "Il", verb: "écouter", answer: "He didn't listen." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Tu", verb: "regarder", answer: "Did you watch?" },
+  { tense: "Past simple", mode: "Affirmatif", subject: "Nous", verb: "prendre", answer: "We took." },
+  { tense: "Past simple", mode: "Négatif", subject: "Elles", verb: "parler", answer: "They didn't speak." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Il", verb: "courir", answer: "Did he run?" },
+  { tense: "Past simple", mode: "Affirmatif", subject: "Tu", verb: "attendre", answer: "You waited." },
+  { tense: "Past simple", mode: "Négatif", subject: "Elle", verb: "écrire", answer: "She didn't write." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Nous", verb: "partir", answer: "Did we leave?" },
+  { tense: "Past simple", mode: "Affirmatif", subject: "Ils", verb: "jouer", answer: "They played." },
+  { tense: "Past simple", mode: "Négatif", subject: "Je", verb: "penser", answer: "I didn't think." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Elle", verb: "utiliser", answer: "Did she use?" },
+  { tense: "Past simple", mode: "Affirmatif", subject: "Il", verb: "finir", answer: "He finished." },
+  { tense: "Past simple", mode: "Négatif", subject: "Tu", verb: "dormir", answer: "You didn't sleep." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Ils", verb: "aider", answer: "Did they help?" },
+  { tense: "Past simple", mode: "Affirmatif", subject: "Nous", verb: "commencer", answer: "We started." },
+  { tense: "Past simple", mode: "Négatif", subject: "Elle", verb: "essayer", answer: "She didn't try." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Tu", verb: "apprendre", answer: "Did you learn?" },
+  { tense: "Past simple", mode: "Affirmatif", subject: "Je", verb: "rester", answer: "I stayed." },
+  { tense: "Past simple", mode: "Négatif", subject: "Il", verb: "répondre", answer: "He didn't answer." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Nous", verb: "suivre", answer: "Did we follow?" },
+  { tense: "Past simple", mode: "Affirmatif", subject: "Elles", verb: "danser", answer: "They danced." },
+  { tense: "Past simple", mode: "Négatif", subject: "Tu", verb: "chercher", answer: "You didn't look." },
+  { tense: "Past simple", mode: "Interrogatif", subject: "Elle", verb: "chanter", answer: "Did she sing?" },
+
+  // Past continuous — 30
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Je", verb: "manger", answer: "I was eating." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Tu", verb: "boire", answer: "You were not drinking." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Elle", verb: "travailler", answer: "Was she working?" },
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Il", verb: "jouer", answer: "He was playing." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Nous", verb: "comprendre", answer: "We were not understanding." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Ils", verb: "venir", answer: "Were they coming?" },
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Elle", verb: "lire", answer: "She was reading." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Il", verb: "écouter", answer: "He was not listening." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Tu", verb: "regarder", answer: "Were you watching?" },
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Nous", verb: "prendre", answer: "We were taking." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Elles", verb: "parler", answer: "They were not speaking." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Il", verb: "courir", answer: "Was he running?" },
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Tu", verb: "attendre", answer: "You were waiting." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Elle", verb: "écrire", answer: "She was not writing." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Nous", verb: "partir", answer: "Were we leaving?" },
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Ils", verb: "jouer", answer: "They were playing." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Je", verb: "penser", answer: "I was not thinking." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Elle", verb: "utiliser", answer: "Was she using?" },
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Il", verb: "finir", answer: "He was finishing." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Tu", verb: "dormir", answer: "You were not sleeping." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Ils", verb: "aider", answer: "Were they helping?" },
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Nous", verb: "commencer", answer: "We were starting." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Elle", verb: "essayer", answer: "She was not trying." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Tu", verb: "apprendre", answer: "Were you learning?" },
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Je", verb: "rester", answer: "I was staying." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Il", verb: "répondre", answer: "He was not answering." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Nous", verb: "suivre", answer: "Were we following?" },
+  { tense: "Past continuous", mode: "Affirmatif", subject: "Elles", verb: "danser", answer: "They were dancing." },
+  { tense: "Past continuous", mode: "Négatif", subject: "Tu", verb: "chercher", answer: "You were not looking." },
+  { tense: "Past continuous", mode: "Interrogatif", subject: "Elle", verb: "chanter", answer: "Was she singing?" },
+];
+
+    const tenseText = document.getElementById("tenseText");
+    const modeText = document.getElementById("modeText");
+    const subjectText = document.getElementById("subjectText");
+    const verbText = document.getElementById("verbText");
+
+    const answerText = document.getElementById("answerText");
+
+    const answerCard = document.getElementById("answerCard");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let currentIndex = 0;
+    let isFlipped = false;
+
+    function showCard(index) {
+
+      const card = cards[index];
+
+      tenseText.textContent = card.tense;
+      modeText.textContent = card.mode;
+      subjectText.textContent = card.subject;
+      verbText.textContent = card.verb;
+
+      answerText.textContent = card.answer;
+    }
+
+    function nextCard() {
+
+      if (isFlipped) {
+
+        answerCard.classList.remove("is-flipped");
+        isFlipped = false;
+
+        setTimeout(() => {
+
+          let newIndex = currentIndex;
+
+          if (cards.length > 1) {
+
+            while (newIndex === currentIndex) {
+              newIndex = Math.floor(Math.random() * cards.length);
+            }
+
+          }
+
+          currentIndex = newIndex;
+          showCard(currentIndex);
+
+        }, 500);
+
+      } else {
+
+        let newIndex = currentIndex;
+
+        if (cards.length > 1) {
+
+          while (newIndex === currentIndex) {
+            newIndex = Math.floor(Math.random() * cards.length);
+          }
+
+        }
+
+        currentIndex = newIndex;
+        showCard(currentIndex);
+
+      }
+
+    }
+
+    answerCard.addEventListener("click", () => {
+
+      answerCard.classList.toggle("is-flipped");
+      isFlipped = !isFlipped;
+
+    });
+
+    nextBtn.addEventListener("click", nextCard);
+
+    showCard(currentIndex);
+
+  </script>
+
+  <script src="../theme.js"></script>
+
+</body>
+
+</html>
