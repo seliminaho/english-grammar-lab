@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Mixed Past Tenses - Flashcards</title>
+
+  <link rel="stylesheet" href="../style.css" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--hero-bg);
+      color: var(--text);
+    }
+
+    .site-header {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .flashcard-wrapper {
+      width: 100%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.8rem;
+      color: var(--text-strong);
+    }
+
+    .page-subtitle {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .card-scene {
+      perspective: 1200px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+      cursor: pointer;
+    }
+
+    .flashcard.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backface-visibility: hidden;
+      box-shadow: var(--shadow-medium);
+      border: 1px solid var(--border);
+    }
+
+    .card-front {
+      background: var(--surface);
+      color: var(--text-strong);
+    }
+
+    .card-back {
+      background: var(--primary);
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-text {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .card-label {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .back-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.4rem;
+    }
+
+    .tense-text {
+      display: inline-block;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .translation-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .translation-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.75;
+    }
+
+    .reason-box {
+      margin-top: 1.2rem;
+      padding: 1rem 1.2rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+
+      transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    .reason-box.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reason-title {
+      margin-bottom: 0.35rem;
+      color: var(--text-strong);
+      font-weight: 800;
+    }
+
+    .reason-text {
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .helper-text {
+      margin-top: 1.5rem;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      main {
+        padding: 1.2rem;
+      }
+
+      .flashcard {
+        min-height: 280px;
+      }
+
+      .card-face {
+        padding: 1.4rem;
+      }
+
+      .page-title {
+        font-size: 1.6rem;
+      }
+
+      .tense-text {
+        font-size: 1rem;
+      }
+
+      .reason-box {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-content">
+
+      <div class="logo">
+        English Grammar Lab
+      </div>
+
+      <nav class="main-nav">
+        <a href="../../index.html">Accueil</a>
+        <a href="../../#categories">Exercices</a>
+
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Changer de thème">
+          🌙
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <main>
+
+    <div class="flashcard-wrapper">
+
+      <h1 class="page-title">
+        Choisis le bon temps et traduis
+      </h1>
+
+      <p class="page-subtitle">
+        Traduis mentalement la phrase, puis clique sur la carte pour voir
+        le temps attendu, la traduction et l'explication.
+      </p>
+
+      <div class="card-scene">
+
+        <div class="flashcard" id="flashcard" role="button" tabindex="0" aria-label="Retourner la carte">
+
+          <div class="card-face card-front">
+
+            <span class="card-label">
+              Français
+            </span>
+
+            <p class="card-text" id="frontText"></p>
+
+          </div>
+
+          <div class="card-face card-back">
+
+            <span class="card-label">
+              Correction
+            </span>
+
+            <div class="back-content">
+
+              <p class="tense-text" id="tenseText"></p>
+
+              <div class="translation-block">
+
+                <span class="translation-label">
+                  Traduction attendue
+                </span>
+
+                <p class="card-text" id="backText"></p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="reason-box" id="reasonBox" aria-live="polite">
+
+        <p class="reason-title">
+          💡 Pourquoi ce temps ?
+        </p>
+
+        <p class="reason-text" id="reasonText"></p>
+
+      </div>
+
+      <p class="helper-text">
+        1er clic : voir la correction • 2e clic : nouvelle carte
+      </p>
+
+    </div>
+
+  </main>
+
+  <script>
+    const cards = [
+      // =======================
+      // PAST SIMPLE
+      // =======================
+
+      {
+        fr: "J'ai raté le bus ce matin.",
+        tense: "Past Simple",
+        en: "I missed the bus this morning.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Elle n'a pas répondu à mon message hier soir.",
+        tense: "Past Simple",
+        en: "She didn't reply to my message last night.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Est-ce que vous avez apprécié le concert ?",
+        tense: "Past Simple",
+        en: "Did you enjoy the concert?",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Nous avons déménagé à Lyon l'année dernière.",
+        tense: "Past Simple",
+        en: "We moved to Lyon last year.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Pourquoi est-ce qu'il est parti si tôt ?",
+        tense: "Past Simple",
+        en: "Why did he leave so early?",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Mon téléphone est tombé par terre, mais il ne s'est pas cassé.",
+        tense: "Past Simple",
+        en: "My phone fell on the floor, but it didn't break.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Ils ont vendu leur maison il y a deux mois.",
+        tense: "Past Simple",
+        en: "They sold their house two months ago.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Tu as oublié de fermer la fenêtre.",
+        tense: "Past Simple",
+        en: "You forgot to close the window.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Le film a commencé à huit heures et s'est terminé vers dix heures.",
+        tense: "Past Simple",
+        en: "The movie started at eight and ended around ten.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Je n'ai rien mangé avant l'examen.",
+        tense: "Past Simple",
+        en: "I didn't eat anything before the exam.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Quand elle était petite, elle passait tous ses étés chez ses grands-parents.",
+        tense: "Past Simple",
+        en: "When she was little, she spent every summer at her grandparents' house.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Quand nous habitions à la campagne, nous marchions jusqu'à l'école.",
+        tense: "Past Simple",
+        en: "When we lived in the countryside, we walked to school.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Est-ce que ton frère jouait souvent avec vous quand vous étiez enfants ?",
+        tense: "Past Simple",
+        en: "Did your brother often play with you when you were children?",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "À l'époque, je ne buvais jamais de café.",
+        tense: "Past Simple",
+        en: "Back then, I never drank coffee.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Elle prenait le train tous les matins avant de changer de travail.",
+        tense: "Past Simple",
+        en: "She took the train every morning before she changed jobs.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Il est entré, a posé ses clés sur la table et s'est assis.",
+        tense: "Past Simple",
+        en: "He came in, put his keys on the table, and sat down.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "J'ai ouvert le réfrigérateur, j'ai pris une bouteille d'eau et je suis remonté dans ma chambre.",
+        tense: "Past Simple",
+        en: "I opened the fridge, grabbed a bottle of water, and went back upstairs.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Elle a lu le document, a signé la dernière page et me l'a rendu.",
+        tense: "Past Simple",
+        en: "She read the document, signed the last page, and gave it back to me.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Le premier homme a marché sur la Lune en 1969.",
+        tense: "Past Simple",
+        en: "The first man walked on the Moon in 1969.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Marie Curie a reçu deux prix Nobel.",
+        tense: "Past Simple",
+        en: "Marie Curie received two Nobel Prizes.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "J'ai croisé Sarah en allant au travail.",
+        tense: "Past Simple",
+        en: "I ran into Sarah on my way to work.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Finalement, la soirée s'est mieux passée que prévu.",
+        tense: "Past Simple",
+        en: "The evening turned out better than expected.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Comment est-ce que vous avez trouvé une solution aussi rapidement ?",
+        tense: "Past Simple",
+        en: "How did you come up with a solution so quickly?",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Elle a refusé l'offre parce que le salaire était trop bas.",
+        tense: "Past Simple",
+        en: "She turned down the offer because the salary was too low.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Nous nous sommes arrêtés là après presque dix heures de travail.",
+        tense: "Past Simple",
+        en: "We called it a day after almost ten hours of work.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Il a fait toute une histoire pour une simple erreur.",
+        tense: "Past Simple",
+        en: "He made a big deal out of a simple mistake.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Le professeur a relevé plusieurs erreurs dans mon introduction.",
+        tense: "Past Simple",
+        en: "The teacher pointed out several mistakes in my introduction.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Ses questions m'ont complètement déstabilisé pendant l'entretien.",
+        tense: "Past Simple",
+        en: "His questions completely threw me off during the interview.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Le voleur a pris l'argent et s'est enfui.",
+        tense: "Past Simple",
+        en: "The thief grabbed the money and ran off.",
+        reason: "Action passée terminée"
+      },
+
+      {
+        fr: "Ils ont essayé de dissimuler leur erreur, mais personne ne les a crus.",
+        tense: "Past Simple",
+        en: "They tried to cover up their mistake, but nobody believed them.",
+        reason: "Action passée terminée"
+      },
+
+      // =======================
+      // PAST CONTINUOUS
+      // =======================
+
+      {
+        fr: "Je regardais un film quand tu m'as appelé.",
+        tense: "Past Continuous + Past Simple",
+        en: "I was watching a movie when you called me.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Elle faisait ses devoirs pendant que son frère jouait aux jeux vidéo.",
+        tense: "Past Continuous",
+        en: "She was doing her homework while her brother was playing video games.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Pourquoi est-ce que tu courais ?",
+        tense: "Past Continuous",
+        en: "Why were you running?",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Nous ne dormions pas encore.",
+        tense: "Past Continuous",
+        en: "We weren't sleeping yet.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Il pleuvait quand nous sommes sortis.",
+        tense: "Past Continuous + Past Simple",
+        en: "It was raining when we went outside.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Le soleil brillait et les oiseaux chantaient.",
+        tense: "Past Continuous",
+        en: "The sun was shining and the birds were singing.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Que faisiez-vous quand le courant a été coupé ?",
+        tense: "Past Continuous + Past Simple",
+        en: "What were you doing when the power went out?",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "J'attendais le bus quand je l'ai aperçu.",
+        tense: "Past Continuous + Past Simple",
+        en: "I was waiting for the bus when I saw him.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Ils traversaient la rue quand la pluie a commencé à tomber.",
+        tense: "Past Continuous + Past Simple",
+        en: "They were crossing the street when it started raining.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Je ne faisais pas attention à ce qu'il disait.",
+        tense: "Past Continuous",
+        en: "I wasn't paying attention to what he was saying.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "À huit heures hier soir, nous dînions encore.",
+        tense: "Past Continuous",
+        en: "At eight o'clock last night, we were still having dinner.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Elle vivait encore chez ses parents à cette époque.",
+        tense: "Past Continuous",
+        en: "She was still living with her parents at that time.",
+        reason: "Situation temporaire dans le passé"
+      },
+
+      {
+        fr: "Le vent soufflait de plus en plus fort.",
+        tense: "Past Continuous",
+        en: "The wind was getting stronger and stronger.",
+        reason: "Évolution dans le passé"
+      },
+
+      {
+        fr: "Nous travaillions sur le même projet cette semaine-là.",
+        tense: "Past Continuous",
+        en: "We were working on the same project that week.",
+        reason: "Situation temporaire dans le passé"
+      },
+
+      {
+        fr: "Tu me suivais ou c'était une coïncidence ?",
+        tense: "Past Continuous",
+        en: "Were you following me, or was it just a coincidence?",
+        reason: "Action en cours dans le passé"
+      },
+
+
+      {
+        fr: "Il trouvait encore une excuse quand je suis arrivé.",
+        tense: "Past Continuous + Past Simple",
+        en: "He was coming up with another excuse when I arrived.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Ils faisaient encore toute une histoire quand je les ai rejoints.",
+        tense: "Past Continuous + Past Simple",
+        en: "They were still making a big deal out of it when I joined them.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Nous traînions ensemble presque tous les soirs cet été-là.",
+        tense: "Past Continuous",
+        en: "We were hanging out together almost every evening that summer.",
+        reason: "Situation temporaire dans le passé"
+      },
+
+      {
+        fr: "Il essayait de dissimuler son erreur pendant toute la réunion.",
+        tense: "Past Continuous",
+        en: "He was trying to cover up his mistake during the whole meeting.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Le professeur relevait chacune de nos erreurs.",
+        tense: "Past Continuous",
+        en: "The teacher was pointing out every single one of our mistakes.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Ils cherchaient un cadeau pour leur mère quand je les ai croisés.",
+        tense: "Past Continuous + Past Simple",
+        en: "They were shopping for a gift for their mother when I ran into them.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Elle essayait de nous déstabiliser avec ses questions.",
+        tense: "Past Continuous",
+        en: "She was trying to throw us off with her questions.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Le voleur s'enfuyait quand la police est arrivée.",
+        tense: "Past Continuous + Past Simple",
+        en: "The thief was running off when the police arrived.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Nous allions justement arrêter de travailler quand le client a appelé.",
+        tense: "Past Continuous + Past Simple",
+        en: "We were just calling it a day when the client called.",
+        reason: "Action en cours dans le passé"
+      },
+
+      {
+        fr: "Elle reprenait le travail après son déjeuner quand son patron l'a appelée.",
+        tense: "Past Continuous + Past Simple",
+        en: "She was getting back to work after lunch when her boss called her.",
+        reason: "Action en cours dans le passé"
+      },
+
+      // =======================
+      // PAST PERFECT
+      // =======================
+
+      {
+        fr: "Quand je suis arrivé, elle était déjà partie.",
+        tense: "Past Perfect + Past Simple",
+        en: "When I arrived, she had already left.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Nous avions déjà mangé quand ils sont arrivés.",
+        tense: "Past Perfect + Past Simple",
+        en: "We had already eaten when they arrived.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Il s'est rendu compte qu'il avait oublié son portefeuille.",
+        tense: "Past Perfect + Past Simple",
+        en: "He realized that he had forgotten his wallet.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Le train était déjà parti quand nous sommes arrivés à la gare.",
+          tense: "Past Perfect + Past Simple",
+        en: "The train had already left when we arrived at the station.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Elle avait déjà terminé son examen avant la fin du temps.",
+        tense: "Past Perfect",
+        en: "She had already finished her exam before the time was up.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Je n'avais jamais vu un paysage aussi beau auparavant.",
+        tense: "Past Perfect",
+        en: "I had never seen such a beautiful landscape before.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Ils avaient vendu leur maison avant de déménager.",
+        tense: "Past Perfect + Past Simple",
+        en: "They had sold their house before they moved.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Pourquoi était-il parti sans rien dire ?",
+        tense: "Past Perfect",
+        en: "Why had he left without saying anything?",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Nous n'avions jamais entendu parler de cette entreprise.",
+        tense: "Past Perfect",
+        en: "We had never heard of that company.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Elle était fatiguée parce qu'elle avait peu dormi.",
+        tense: "Past Perfect + Past Simple",
+        en: "She was tired because she had slept very little.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Ils avaient déjà pris leur décision avant la réunion.",
+        tense: "Past Perfect",
+        en: "They had already made their decision before the meeting.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Personne ne lui avait expliqué les règles.",
+        tense: "Past Perfect",
+        en: "Nobody had explained the rules to him.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Le film avait déjà commencé quand nous sommes entrés dans la salle.",
+        tense: "Past Perfect + Past Simple",
+        en: "The movie had already started when we entered the theater.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "J'avais complètement oublié cette histoire.",
+        tense: "Past Perfect",
+        en: "I had completely forgotten that story.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Ils avaient perdu les clés avant de quitter la maison.",
+        tense: "Past Perfect",
+        en: "They had lost the keys before leaving the house.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Il avait trouvé une excuse avant même que je pose la question.",
+        tense: "Past Perfect + Past Simple",
+        en: "He had already come up with an excuse before I even asked.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Au final, tout s'était mieux passé que prévu.",
+        tense: "Past Perfect",
+        en: "In the end, everything had turned out better than expected.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Ils avaient déjà arrêté de travailler quand je suis arrivé.",
+        tense: "Past Perfect + Past Simple",
+        en: "They had already called it a day when I arrived.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Elle avait fait toute une histoire pour un simple malentendu.",
+        tense: "Past Perfect",
+        en: "She had made a big deal out of a simple misunderstanding.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Le professeur avait relevé toutes les erreurs avant de rendre les copies.",
+        tense: "Past Perfect",
+        en: "The teacher had pointed out every mistake before handing back the papers.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Ils avaient essayé de dissimuler la vérité pendant des semaines.",
+        tense: "Past Perfect",
+        en: "They had tried to cover up the truth for weeks.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Nous avions repris le travail avant que le directeur n'arrive.",
+        tense: "Past Perfect + Past Simple",
+        en: "We had gotten back to work before the manager arrived.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Le voleur s'était déjà enfui quand la police est arrivée.",
+        tense: "Past Perfect + Past Simple",
+        en: "The thief had already run off when the police arrived.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Ses remarques m'avaient complètement déstabilisé avant l'entretien.",
+        tense: "Past Perfect",
+        en: "His comments had completely thrown me off before the interview.",
+        reason: "Passé antérieur"
+      },
+
+      {
+        fr: "Ils avaient acheté un cadeau avant de passer chez leurs parents.",
+        tense: "Past Perfect",
+        en: "They had shopped for a gift before visiting their parents.",
+        reason: "Passé antérieur"
+      },
+
+      // =======================
+      // PAST PERFECT CONTINUOUS
+      // =======================
+
+      {
+        fr: "Ça faisait deux heures que j'attendais le bus.",
+        tense: "Past Perfect Continuous",
+        en: "I had been waiting for the bus for two hours.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ça faisait des semaines qu'ils cherchaient un appartement.",
+        tense: "Past Perfect Continuous",
+        en: "They had been looking for an apartment for weeks.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ça faisait une heure qu'elle parlait au téléphone.",
+        tense: "Past Perfect Continuous",
+        en: "She had been talking on the phone for an hour.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "il avait plu toute la matinée.",
+        tense: "Past Perfect Continuous",
+        en: "It had been raining all morning.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ça faisait dix minutes qu'on t'attendait.",
+        tense: "Past Perfect Continuous",
+        en: "We had been waiting for you for ten minutes.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ça faisait longtemps qu'elle apprenait le japonais.",
+        tense: "Past Perfect Continuous",
+        en: "She had been learning Japanese for a long time.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ça faisait des mois qu'ils économisaient pour acheter une maison.",
+        tense: "Past Perfect Continuous",
+        en: "They had been saving for a house for months.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "il avait travaillé toute la journée.",
+        tense: "Past Perfect Continuous",
+        en: "He had been working all day.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ça faisait plus d'une heure que je révisais.",
+        tense: "Past Perfect Continuous",
+        en: "I had been studying for more than an hour.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "ils avaient rénové leur maison toute la semaine.",
+        tense: "Past Perfect Continuous",
+        en: "They had been renovating their house all week.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+
+
+      {
+        fr: "J'attendais depuis trois heures quand le train est enfin arrivé.",
+        tense: "Past Perfect Continuous + Past Simple",
+        en: "I had been waiting for three hours when the train finally arrived.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Elle travaillait sur ce dossier depuis janvier.",
+        tense: "Past Perfect Continuous",
+        en: "She had been working on that file since January.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ils s'entraînaient depuis des mois avant la compétition.",
+        tense: "Past Perfect Continuous",
+        en: "They had been training for months before the competition.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Tu cherchais tes clés depuis combien de temps ?",
+        tense: "Past Perfect Continuous",
+        en: "How long had you been looking for your keys?",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Nous marchions depuis le lever du soleil.",
+        tense: "Past Perfect Continuous",
+        en: "We had been walking since sunrise.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ça faisait une demi-heure qu'il inventait une excuse.",
+        tense: "Past Perfect Continuous",
+        en: "He had been coming up with an excuse for half an hour.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Elle avait fait toute une histoire pendant toute la réunion.",
+        tense: "Past Perfect Continuous",
+        en: "She had been making a big deal out of it during the whole meeting.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ils traînaient ensemble depuis le début de l'été.",
+        tense: "Past Perfect Continuous",
+        en: "They had been hanging out together since the beginning of the summer.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ça faisait des jours qu'il essayait de dissimuler son erreur.",
+        tense: "Past Perfect Continuous",
+        en: "He had been trying to cover up his mistake for days.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Le professeur relevait les mêmes erreurs depuis le début du semestre.",
+        tense: "Past Perfect Continuous",
+        en: "The teacher had been pointing out the same mistakes since the beginning of the semester.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ils cherchaient un cadeau depuis toute la matinée.",
+        tense: "Past Perfect Continuous",
+        en: "They had been shopping for a gift all morning.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Ça faisait des semaines qu'elle essayait de nous déstabiliser.",
+        tense: "Past Perfect Continuous",
+        en: "She had been trying to throw us off for weeks.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Le voleur courait depuis plusieurs minutes quand la police l'a arrêté.",
+        tense: "Past Perfect Continuous + Past Simple",
+        en: "The thief had been running off for several minutes when the police caught him.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "Nous travaillions depuis le matin quand nous avons enfin arrêté.",
+        tense: "Past Perfect Continuous + Past Simple",
+        en: "We had been working since the morning when we finally called it a day.",
+        reason: "Insistance sur la durée dans le passé"
+      },
+
+      {
+        fr: "elle avait repris son travail après chaque interruption toute la matinée.",
+        tense: "Past Perfect Continuous",
+        en: "She had been getting back to work after every interruption all morning.",
+        reason: "Insistance sur la durée dans le passé"
+      }
+
+
+
+
+
+    ];
+
+    const flashcard = document.getElementById("flashcard");
+    const frontText = document.getElementById("frontText");
+    const tenseText = document.getElementById("tenseText");
+    const backText = document.getElementById("backText");
+    const reasonBox = document.getElementById("reasonBox");
+    const reasonText = document.getElementById("reasonText");
+
+    let currentIndex = 0;
+    let isFront = true;
+
+    function showCard(index) {
+      const card = cards[index];
+
+      frontText.textContent = card.fr;
+      tenseText.textContent = card.tense;
+      backText.textContent = card.en;
+      reasonText.textContent = card.reason;
+    }
+
+    function nextCard() {
+      let newIndex = currentIndex;
+
+      if (cards.length > 1) {
+        while (newIndex === currentIndex) {
+          newIndex = Math.floor(Math.random() * cards.length);
+        }
+      }
+
+      currentIndex = newIndex;
+      showCard(currentIndex);
+    }
+
+    function handleCardClick() {
+      if (isFront) {
+        flashcard.classList.add("is-flipped");
+        reasonBox.classList.add("is-visible");
+
+        isFront = false;
+      } else {
+        flashcard.classList.remove("is-flipped");
+        reasonBox.classList.remove("is-visible");
+
+        isFront = true;
+
+        setTimeout(() => {
+          nextCard();
+        }, 200);
+      }
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", handleCardClick);
+
+    flashcard.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handleCardClick();
+      }
+    });
+  </script>
+
+  <script src="../theme.js"></script>
+
+</body>
+
+</html>
