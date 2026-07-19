@@ -4,8 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Present Simple - Flashcards</title>
+
+  <title>Mixed Present Tenses - Flashcards</title>
+
   <link rel="stylesheet" href="../style.css" />
+
   <style>
     * {
       margin: 0;
@@ -28,7 +31,6 @@
       background: var(--header-bg);
       backdrop-filter: blur(8px);
     }
-
 
     main {
       flex: 1;
@@ -54,6 +56,7 @@
       color: var(--text-soft);
       margin-bottom: 2rem;
       font-size: 1rem;
+      line-height: 1.5;
     }
 
     .card-scene {
@@ -115,6 +118,71 @@
       opacity: 0.8;
     }
 
+    .back-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.4rem;
+    }
+
+    .tense-text {
+      display: inline-block;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .translation-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .translation-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.75;
+    }
+
+    .reason-box {
+      margin-top: 1.2rem;
+      padding: 1rem 1.2rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      text-align: left;
+
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+
+      transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    .reason-box.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reason-title {
+      margin-bottom: 0.35rem;
+      color: var(--text-strong);
+      font-weight: 800;
+    }
+
+    .reason-text {
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
     .helper-text {
       margin-top: 1.5rem;
       color: var(--text-soft);
@@ -122,8 +190,12 @@
     }
 
     @media (max-width: 640px) {
+      main {
+        padding: 1.2rem;
+      }
+
       .flashcard {
-        min-height: 260px;
+        min-height: 280px;
       }
 
       .card-face {
@@ -133,229 +205,925 @@
       .page-title {
         font-size: 1.6rem;
       }
+
+      .tense-text {
+        font-size: 1rem;
+      }
+
+      .reason-box {
+        font-size: 0.95rem;
+      }
     }
   </style>
 </head>
 
 <body>
+
   <header class="site-header">
     <div class="container header-content">
-      <div class="logo">English Grammar Lab</div>
+
+      <div class="logo">
+        English Grammar Lab
+      </div>
 
       <nav class="main-nav">
         <a href="../../index.html">Accueil</a>
         <a href="../../#categories">Exercices</a>
-        <button class="theme-toggle" id="themeToggle">🌙</button>
+
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Changer de thème">
+          🌙
+        </button>
       </nav>
+
     </div>
   </header>
 
   <main>
+
     <div class="flashcard-wrapper">
-      <h1 class="page-title">Present Simple ou Present Continuous ? </h1>
+
+      <h1 class="page-title">
+        Choisis le bon temps et traduis
+      </h1>
+
       <p class="page-subtitle">
-        Clique sur la carte pour voir la correction, puis reclique pour passer à une nouvelle phrase.
+        Traduis mentalement la phrase, puis clique sur la carte pour voir
+        le temps attendu, la traduction et l'explication.
       </p>
 
       <div class="card-scene">
-        <div class="flashcard" id="flashcard">
+
+        <div class="flashcard" id="flashcard" role="button" tabindex="0" aria-label="Retourner la carte">
+
           <div class="card-face card-front">
-            <span class="card-label">Français</span>
+
+            <span class="card-label">
+              Français
+            </span>
+
             <p class="card-text" id="frontText"></p>
+
           </div>
 
           <div class="card-face card-back">
-            <span class="card-label">English</span>
-            <p class="card-text" id="backText"></p>
+
+            <span class="card-label">
+              Correction
+            </span>
+
+            <div class="back-content">
+
+              <p class="tense-text" id="tenseText"></p>
+
+              <div class="translation-block">
+
+                <span class="translation-label">
+                  Traduction attendue
+                </span>
+
+                <p class="card-text" id="backText"></p>
+
+              </div>
+
+            </div>
+
           </div>
+
         </div>
+
+      </div>
+
+      <div class="reason-box" id="reasonBox" aria-live="polite">
+
+        <p class="reason-title">
+          💡 Pourquoi ce temps ?
+        </p>
+
+        <p class="reason-text" id="reasonText"></p>
+
       </div>
 
       <p class="helper-text">
-        1er clic : voir la traduction • 2e clic : nouvelle carte
+        1er clic : voir la correction • 2e clic : nouvelle carte
       </p>
+
     </div>
+
   </main>
 
   <script>
     const cards = [
-  { fr: "Je mange des pâtes là.", en: "I'm eating pasta right now." },
-  { fr: "Je mange des pâtes tous les dimanches.", en: "I eat pasta every Sunday." },
-  { fr: "Elle boit un café maintenant.", en: "She's drinking a coffee now." },
-  { fr: "Elle boit toujours du café le matin.", en: "She always drinks coffee in the morning." },
-  { fr: "On regarde un film en ce moment.", en: "We're watching a movie at the moment." },
-  { fr: "On regarde souvent des films.", en: "We often watch films." },
-  { fr: "Il parle au téléphone là.", en: "He's talking on the phone right now." },
-  { fr: "Il parle souvent avec ses amis.", en: "He often talks with his friends." },
-  { fr: "Ils mangent dehors en ce moment.", en: "They're eating outside at the moment." },
-  { fr: "Ils mangent dehors tous les vendredis.", en: "They eat outside every Friday." },
 
-  { fr: "Je travaille là.", en: "I'm working right now." },
-  { fr: "Je travaille tous les jours.", en: "I work every day." },
-  { fr: "Elle lit un livre maintenant.", en: "She's reading a book now." },
-  { fr: "Elle lit souvent le soir.", en: "She often reads in the evening." },
-  { fr: "On écoute de la musique là.", en: "We're listening to music right now." },
-  { fr: "On écoute souvent de la musique.", en: "We often listen to music." },
-  { fr: "Il écrit un message maintenant.", en: "He's writing a message now." },
-  { fr: "Il écrit rarement.", en: "He rarely writes." },
-  { fr: "Ils regardent la télé là.", en: "They're watching TV right now." },
-  { fr: "Ils regardent toujours la télé le soir.", en: "They always watch TV in the evening." },
+      // =======================
+      // PRESENT SIMPLE
+      // =======================
 
-  { fr: "Je marche dans la rue là.", en: "I'm walking in the street right now." },
-  { fr: "Je marche souvent après le travail.", en: "I often walk after work." },
-  { fr: "Elle travaille sur son projet en ce moment.", en: "She's working on her project at the moment." },
-  { fr: "Elle travaille dans une banque.", en: "She works in a bank." },
-  { fr: "On attend.", en: "We're waiting." },
-  { fr: "On attend toujours longtemps ici.", en: "We always wait a long time here." },
-  { fr: "Il mange là.", en: "He's eating right now." },
-  { fr: "Il mange toujours à midi.", en: "He always eats at noon." },
-  { fr: "Ils parlent ensemble en ce moment.", en: "They're talking together at the moment." },
-  { fr: "Ils parlent souvent ensemble.", en: "They often talk together." },
+      {
+        fr: "Je me lève toujours avant sept heures.",
+        tense: "Present Simple",
+        en: "I always get up before seven o'clock.",
+        reason: "Habitude / fréquence"
+      },
 
-  { fr: "Je ne travaille pas aujourd'hui.", en: "I'm not working today." },
-  { fr: "Je ne travaille jamais le dimanche.", en: "I never work on Sundays." },
-  { fr: "Elle n'est pas en train de parler.", en: "She's not talking." },
-  { fr: "Elle ne parle jamais en classe.", en: "She never speaks in class." },
-  { fr: "On ne regarde pas ça maintenant.", en: "We're not watching that now." },
-  { fr: "On ne regarde jamais ça.", en: "We never watch that." },
-  { fr: "Il ne mange pas là.", en: "He's not eating." },
-  { fr: "Il ne mange jamais ça.", en: "He never eats that." },
-  { fr: "Ils ne jouent pas là.", en: "They're not playing." },
-  { fr: "Ils ne jouent jamais ensemble.", en: "They never play together." },
+      {
+        fr: "Mon frère ne regarde jamais la télévision le matin.",
+        tense: "Present Simple",
+        en: "My brother never watches TV in the morning.",
+        reason: "Habitude / fréquence"
+      },
 
-  { fr: "Qu'est-ce que tu fais là ?", en: "What are you doing?" },
-  { fr: "Qu'est-ce que tu fais tous les jours ?", en: "What do you do every day?" },
-  { fr: "Pourquoi est-ce qu'elle pleure maintenant ?", en: "Why is she crying now?" },
-  { fr: "Pourquoi est-ce qu'elle pleure souvent ?", en: "Why does she often cry?" },
-  { fr: "Où est-ce qu'ils vont là ?", en: "Where are they going?" },
-  { fr: "Où est-ce qu'ils vont tous les week-ends ?", en: "Where do they go every weekend?" },
-  { fr: "Tu travailles là ?", en: "Are you working?" },
-  { fr: "Tu travailles souvent ?", en: "Do you often work?" },
-  { fr: "Il parle là ?", en: "Is he talking?" },
-  { fr: "Il parle souvent ?", en: "Does he often talk?" },
+      {
+        fr: "Est-ce que tu prends souvent le train ?",
+        tense: "Present Simple",
+        en: "Do you often take the train?",
+        reason: "Habitude / fréquence"
+      },
 
-  // ---- un peu plus avancé ----
+      {
+        fr: "Ma mère prépare toujours le dîner.",
+        tense: "Present Simple",
+        en: "My mother always cooks dinner.",
+        reason: "Habitude / fréquence"
+      },
 
-  { fr: "Je suis en train de manger des spaghettis.", en: "I'm eating spaghetti." },
-  { fr: "Je mange souvent des spaghettis.", en: "I often eat spaghetti." },
-  { fr: "Elle est en train de chercher ses clés.", en: "She's looking for her keys." },
-  { fr: "Elle cherche toujours ses clés.", en: "She always looks for her keys." },
-  { fr: "On est en train de préparer le dîner.", en: "We're preparing dinner." },
-  { fr: "On prépare toujours le dîner ensemble.", en: "We always prepare dinner together." },
-  { fr: "Il est en train de regarder ce que tu fais.", en: "He's watching what you're doing." },
-  { fr: "Il regarde souvent ce que tu fais.", en: "He often watches what you do." },
-  { fr: "Ils sont en train de travailler sur quelque chose.", en: "They're working on something." },
-  { fr: "Ils travaillent souvent ensemble.", en: "They often work together." },
+      {
+        fr: "Nous habitons près de la gare.",
+        tense: "Present Simple",
+        en: "We live near the train station.",
+        reason: "Situation permanente"
+      },
 
-  { fr: "Je ne suis pas en train d'écouter.", en: "I'm not listening." },
-  { fr: "Je n'écoute jamais ça.", en: "I never listen to that." },
-  { fr: "Elle n'est pas en train de venir.", en: "She's not coming." },
-  { fr: "Elle ne vient jamais ici.", en: "She never comes here." },
-  { fr: "On n'est pas en train de parler.", en: "We're not talking." },
-  { fr: "On ne parle jamais de ça.", en: "We never talk about that." },
-  { fr: "Il n'est pas en train de répondre.", en: "He's not answering." },
-  { fr: "Il ne répond jamais.", en: "He never answers." },
-  { fr: "Ils ne sont pas en train de regarder.", en: "They're not watching." },
-  { fr: "Ils ne regardent jamais ça.", en: "They never watch that." },
+      {
+        fr: "Mon père travaille dans une banque.",
+        tense: "Present Simple",
+        en: "My father works in a bank.",
+        reason: "Situation permanente"
+      },
 
-  { fr: "Qu'est-ce que tu es en train de manger ?", en: "What are you eating?" },
-  { fr: "Qu'est-ce que tu manges souvent ?", en: "What do you often eat?" },
-  { fr: "Pourquoi est-ce que tu attends là ?", en: "Why are you waiting?" },
-  { fr: "Pourquoi est-ce que tu attends toujours ?", en: "Why do you always wait?" },
-  { fr: "Où est-ce qu'elle est en train d'aller ?", en: "Where is she going?" },
-  { fr: "Où est-ce qu'elle va d'habitude ?", en: "Where does she usually go?" },
-  { fr: "Est-ce qu'ils sont en train de travailler ?", en: "Are they working?" },
-  { fr: "Est-ce qu'ils travaillent souvent ?", en: "Do they often work?" },
-  { fr: "Est-ce que tu es en train d'écouter ?", en: "Are you listening?" },
-  { fr: "Est-ce que tu écoutes souvent ?", en: "Do you often listen?" },
-  { fr: "Je mange une pomme maintenant.", en: "I'm eating an apple now." },
-  { fr: "Je mange une pomme tous les matins.", en: "I eat an apple every morning." },
-  { fr: "Elle écrit un message là.", en: "She's writing a message right now." },
-  { fr: "Elle écrit souvent à ses amis.", en: "She often writes to her friends." },
-  { fr: "On parle ensemble en ce moment.", en: "We're talking together at the moment." },
-  { fr: "On parle souvent ensemble.", en: "We often talk together." },
-  { fr: "Il écoute de la musique maintenant.", en: "He's listening to music now." },
-  { fr: "Il écoute toujours de la musique en travaillant.", en: "He always listens to music while working." },
-  { fr: "Ils regardent une vidéo là.", en: "They're watching a video right now." },
-  { fr: "Ils regardent souvent des vidéos.", en: "They often watch videos." },
+      {
+        fr: "L'eau gèle à zéro degré.",
+        tense: "Present Simple",
+        en: "Water freezes at zero degrees.",
+        reason: "Vérité générale"
+      },
 
-  { fr: "Je ne lis pas là.", en: "I'm not reading right now." },
-  { fr: "Je ne lis jamais ce genre de livre.", en: "I never read that kind of book." },
-  { fr: "Elle ne travaille pas maintenant.", en: "She's not working now." },
-  { fr: "Elle ne travaille jamais le week-end.", en: "She never works on weekends." },
-  { fr: "On ne mange pas là.", en: "We're not eating right now." },
-  { fr: "On ne mange jamais ici.", en: "We never eat here." },
-  { fr: "Il ne parle pas maintenant.", en: "He's not talking now." },
-  { fr: "Il ne parle jamais en réunion.", en: "He never speaks in meetings." },
-  { fr: "Ils ne jouent pas là.", en: "They're not playing right now." },
-  { fr: "Ils ne jouent jamais dehors.", en: "They never play outside." },
+      {
+        fr: "Le soleil se couche à l'ouest.",
+        tense: "Present Simple",
+        en: "The sun sets in the west.",
+        reason: "Vérité générale"
+      },
 
-  { fr: "Est-ce que tu manges là ?", en: "Are you eating?" },
-  { fr: "Est-ce que tu manges souvent ici ?", en: "Do you often eat here?" },
-  { fr: "Est-ce qu'elle travaille maintenant ?", en: "Is she working now?" },
-  { fr: "Est-ce qu'elle travaille souvent ?", en: "Does she often work?" },
-  { fr: "Est-ce qu'on regarde ça maintenant ?", en: "Are we watching that now?" },
-  { fr: "Est-ce qu'on regarde souvent ça ?", en: "Do we often watch that?" },
-  { fr: "Est-ce qu'il écoute là ?", en: "Is he listening?" },
-  { fr: "Est-ce qu'il écoute souvent ?", en: "Does he often listen?" },
-  { fr: "Est-ce qu'ils jouent là ?", en: "Are they playing?" },
-  { fr: "Est-ce qu'ils jouent souvent ?", en: "Do they often play?" },
+      {
+        fr: "Le musée ouvre à dix heures.",
+        tense: "Present Simple",
+        en: "The museum opens at ten o'clock.",
+        reason: "Horaire ou programme"
+      },
 
-  { fr: "Qu'est-ce que tu regardes là ?", en: "What are you watching?" },
-  { fr: "Qu'est-ce que tu regardes souvent ?", en: "What do you often watch?" },
-  { fr: "Pourquoi est-ce qu'elle parle là ?", en: "Why is she talking?" },
-  { fr: "Pourquoi est-ce qu'elle parle toujours ?", en: "Why does she always talk?" },
-  { fr: "Où est-ce qu'ils vont là ?", en: "Where are they going?" },
-  { fr: "Où est-ce qu'ils vont d'habitude ?", en: "Where do they usually go?" },
-  { fr: "Avec qui est-ce que tu parles là ?", en: "Who are you talking to?" },
-  { fr: "Avec qui est-ce que tu parles souvent ?", en: "Who do you often talk to?" },
-  { fr: "Comment est-ce qu'il fait ça là ?", en: "How is he doing that?" },
-  { fr: "Comment est-ce qu'il fait ça d'habitude ?", en: "How does he usually do that?" },
+      {
+        fr: "Le train part à 18 h 15.",
+        tense: "Present Simple",
+        en: "The train leaves at 6:15 p.m.",
+        reason: "Horaire ou programme"
+      },
 
-  { fr: "Je suis en train de cuisiner.", en: "I'm cooking." },
-  { fr: "Je cuisine souvent le soir.", en: "I often cook in the evening." },
-  { fr: "Elle est en train de nettoyer.", en: "She's cleaning." },
-  { fr: "Elle nettoie toujours après manger.", en: "She always cleans after eating." },
-  { fr: "On est en train de travailler ensemble.", en: "We're working together." },
-  { fr: "On travaille souvent ensemble.", en: "We often work together." },
-  { fr: "Il est en train de réparer la voiture.", en: "He's fixing the car." },
-  { fr: "Il répare souvent des voitures.", en: "He often fixes cars." },
-  { fr: "Ils sont en train de préparer le dîner.", en: "They're preparing dinner." },
-  { fr: "Ils préparent toujours le dîner.", en: "They always prepare dinner." },
+      {
+        fr: "Je vais à la salle de sport trois fois par semaine.",
+        tense: "Present Simple",
+        en: "I go to the gym three times a week.",
+        reason: "Habitude / fréquence"
+      },
 
-  { fr: "Je ne suis pas en train de cuisiner.", en: "I'm not cooking." },
-  { fr: "Je ne cuisine jamais.", en: "I never cook." },
-  { fr: "Elle n'est pas en train de nettoyer.", en: "She's not cleaning." },
-  { fr: "Elle ne nettoie jamais.", en: "She never cleans." },
-  { fr: "On n'est pas en train de travailler.", en: "We're not working." },
-  { fr: "On ne travaille jamais ici.", en: "We never work here." },
-  { fr: "Il n'est pas en train de réparer.", en: "He's not fixing." },
-  { fr: "Il ne répare jamais ça.", en: "He never fixes that." },
-  { fr: "Ils ne sont pas en train de préparer.", en: "They're not preparing." },
-  { fr: "Ils ne préparent jamais ça.", en: "They never prepare that." },
+      {
+        fr: "Elle téléphone toujours à sa grand-mère le dimanche.",
+        tense: "Present Simple",
+        en: "She always calls her grandmother on Sundays.",
+        reason: "Habitude / fréquence"
+      },
 
-  { fr: "Qu'est-ce que tu es en train de cuisiner ?", en: "What are you cooking?" },
-  { fr: "Qu'est-ce que tu cuisines souvent ?", en: "What do you often cook?" },
-  { fr: "Pourquoi est-ce qu'elle nettoie là ?", en: "Why is she cleaning?" },
-  { fr: "Pourquoi est-ce qu'elle nettoie toujours ?", en: "Why does she always clean?" },
-  { fr: "Où est-ce qu'on travaille là ?", en: "Where are we working?" },
-  { fr: "Où est-ce qu'on travaille d'habitude ?", en: "Where do we usually work?" },
-  { fr: "Est-ce qu'il est en train de réparer ?", en: "Is he fixing it?" },
-  { fr: "Est-ce qu'il répare souvent ça ?", en: "Does he often fix that?" },
-  { fr: "Est-ce qu'ils sont en train de préparer ?", en: "Are they preparing?" },
-  { fr: "Est-ce qu'ils préparent souvent ça ?", en: "Do they often prepare that?" }
+      {
+        fr: "Nous déjeunons rarement à la maison.",
+        tense: "Present Simple",
+        en: "We rarely have lunch at home.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Tu oublies souvent tes clés.",
+        tense: "Present Simple",
+        en: "You often forget your keys.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Mon meilleur ami habite au Canada.",
+        tense: "Present Simple",
+        en: "My best friend lives in Canada.",
+        reason: "Situation permanente"
+      },
+
+      {
+        fr: "Cette route mène à la plage.",
+        tense: "Present Simple",
+        en: "This road leads to the beach.",
+        reason: "Situation permanente"
+      },
+
+      {
+        fr: "Les oiseaux pondent des œufs.",
+        tense: "Present Simple",
+        en: "Birds lay eggs.",
+        reason: "Vérité générale"
+      },
+
+      {
+        fr: "La Terre tourne autour du Soleil.",
+        tense: "Present Simple",
+        en: "The Earth revolves around the Sun.",
+        reason: "Vérité générale"
+      },
+
+      {
+        fr: "Le magasin ferme à dix-neuf heures.",
+        tense: "Present Simple",
+        en: "The shop closes at seven p.m.",
+        reason: "Horaire ou programme"
+      },
+
+      {
+        fr: "Le cours commence dans cinq minutes.",
+        tense: "Present Simple",
+        en: "The class starts in five minutes.",
+        reason: "Horaire ou programme"
+      },
+
+      {
+        fr: "Je passe prendre un café tous les matins avant le travail.",
+        tense: "Present Simple",
+        en: "I grab a coffee every morning before work.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "On commande souvent à manger le vendredi soir.",
+        tense: "Present Simple",
+        en: "We usually order takeout on Friday nights.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Je laisse toujours mon téléphone en mode silencieux au travail.",
+        tense: "Present Simple",
+        en: "I always keep my phone on silent at work.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Tu oublies toujours où tu gares ta voiture.",
+        tense: "Present Simple",
+        en: "You always forget where you park your car.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Mon frère travaille de nuit.",
+        tense: "Present Simple",
+        en: "My brother works the night shift.",
+        reason: "Situation permanente"
+      },
+
+      {
+        fr: "Ma sœur est végétarienne.",
+        tense: "Present Simple",
+        en: "My sister is vegetarian.",
+        reason: "Situation permanente"
+      },
+
+      {
+        fr: "L'huile flotte sur l'eau.",
+        tense: "Present Simple",
+        en: "Oil floats on water.",
+        reason: "Vérité générale"
+      },
+
+      {
+        fr: "Le premier film commence à 20 h.",
+        tense: "Present Simple",
+        en: "The first movie starts at 8 p.m.",
+        reason: "Horaire ou programme"
+      },
+
+      {
+        fr: "Pourquoi est-ce qu'il fait toujours toute une histoire pour rien ?",
+        tense: "Present Simple",
+        en: "Why does he always make a big deal out of nothing?",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Comment est-ce qu'elle fait pour toujours trouver des excuses aussi rapidement ?",
+        tense: "Present Simple",
+        en: "How does she always come up with excuses so quickly?",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "On ne traîne jamais avec eux en semaine.",
+        tense: "Present Simple",
+        en: "We never hang out with them during the week.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Tu as souvent envie de sortir après le travail ?",
+        tense: "Present Simple",
+        en: "Do you often feel like going out after work?",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Les choses ne se passent pas toujours comme prévu.",
+        tense: "Present Simple",
+        en: "Things don't always turn out as planned.",
+        reason: "Vérité générale"
+      },
+
+      {
+        fr: "Elle achète toujours les cadeaux de tout le monde au dernier moment.",
+        tense: "Present Simple",
+        en: "She always shops for everyone's gifts at the last minute.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Pendant que tu y es, tu peux vérifier aussi mes messages ?",
+        tense: "Present Simple",
+        en: "While you're at it, can you check my messages too?",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Pourquoi est-ce qu'elle relève toujours les erreurs des autres ?",
+        tense: "Present Simple",
+        en: "Why does she always point out other people's mistakes?",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Chaque fois qu'il panique, il s'enfuit.",
+        tense: "Present Simple",
+        en: "Whenever he panics, he runs off.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Tu prends toujours ton temps avant de répondre ?",
+        tense: "Present Simple",
+        en: "Do you always take your time before you answer?",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "En général, on s'arrête de travailler vers six heures.",
+        tense: "Present Simple",
+        en: "We usually call it a day around six.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Après le déjeuner, tout le monde se remet au travail.",
+        tense: "Present Simple",
+        en: "Everyone gets back to work after lunch.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Ses questions déstabilisent toujours les nouveaux candidats.",
+        tense: "Present Simple",
+        en: "His questions always throw new candidates off.",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Pourquoi est-ce qu'ils essaient toujours de dissimuler leurs erreurs ?",
+        tense: "Present Simple",
+        en: "Why do they always try to cover up their mistakes?",
+        reason: "Habitude / fréquence"
+      },
+
+      {
+        fr: "Cette école renvoie les élèves qui trichent.",
+        tense: "Present Simple",
+        en: "This school kicks out students who cheat.",
+        reason: "Situation permanente"
+      },
+
+      // =======================
+      // PRESENT CONTINUOUS
+      // =======================
+
+      {
+        fr: "Pourquoi est-ce qu'elle sourit ?",
+        tense: "Present Continuous",
+        en: "Why is she smiling?",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Je suis en train de chercher mes écouteurs.",
+        tense: "Present Continuous",
+        en: "I am looking for my earphones.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Ils jouent dans le jardin en ce moment.",
+        tense: "Present Continuous",
+        en: "They are playing in the garden at the moment.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Nous ne dormons pas encore.",
+        tense: "Present Continuous",
+        en: "We are not sleeping yet.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Regarde ! Le chat grimpe dans l'arbre.",
+        tense: "Present Continuous",
+        en: "Look! The cat is climbing the tree.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Tu écoutes ce que je dis ?",
+        tense: "Present Continuous",
+        en: "Are you listening to what I'm saying?",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Le vent devient de plus en plus fort.",
+        tense: "Present Continuous",
+        en: "The wind is getting stronger and stronger.",
+        reason: "Situation en cours ou temporaire"
+      },
+      {
+        fr: "Je suis en train de préparer le dîner.",
+        tense: "Present Continuous",
+        en: "I am preparing dinner.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Ils regardent un documentaire en ce moment.",
+        tense: "Present Continuous",
+        en: "They are watching a documentary at the moment.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Pourquoi est-ce que vous courez ?",
+        tense: "Present Continuous",
+        en: "Why are you running?",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Nous travaillons sur un nouveau projet cette semaine.",
+        tense: "Present Continuous",
+        en: "We are working on a new project this week.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Elle vit chez sa sœur pendant quelques semaines.",
+        tense: "Present Continuous",
+        en: "She is living with her sister for a few weeks.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Le niveau de la rivière monte rapidement.",
+        tense: "Present Continuous",
+        en: "The river level is rising quickly.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Je ne porte pas mes lunettes aujourd'hui.",
+        tense: "Present Continuous",
+        en: "I am not wearing my glasses today.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Je suis justement en train de quitter le bureau.",
+        tense: "Present Continuous",
+        en: "I'm just leaving the office.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Désolé, je parle au téléphone.",
+        tense: "Present Continuous",
+        en: "Sorry, I'm talking on the phone.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Attends une seconde, je cherche ton message.",
+        tense: "Present Continuous",
+        en: "Hang on, I'm looking for your message.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Qu'est-ce que tu fabriques ?",
+        tense: "Present Continuous",
+        en: "What are you doing?",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "En ce moment, on refait toute la cuisine.",
+        tense: "Present Continuous",
+        en: "We're renovating the whole kitchen at the moment.",
+        reason: "Situation en cours ou temporaire"
+      },
+
+      {
+        fr: "Les prix augmentent de plus en plus.",
+        tense: "Present Continuous",
+        en: "Prices are going up more and more.",
+        reason: "Situation en cours ou temporaire"
+      },
+      // =======================
+      // PRESENT PERFECT
+      // =======================
+
+      {
+        fr: "Elle n'a jamais conduit une voiture automatique.",
+        tense: "Present Perfect",
+        en: "She has never driven an automatic car.",
+        reason: "Expérience de vie"
+      },
+
+      {
+        fr: "As-tu déjà rencontré son frère ?",
+        tense: "Present Perfect",
+        en: "Have you ever met his brother?",
+        reason: "Expérience de vie"
+      },
+
+      {
+        fr: "J'ai déjà visité Londres.",
+        tense: "Present Perfect",
+        en: "I have already visited London.",
+        reason: "Expérience de vie"
+      },
+
+      {
+        fr: "J'ai déjà terminé mes devoirs.",
+        tense: "Present Perfect",
+        en: "I have already finished my homework.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Nous avons perdu nos billets.",
+        tense: "Present Perfect",
+        en: "We have lost our tickets.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Le professeur vient juste d'arriver.",
+        tense: "Present Perfect",
+        en: "The teacher has just arrived.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Ils ont déjà choisi un restaurant.",
+        tense: "Present Perfect",
+        en: "They have already chosen a restaurant.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Je connais cette chanson depuis des années.",
+        tense: "Present Perfect",
+        en: "I have known this song for years.",
+        reason: "Insistance sur la durée (verbe d'état)"
+      },
+      {
+        fr: "J'ai déjà essayé le parachutisme.",
+        tense: "Present Perfect",
+        en: "I have already tried skydiving.",
+        reason: "Expérience de vie"
+      },
+
+      {
+        fr: "Elle n'a jamais vu la mer.",
+        tense: "Present Perfect",
+        en: "She has never seen the sea.",
+        reason: "Expérience de vie"
+      },
+
+      {
+        fr: "Avez-vous déjà dormi sous une tente ?",
+        tense: "Present Perfect",
+        en: "Have you ever slept in a tent?",
+        reason: "Expérience de vie"
+      },
+
+      {
+        fr: "J'ai oublié mon portefeuille.",
+        tense: "Present Perfect",
+        en: "I have forgotten my wallet.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Quelqu'un a cassé la fenêtre.",
+        tense: "Present Perfect",
+        en: "Someone has broken the window.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Nous avons enfin trouvé la solution.",
+        tense: "Present Perfect",
+        en: "We have finally found the solution.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Elle vient juste de terminer son examen.",
+        tense: "Present Perfect",
+        en: "She has just finished her exam.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Je possède cette voiture depuis dix ans.",
+        tense: "Present Perfect",
+        en: "I have owned this car for ten years.",
+        reason: "Insistance sur la durée (verbe d'état)"
+      },
+
+      {
+        fr: "Tu as déjà raté un avion ?",
+        tense: "Present Perfect",
+        en: "Have you ever missed a flight?",
+        reason: "Expérience de vie"
+      },
+
+      {
+        fr: "Je n'ai jamais mangé de nourriture coréenne.",
+        tense: "Present Perfect",
+        en: "I've never had Korean food.",
+        reason: "Expérience de vie"
+      },
+
+      {
+        fr: "J'ai encore oublié mes écouteurs.",
+        tense: "Present Perfect",
+        en: "I've forgotten my earphones again.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "On a enfin trouvé une place pour se garer.",
+        tense: "Present Perfect",
+        en: "We've finally found a parking spot.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Quelqu'un a pris ma place.",
+        tense: "Present Perfect",
+        en: "Someone has taken my seat.",
+        reason: "Lien / conséquence avec le présent"
+      },
+
+      {
+        fr: "Je connais Marc depuis le lycée.",
+        tense: "Present Perfect",
+        en: "I've known Marc since high school.",
+        reason: "Insistance sur la durée (verbe d'état)"
+      },
+
+
+      // =======================
+      // PRESENT PERFECT CONTINUOUS
+      // =======================
+
+      {
+        fr: "Il pleut depuis ce matin.",
+        tense: "Present Perfect Continuous",
+        en: "It has been raining since this morning.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Je travaille ici depuis trois ans.",
+        tense: "Present Perfect Continuous",
+        en: "I have been working here for three years.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Nous attendons depuis presque une heure.",
+        tense: "Present Perfect Continuous",
+        en: "We have been waiting for almost an hour.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Elle apprend le japonais depuis janvier.",
+        tense: "Present Perfect Continuous",
+        en: "She has been learning Japanese since January.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Ils s'entraînent toute la matinée.",
+        tense: "Present Perfect Continuous",
+        en: "They have been training all morning.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Tu m'attends depuis longtemps ?",
+        tense: "Present Perfect Continuous",
+        en: "Have you been waiting for me for a long time?",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Je lis ce livre depuis une semaine.",
+        tense: "Present Perfect Continuous",
+        en: "I have been reading this book for a week.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Nous rénovons cette maison depuis plusieurs mois.",
+        tense: "Present Perfect Continuous",
+        en: "We have been renovating this house for several months.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Elle parle au téléphone depuis plus d'une heure.",
+        tense: "Present Perfect Continuous",
+        en: "She has been talking on the phone for more than an hour.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "ça fait deux heures qu'on marche",
+        tense: "Present Perfect Continuous",
+        en: "We have been walking for two hours.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Il cuisine depuis ce matin.",
+        tense: "Present Perfect Continuous",
+        en: "He has been cooking since this morning.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Je révise depuis le petit-déjeuner.",
+        tense: "Present Perfect Continuous",
+        en: "I have been studying since breakfast.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Ca fait une heure qu'ils nettoient le garage.",
+        tense: "Present Perfect Continuous",
+        en: "They have been cleaning the garage for an hour.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Ca fait combien de temps que tu travailles sur ce dossier ?",
+        tense: "Present Perfect Continuous",
+        en: "How long have you been working on this file?",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Elle dessine depuis tout l'après-midi.",
+        tense: "Present Perfect Continuous",
+        en: "She has been drawing all afternoon.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Nous faisons la queue depuis quarante minutes.",
+        tense: "Present Perfect Continuous",
+        en: "We have been waiting in line for forty minutes.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Je cherche mon téléphone depuis une demi-heure.",
+        tense: "Present Perfect Continuous",
+        en: "I have been looking for my phone for half an hour.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Ils répètent cette chanson depuis ce matin.",
+        tense: "Present Perfect Continuous",
+        en: "They have been rehearsing this song since this morning.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Je scroll sur TikTok depuis une demi-heure.",
+        tense: "Present Perfect Continuous",
+        en: "I've been scrolling through TikTok for half an hour.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "On essaie de le joindre depuis ce matin.",
+        tense: "Present Perfect Continuous",
+        en: "We've been trying to reach him since this morning.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Elle travaille énormément ces derniers temps.",
+        tense: "Present Perfect Continuous",
+        en: "She's been working a lot lately.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "J'attends ce colis depuis une semaine.",
+        tense: "Present Perfect Continuous",
+        en: "I've been waiting for this package for a week.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Ils cherchent un appartement depuis des mois.",
+        tense: "Present Perfect Continuous",
+        en: "They've been looking for an apartment for months.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Tu joues à ce jeu depuis combien de temps ?",
+        tense: "Present Perfect Continuous",
+        en: "How long have you been playing this game?",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Ca fait un moment que je pense à changer de travail",
+        tense: "Present Perfect Continuous",
+        en: "I've been thinking about changing jobs for a while.",
+        reason: "Insistance sur la durée"
+      },
+
+      {
+        fr: "Il pleut toute la journée.",
+        tense: "Present Perfect Continuous",
+        en: "It's been raining all day.",
+        reason: "Insistance sur la durée"
+      }
+
     ];
 
     const flashcard = document.getElementById("flashcard");
     const frontText = document.getElementById("frontText");
+    const tenseText = document.getElementById("tenseText");
     const backText = document.getElementById("backText");
+    const reasonBox = document.getElementById("reasonBox");
+    const reasonText = document.getElementById("reasonText");
 
     let currentIndex = 0;
     let isFront = true;
 
     function showCard(index) {
-      frontText.textContent = cards[index].fr;
-      backText.textContent = cards[index].en;
+      const card = cards[index];
+
+      frontText.textContent = card.fr;
+      tenseText.textContent = card.tense;
+      backText.textContent = card.en;
+      reasonText.textContent = card.reason;
     }
 
     function nextCard() {
@@ -371,24 +1139,38 @@
       showCard(currentIndex);
     }
 
-    showCard(currentIndex);
-
-    flashcard.addEventListener("click", () => {
+    function handleCardClick() {
       if (isFront) {
         flashcard.classList.add("is-flipped");
+        reasonBox.classList.add("is-visible");
+
         isFront = false;
       } else {
         flashcard.classList.remove("is-flipped");
+        reasonBox.classList.remove("is-visible");
+
         isFront = true;
 
-        // changer au milieu de l'animation (0.7s / 2)
         setTimeout(() => {
           nextCard();
         }, 200);
       }
+    }
+
+    showCard(currentIndex);
+
+    flashcard.addEventListener("click", handleCardClick);
+
+    flashcard.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handleCardClick();
+      }
     });
   </script>
+
   <script src="../theme.js"></script>
+
 </body>
 
 </html>
